@@ -2,6 +2,8 @@
   "name": "hypernote",
   "version": "0.1.0",
   "private": true,
+  "main": "src/electron.js",
+  "homepage": "./",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.5",
     "@testing-library/react": "^11.1.0",
@@ -9,13 +11,17 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.0",
+    "react-split-pane": "^2.0.3",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "nf start -p 3000",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "electron-start": "node src/wait-for-react",
+    "react-start": "react-scripts start"
   },
   "eslintConfig": {
     "extends": [
@@ -34,5 +40,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "electron": "^10.1.5",
+    "foreman": "^3.0.1"
   }
 }
