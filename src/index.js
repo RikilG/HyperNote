@@ -1,11 +1,13 @@
 // renderer.js also
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import Main from './application/Main';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <React.StrictMode>
+        <div style={{height: "100vh"}}>
+            <Main />
+        </div>
+    </React.StrictMode>,
+    document.getElementById('root')
 );
