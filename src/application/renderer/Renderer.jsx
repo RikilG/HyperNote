@@ -1,15 +1,15 @@
 import React from 'react';
 
-import '../css/Renderer.module.css';
+import style from '../css/Renderer.css';
 
 const marked = require('marked');
 
-export default class Viewer extends React.Component {
+export default class Renderer extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            markup: '# Loading...',
+            markup: '',
         }
     }
 
@@ -31,7 +31,7 @@ export default class Viewer extends React.Component {
 
     render() {
         return (
-            <div className="renderer" dangerouslySetInnerHTML={this.getMarkdownText()} />
+            <div className="renderer y-scrollable " dangerouslySetInnerHTML={this.getMarkdownText()} />
         );
     }
 }

@@ -25,7 +25,7 @@ export default class TreeItem extends React.Component {
             <div onClick={this.props.onClick} className="tree-item">
                 {/* {type == 'directory' && expander} */}
                 {/* {this.props.icon} */}
-                <FontAwesomeIcon icon={this.getIcon()} style={{marginRight:"5px"}} />
+                <FontAwesomeIcon icon={this.getIcon()} style={{margin:"0 5px"}} />
                 {this.props.name}
             </div>
         );

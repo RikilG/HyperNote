@@ -2,8 +2,8 @@ import React from 'react';
 import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane'; // ignore error, no types for typescript
 
-import { Navspace } from './Navspace';
-import { Workspace } from './Workspace';
+import Navspace from './Navspace';
+import Workspace from './workspace/Workspace';
 
 import './css/SplitPane.css'
 

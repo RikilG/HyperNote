@@ -17,8 +17,12 @@ export default class Tree extends React.Component {
     }
 
     expandTree = () => {
-        if (this.state.type !== "file")
+        if (this.state.type === "file") { // open the file
+            
+        }
+        else { // toggle the tree (folder)
             this.setState({expanded: !this.state.expanded});
+        }
     }
 
     render() {

@@ -1,12 +1,11 @@
-.body, .renderer {
+.renderer {
     background: #000;
     font-family: Georgia, Palatino, serif;
     color: #EEE;
     line-height: 1;
     padding: 30px;
-    margin:auto;
-    max-width:42em;
     height: 100%;
+    word-wrap: break-word;
 }
 
 h1, h2, h3, h4 {
