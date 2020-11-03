@@ -12,7 +12,7 @@ export default class Workspace extends React.Component {
                     this.props.openFiles &&
                     this.props.openFiles.map((fileObj, idx) => 
                         <Pane minSize="50px" >
-                            <EditorGroup fileObj={fileObj} closeFile={this.props.closeFile} />
+                            <EditorGroup key={fileObj.id} fileObj={fileObj} closeFile={this.props.closeFile} />
                         </Pane>
                     )
                 }

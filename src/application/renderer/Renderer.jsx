@@ -4,6 +4,14 @@ import React from 'react';
 
 const marked = require('marked');
 
+
+let style = {
+    container: {
+        height: "100%",
+        overflowY: "auto",
+    }
+}
+
 export default class Renderer extends React.Component {
     constructor(props) {
         super(props);
@@ -31,7 +39,7 @@ export default class Renderer extends React.Component {
 
     render() {
         return (
-            <div className="renderer y-scrollable " dangerouslySetInnerHTML={this.getMarkdownText()} />
+            <div style={style.container} dangerouslySetInnerHTML={this.getMarkdownText()} />
         );
     }
 }
