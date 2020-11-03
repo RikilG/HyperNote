@@ -5,6 +5,17 @@ import Pane from 'react-split-pane/lib/Pane';
 import Editor from '../editor/Editor';
 import Renderer from '../renderer/Renderer';
 import EditorGroupBar from './EditorGroupBar';
+import FileSystem from '../explorer/FileSystem';
+
+const style = {
+    container: {
+        display: "flex",
+        flexFlow: "column",
+    },
+    fill: {
+        flex: "1",
+    }
+}
 
 export default class EditorGroup extends React.Component {
     constructor(props) {
@@ -13,22 +24,43 @@ export default class EditorGroup extends React.Component {
         this.state = {
             value: '# Hello!',
             showRender: false,
+            modified: false,
+        }
+    }
+
+    componentDidMount() {
+        if (this.props.fileObj) {
+            this.setState({
+                value: FileSystem.readFile(this.props.fileObj.path)
+            });
         }
     }
 
     handleTextChange = (event) => {
-        this.setState({value: event.target.value});
+        this.setState({
+            value: event.target.value,
+            modified: true,
+        });
     }
 
     handleShowRender = () => {
         this.setState({showRender: !this.state.showRender});
     }
 
+    handleClose = () => {
+        this.props.closeFile(this.props.fileObj);
+    }
+
     render() {
         return (
-            <div className="fill-parent">
-                <EditorGroupBar renderVisible={this.state.showRender} handleShowRender={this.handleShowRender} />
-                <SplitPane>
+            <div className="fill-parent" style={style.container}>
+                <EditorGroupBar
+                    renderVisible={this.state.showRender}
+                    handleShowRender={this.handleShowRender}
+                    handleClose={this.handleClose}
+                    filename={this.props.fileObj.name}
+                />
+                <SplitPane style={style.fill}>
                     <Pane minSize="50px">
                         <Editor value={this.state.value} handleChange={this.handleTextChange}/>
                     </Pane>

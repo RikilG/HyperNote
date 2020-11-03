@@ -21,4 +21,11 @@ export default class FileSystem {
         }
         return "No Filesystem";
     }
+
+    static readFile(filepath) {
+        if (window.isElectron) {
+            return window.fs.readFileSync(filepath, {encoding: "utf-8"});
+        }
+        return undefined
+    }
 }

@@ -9,16 +9,17 @@ export default class Tree extends React.Component {
         super(props);
 
         this.state = {
-            name: this.props.name,
-            type: this.props.type,
-            subtree: this.props.subtree,
             expanded: false,
         }
     }
 
     expandTree = () => {
-        if (this.state.type === "file") { // open the file
-            
+        if (this.props.type === "file") { // open the file
+            let file = {
+                name: this.props.name,
+                path: this.props.path,
+            }
+            this.props.openFile(file);
         }
         else { // toggle the tree (folder)
             this.setState({expanded: !this.state.expanded});
@@ -32,7 +33,13 @@ export default class Tree extends React.Component {
                 <div className="explorerTree">
                     {this.props.subtree && this.state.expanded &&
                         this.props.subtree.map(element => 
-                            <Tree name={element['name']} type={element['type']} subtree={element['children']} />
+                            <Tree
+                                name={element.name}
+                                type={element.type}
+                                path={element.path}
+                                subtree={element.children}
+                                openFile={this.props.openFile}
+                            />
                         )
                     }
                 </div>

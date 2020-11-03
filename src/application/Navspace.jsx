@@ -10,7 +10,13 @@ export default class Navspace extends React.Component {
 
         return (
             <div className="y-scrollable fill-parent">
-                <Tree name="src" type="directory" subtree={test['children']} />
+                <Tree
+                    name={test.name}
+                    type={test.type}
+                    path={test.path}
+                    subtree={test.children}
+                    openFile={this.props.openFile}
+                />
             </div>
         );
     }

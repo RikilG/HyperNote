@@ -1,6 +1,6 @@
 import React from 'react';
 
-import style from '../css/Renderer.css';
+// import style from '../css/Renderer.css';
 
 const marked = require('marked');
 
