@@ -1,5 +1,7 @@
 import React from 'react';
 
+import '../css/Renderer.module.css';
+
 const marked = require('marked');
 
 export default class Viewer extends React.Component {
@@ -14,7 +16,7 @@ export default class Viewer extends React.Component {
     componentDidMount() {
         this.setState({
                 interval: setInterval(() => this.setState({
-                    markup: marked(this.props.value, {sanitize: true})
+                    markup: marked(this.props.value)
                 }), 500)
         });
     }
@@ -29,7 +31,7 @@ export default class Viewer extends React.Component {
 
     render() {
         return (
-            <div dangerouslySetInnerHTML={this.getMarkdownText()} />
+            <div className="renderer" dangerouslySetInnerHTML={this.getMarkdownText()} />
         );
     }
 }

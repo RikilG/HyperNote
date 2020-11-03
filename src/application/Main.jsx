@@ -11,7 +11,7 @@ export default class Main extends React.Component {
     render() {
         return (
             <SplitPane split="vertical">
-                <Pane minSize="120px" maxSize="50%" initialSize="20%">
+                <Pane minSize="120px" maxSize="50%" initialSize="180px">
                     <Navspace />
                 </Pane>
                 <Pane minSize="50px">

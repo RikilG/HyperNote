@@ -1,6 +1,16 @@
 .editor {
-    outline: none;
     border: none;
-    width: 98%;
+    outline: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    resize: none;
+    background-color: transparent;
+    width: 97%;
     height: 100%;
+}
+
+.editor:focus {
+    outline: none;
+    box-shadow: none;
 }

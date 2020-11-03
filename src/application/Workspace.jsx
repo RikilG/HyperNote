@@ -1,6 +1,6 @@
 import React from 'react';
 import SplitPane from 'react-split-pane';
-// import Pane from 'react-split-pane/lib/Pane';
+import Pane from 'react-split-pane/lib/Pane';
 
 import Editor from './editor/Editor';
 import Viewer from './viewer/Viewer';
@@ -20,8 +20,12 @@ export class Workspace extends React.Component {
     render() {
         return (
             <SplitPane>
-                <Editor value={this.state.value} handleChange={this.handleChange}/>
-                <Viewer value={this.state.value} />
+                <Pane minSize="50px">
+                    <Editor value={this.state.value} handleChange={this.handleChange}/>
+                </Pane>
+                <Pane minSize="50px">
+                    <Viewer value={this.state.value} />
+                </Pane>
             </SplitPane>
         );
     }

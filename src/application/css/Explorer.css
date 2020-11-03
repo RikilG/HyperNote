@@ -1,0 +1,20 @@
+.explorerTree {
+    margin-left: 10px;
+}
+
+.y-scrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.fill-parent {
+    height: 100%;
+}
+
+.tree-item {
+    cursor: pointer;
+}
+
+.tree-item:hover {
+    background-color: gray;
+}

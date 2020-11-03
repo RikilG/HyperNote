@@ -2,12 +2,12 @@ import React from 'react';
 import '../css/Editor.css'
 
 export default class Editor extends React.Component {
-    constructor(props) {
-        super(props);
-        // this.state = {
-        //     value: 'Get Started!'
-        // };
-    }
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {
+    //         value: 'Get Started!'
+    //     };
+    // }
 
     // handleChange = (event) => {
     //     this.setState({value: event.target.value});
