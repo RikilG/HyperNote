@@ -1,0 +1,14 @@
+body {
+    background: var(--backgroundColor);
+    color: var(--textColor);
+}
+
+.y-scrollable {
+    overflow-y: auto;
+    /* overflow-x: hidden; */
+}
+
+.fill-parent {
+    height: 100%;
+    width: 100%;
+}

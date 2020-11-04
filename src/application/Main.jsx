@@ -2,10 +2,12 @@ import React from 'react';
 import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane'; // ignore error, no types for typescript
 
+import ThemeContextWrapper from './ThemeContext';
 import Navspace from './Navspace';
 import Workspace from './workspace/Workspace';
 
-import './css/SplitPane.css'
+import './css/AppStyle.css';
+import './css/SplitPane.css';
 
 export default class Main extends React.Component {
     constructor(props) {
@@ -40,14 +42,16 @@ export default class Main extends React.Component {
 
     render() {
         return (
-            <SplitPane split="vertical">
-                <Pane minSize="120px" maxSize="50%" initialSize="180px">
-                    <Navspace openFile={this.openFile} />
-                </Pane>
-                <Pane minSize="50px">
-                    <Workspace openFiles={this.state.openFiles} closeFile={this.closeFile} />
-                </Pane>
-            </SplitPane>
+            <ThemeContextWrapper>
+                <SplitPane split="vertical">
+                    <Pane minSize="120px" maxSize="50%" initialSize="180px">
+                        <Navspace openFile={this.openFile} />
+                    </Pane>
+                    <Pane minSize="50px">
+                        <Workspace openFiles={this.state.openFiles} closeFile={this.closeFile} />
+                    </Pane>
+                </SplitPane>
+            </ThemeContextWrapper>
         );
     }
 }
