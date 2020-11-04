@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEye, faEyeSlash, faSave, faWindowClose, faFile, faFileAlt, faFileImage, faColumns } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faSave, faWindowClose, faFile, faColumns } from '@fortawesome/free-solid-svg-icons';
 
 let styles = {
     bar: {
@@ -29,8 +29,8 @@ export default class EditorGroupBar extends React.Component {
                     <span>{this.props.filename}</span>
                 </div>
                 <div style={styles.button} onClick={this.props.handleEditorGroup}>
-                    <FontAwesomeIcon style={styles.icon} icon={this.props.choice === 0 ? faFileAlt : this.props.choice === 1 ? faFileImage : faColumns} />
-                    <span>{this.props.choice === 0 ? "Show Render" : this.props.choice === 1 ? "Show Both" : "Show Editor"}</span>
+                    <FontAwesomeIcon style={styles.icon} icon={this.props.choice === 0 ? faEye : this.props.choice === 1 ? faColumns : faEyeSlash} />
+                    <span>{this.props.choice === 0 ? "Show Render" : this.props.choice === 1 ? "Show Both" : "Hide Render"}</span>
                 </div>
                 <div style={styles.button}>
                     <FontAwesomeIcon style={styles.icon} icon={faSave} />
