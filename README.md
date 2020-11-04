@@ -2,6 +2,11 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## TODO:
+
+- [ ] Give option to toggle b/w renderer and editor (or) split renderer
+- [ ] Provide a default page with info when no files are open (similar to vscode blank tab when no files are open)
+
 ## Available Scripts
 
 In the project directory, you can run:
