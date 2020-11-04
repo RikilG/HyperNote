@@ -20,10 +20,12 @@ const style = {
 export default class EditorGroup extends React.Component {
     constructor(props) {
         super(props);
-        
+
         this.state = {
             value: '# Hello!',
             showRender: false,
+            showEditor: true,
+            currentChoice: 0,
             modified: false,
         }
     }
@@ -43,8 +45,26 @@ export default class EditorGroup extends React.Component {
         });
     }
 
-    handleShowRender = () => {
-        this.setState({showRender: !this.state.showRender});
+    /*handleShowRender = () => {
+        this.setState({ showRender: !this.state.showRender });
+    }
+
+    handleShowEditor = () => {
+        this.setState({ showEditor: !this.state.showEditor });
+    }*/
+
+    handleEditorGroup = () => {
+        let choice = (this.state.currentChoice + 1) % 3;
+        if (choice === 0) {
+            this.setState({ showEditor: true, showRender: false });
+        }
+        else if (choice === 1) {
+            this.setState({ showEditor: false, showRender: true });
+        }
+        else {
+            this.setState({ showEditor: true, showRender: true });
+        }
+        this.setState({ currentChoice: choice });
     }
 
     handleClose = () => {
@@ -55,16 +75,18 @@ export default class EditorGroup extends React.Component {
         return (
             <div className="fill-parent" style={style.container}>
                 <EditorGroupBar
-                    renderVisible={this.state.showRender}
-                    handleShowRender={this.handleShowRender}
+                    choice={this.state.currentChoice}
+                    handleEditorGroup={this.handleEditorGroup}
                     handleClose={this.handleClose}
                     filename={this.props.fileObj.name}
                 />
                 <SplitPane style={style.fill}>
-                    <Pane minSize="50px">
-                        <Editor value={this.state.value} handleChange={this.handleTextChange}/>
-                    </Pane>
-                    {this.state.showRender && 
+                    {this.state.showEditor &&
+                        <Pane minSize="50px">
+                            <Editor value={this.state.value} handleChange={this.handleTextChange} />
+                        </Pane>
+                    }
+                    {this.state.showRender &&
                         <Pane minSize="50px">
                             <Renderer value={this.state.value} />
                         </Pane>
