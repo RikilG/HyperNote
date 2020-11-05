@@ -11,9 +11,10 @@ function createWindow() {
         height: 600,
         webPreferences:{
             nodeIntegration: false,
+            enableRemoteModule: true, // for accessing userData
             preload: path.join(__dirname, "preload.js"),
         },
-        // frame: false,
+        frame: false,
     });
     
     mainWindow.loadURL('http://localhost:3000');
