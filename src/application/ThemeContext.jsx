@@ -14,7 +14,7 @@ export const ThemeContext = React.createContext({
 });
 
 const ThemeContextWrapper = ({ children }) => {
-    const [themeName, setThemeName] = useState("dark");
+    const [themeName, setThemeName] = useState("material");
     const [theme, setTheme] = useState(themes[themeName]);
   
     const changeTheme = (newTheme) => {

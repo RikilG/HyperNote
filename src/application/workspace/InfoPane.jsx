@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { ThemeContext } from '../ThemeContext';
+import themes from '../css/themes';
 
 const InfoPane = (/*{ children }*/) => {
     // const [themeName, setThemeName] = useState("dark");
@@ -12,9 +13,10 @@ const InfoPane = (/*{ children }*/) => {
             height: "100%",
         },
         button: {
-            margin: "5%",
+            margin: "2% 5%",
             display: "block",
             padding: "10px",
+            background: "var(--primaryColor)",
         },
     }
 
@@ -22,11 +24,20 @@ const InfoPane = (/*{ children }*/) => {
         let newTheme = event.target.value;
         changeTheme(newTheme);
     }
+
+    const getThemeButtons = () => {
+        let output = [];
+
+        for (var theme in themes) {
+            output.push(<button key={theme} onClick={handleThemeChange} value={theme} style={style.button}>{theme.charAt(0).toUpperCase() + theme.slice(1)} Theme</button>)
+        }
+
+        return output;
+    }
   
     return (
         <div style={style.container}>
-            <button onClick={handleThemeChange} value="light" style={style.button}>Light Theme</button>
-            <button onClick={handleThemeChange} value="dark" style={style.button}>Dark Theme</button>
+            {getThemeButtons()}
         </div>
     );
 };

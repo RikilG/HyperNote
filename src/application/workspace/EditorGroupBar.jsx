@@ -8,6 +8,7 @@ let styles = {
         flexFlow: "row nowrap",
         justifyContent: "space-evenly",
         padding: "5px",
+        background: "var(--backgroundAccent)",
     },
     icon: {
         margin: "0 5px",

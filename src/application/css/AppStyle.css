@@ -1,6 +1,6 @@
 body {
     background: var(--backgroundColor);
-    color: var(--textColor);
+    color: var(--primaryTextColor);
 }
 
 .y-scrollable {

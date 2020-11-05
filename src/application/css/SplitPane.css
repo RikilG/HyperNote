@@ -1,5 +1,23 @@
+div[data-type="Resizer"] {
+    background: var(--dividerColor);
+    opacity: 1;
+    z-index: 1;
+    box-sizing: border-box;
+    background-clip: padding-box;
+}
+
+div[data-type="Resizer"]:hover {
+    border: 5px solid var(--dividerColor);
+    opacity: 0.3;
+    transition: all 0.5s ease;
+}
+
+/* all the other properties don't seem to work as styles are hardcoded
+    by author in node_modules: need update from author or consider
+    downgrading package to react-split-pane@0.1.92 */
+
 .Resizer {
-    background: var(--textColor);
+    background: var(--textColor) !important;
     opacity: 0.2;
     z-index: 1;
     -moz-box-sizing: border-box;
@@ -18,28 +36,28 @@
 .Resizer.horizontal {
     height: 11px;
     margin: -5px 0;
-    border-top: 5px solid rgba(255, 255, 255, 0);
-    border-bottom: 5px solid rgba(255, 255, 255, 0);
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
     cursor: row-resize;
     width: 100%;
 }
 
 .Resizer.horizontal:hover {
-    border-top: 5px solid rgba(0, 0, 0, 0.5);
-    border-bottom: 5px solid rgba(0, 0, 0, 0.5);
+    border-top: 5px solid var(--textColor);
+    border-bottom: 5px solid var(--textColor);
 }
 
 .Resizer.vertical {
     width: 11px;
     margin: 0 -5px;
-    border-left: 5px solid rgba(255, 255, 255, 0);
-    border-right: 5px solid rgba(255, 255, 255, 0);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
     cursor: col-resize;
 }
 
 .Resizer.vertical:hover {
-    border-left: 5px solid rgba(0, 0, 0, 0.5);
-    border-right: 5px solid rgba(0, 0, 0, 0.5);
+    border-left: 5px solid var(--textColor);
+    border-right: 5px solid var(--textColor);
 }
 
 .Resizer.disabled {

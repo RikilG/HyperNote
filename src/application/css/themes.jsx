@@ -1,21 +1,31 @@
 const themes = {
     dark: {
-        primary: "#1ca086",
-        separatorColor: "rgba(255,255,255,0.20)",
-        textColor: "white",
-        backgroundColor: "#202020", // #121212
-        headerBackgroundColor: "rgba(255,255,255,0.05)",
+        primaryColor: "#8BC34A",
+        accentColor: "#009688",
+        primaryTextColor: "white",
+        backgroundColor: "#303030", // #121212
+        backgroundAccent: "#202020",
         blockquoteColor: "rgba(255,255,255,0.20)",
-        icon: "white",
+        dividerColor: "#808080",
     },
     light: {
-        primary: "#1ca086",
-        separatorColor: "rgba(0,0,0,0.08)",
-        textColor: "black",
+        primaryColor: "#8BC34A",
+        accentColor: "#009688",
+        primaryTextColor: "black",
         backgroundColor: "white",
-        headerBackgroundColor: "#f6f6f6",
+        backgroundAccent: "#e4e4e4",
         blockquoteColor: "rgba(0,0,0,0.80)",
-        icon: "#121212",
+        dividerColor: "#808080",
+    },
+    material: {
+        darkPrimaryColor: "#689F38",
+        primaryColor: "#8BC34A",
+        accentColor: "#795548",
+        backgroundColor: "#DCEDC8", // lightPrimaryColor
+        backgroundAccent: "#BCD0A8", // lightPrimaryColor
+        primaryTextColor: "#212121",
+        secondaryTextColor: "#757575",
+        dividerColor: "#BDBDBD",
     },
 };
   
