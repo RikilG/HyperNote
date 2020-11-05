@@ -3,7 +3,7 @@ import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane'; // ignore error, no types for typescript
 
 import ThemeContextWrapper from './ThemeContext';
-import Navspace from './Navspace';
+import Navspace from './navspace/Navspace';
 import Workspace from './workspace/Workspace';
 
 import './css/AppStyle.css';
