@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import Navbar from './Navbar';
 import Searchbar from './Searchbar';
-import Tree from '../explorer/Tree';
+import Explorer from '../explorer/Explorer';
 import FileSystem from '../explorer/FileSystem';
 
 const style = {
@@ -22,7 +22,7 @@ const Navspace = (props) => {
 
     // let test = FileSystem.getTree('../../../../../KnowledgeBase');
     let test = FileSystem.getTree('./src');
-    const TREE = <Tree
+    /*const TREE = <Tree
             key={test.id}
             id={test.id}
             name={test.name}
@@ -30,12 +30,21 @@ const Navspace = (props) => {
             path={test.path}
             subtree={test.children}
             openFile={props.openFile}
-        />;
+        />;*/
+    const EXPLORER = <Explorer
+        key={test.id}
+        id={test.id}
+        name={test.name}
+        type={test.type}
+        path={test.path}
+        subtree={test.children}
+        openFile={props.openFile}
+    />;
     const SEARCH = <Searchbar />;
 
     const showSelection = () => {
-        switch(selection) {
-            case "tree": return TREE;
+        switch (selection) {
+            case "explorer": return EXPLORER;
             case "search": return SEARCH;
             default: return;
         }

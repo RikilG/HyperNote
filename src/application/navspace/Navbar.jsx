@@ -31,7 +31,7 @@ const Navbar = (props) => {
     return (
         <div style={style.container}>
             <div style={style.menu}>
-                <FontAwesomeIcon style={style.icon} icon={faFolderOpen} onClick={() => props.changeSelection("tree")} />
+                <FontAwesomeIcon style={style.icon} icon={faFolderOpen} onClick={() => props.changeSelection("explorer")} />
                 <FontAwesomeIcon style={style.icon} icon={faSearch} onClick={() => props.changeSelection("search")} />
             </div>
             <div style={style.tools}>
