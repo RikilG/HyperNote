@@ -22,15 +22,6 @@ const Navspace = (props) => {
 
     // let test = FileSystem.getTree('../../../../../KnowledgeBase');
     let test = FileSystem.getTree('./src');
-    /*const TREE = <Tree
-            key={test.id}
-            id={test.id}
-            name={test.name}
-            type={test.type}
-            path={test.path}
-            subtree={test.children}
-            openFile={props.openFile}
-        />;*/
     const EXPLORER = <Explorer
         key={test.id}
         id={test.id}
