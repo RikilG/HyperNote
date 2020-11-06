@@ -1,15 +1,17 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFolderPlus, faPlusSquare } from '@fortawesome/free-solid-svg-icons';
+import { faFolderPlus, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const style = {
     menu: {
         display: "flex",
         flexFlow: "row",
-        flex: "1"
+        flex: "1",
+        borderStyle: 'solid',
+        borderColor: 'black'
     },
     icon: {
-        width: "40%",
+        width: "35%",
         height: "40px",
         padding: "10% 5%",
         cursor: "pointer",
@@ -19,7 +21,7 @@ const style = {
 const TreeToolbar = (props) => {
     return (
         <div style={style.menu}>
-            <FontAwesomeIcon style={style.icon} icon={faPlusSquare} onClick={() => { }} />
+            <FontAwesomeIcon style={style.icon} icon={faPlus} onClick={() => { }} />
             <FontAwesomeIcon style={style.icon} icon={faFolderPlus} onClick={() => { }} />
         </div>
     );

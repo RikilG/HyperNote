@@ -2,14 +2,21 @@
     margin-left: 10px;
 }
 
+.text{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow: ellipsis;
+    width: 100px; /* CHANGE WHEN NAVSPACE WIDTH IS KNOWN */
+}
+
 .tree-item:hover {
     background-color: gray;
 }
 
-.tree-item .container{
+.tree-item .new-icon-container{
     visibility: hidden;
 }
 
-.tree-item:hover .container {
+.tree-item:hover .new-icon-container{
     visibility: visible;
 }
