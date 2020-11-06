@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import themes from './css/themes';
+const { Color } = window.require('custom-electron-titlebar');
 
 const setCSSVariables = (theme) => {
     for (const value in theme) {
@@ -13,7 +14,7 @@ export const ThemeContext = React.createContext({
     changeTheme: () => {}
 });
 
-const ThemeContextWrapper = ({ children }) => {
+const ThemeContextWrapper = ({ children, titlebar }) => {
     const [themeName, setThemeName] = useState("material");
     const [theme, setTheme] = useState(themes[themeName]);
   
@@ -28,7 +29,8 @@ const ThemeContextWrapper = ({ children }) => {
         // }
         if (themes[newTheme]) {
             setTheme(themes[newTheme]);
-            setThemeName(newTheme)
+            setThemeName(newTheme);
+            titlebar.updateBackground(Color.fromHex(themes[newTheme].backgroundAccent));
         }
     };
 
