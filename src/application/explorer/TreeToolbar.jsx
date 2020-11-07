@@ -7,13 +7,14 @@ const style = {
         display: "flex",
         flexFlow: "row",
         flex: "1",
-        borderStyle: 'solid',
-        borderColor: 'black'
+        justifyContent: "space-evenly",
+        borderColor: "var(--backgroundAccent)",
+        marginBottom: '0.3rem',
+        borderTop: "0",
+        borderLeft: "0"
     },
     icon: {
-        width: "35%",
-        height: "40px",
-        padding: "10% 5%",
+        padding: '0.4rem',
         cursor: "pointer",
     }
 }

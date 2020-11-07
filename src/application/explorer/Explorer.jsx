@@ -8,6 +8,7 @@ const style = {
         height: "5px",
         display: "flex",
         flexFlow: "column nowrap",
+        position: "relative"
     }
 }
 const Explorer = (props) => {

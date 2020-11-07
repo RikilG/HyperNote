@@ -6,7 +6,6 @@
     overflow:hidden;
     white-space:nowrap;
     text-overflow: ellipsis;
-    width: 100px; /* CHANGE WHEN NAVSPACE WIDTH IS KNOWN */
 }
 
 .tree-item:hover {

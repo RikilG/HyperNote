@@ -26,7 +26,7 @@ export default class Main extends React.Component {
 
         if (!fileAlreadyOpen) {
             let openFiles = this.state.openFiles.concat(fileObj);
-            this.setState({openFiles: openFiles});
+            this.setState({ openFiles: openFiles });
         }
     }
 
@@ -35,14 +35,14 @@ export default class Main extends React.Component {
         if (index !== -1) {
             let otherFiles = [...this.state.openFiles];
             otherFiles.splice(index, 1);
-            this.setState({openFiles: otherFiles});
+            this.setState({ openFiles: otherFiles });
         }
     }
 
     render() {
         return (
             <SplitPane split="vertical">
-                <Pane minSize="120px" maxSize="50%" initialSize="180px">
+                <Pane minSize="120px" maxSize="50%" initialSize="225px">
                     <Navspace openFile={this.openFile} />
                 </Pane>
                 <Pane minSize="50px">

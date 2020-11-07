@@ -13,12 +13,12 @@ const style = {
     },
     fillFlex: {
         flex: "1",
-        paddingTop: "0.3rem",
+        width: "calc(100% - 35px)"
     }
 }
 
 const Navspace = (props) => {
-    let [selection, setSelection] = useState('search');
+    let [selection, setSelection] = useState('explorer');
 
     // let test = FileSystem.getTree('../../../../../KnowledgeBase');
     let test = FileSystem.getTree('./src');

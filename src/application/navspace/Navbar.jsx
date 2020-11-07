@@ -4,9 +4,9 @@ import { faFolderOpen, faSearch, faCog } from '@fortawesome/free-solid-svg-icons
 
 const style = {
     container: {
+        flex: "0 0 35px",
         height: "100%",
         background: "var(--backgroundAccent)",
-        width: "35px",
         display: "flex",
         flexFlow: "column nowrap",
     },

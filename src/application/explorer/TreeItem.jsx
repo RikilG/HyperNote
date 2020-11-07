@@ -19,7 +19,7 @@ const styles = {
         display: "flex",
         flexFlow: "row nowrap",
         position: "absolute",
-        left: "15%",
+        right: "5px",
         zIndex: '1'
     },
     pageIcon: {
