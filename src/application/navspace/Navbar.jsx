@@ -4,9 +4,9 @@ import { faFolderOpen, faSearch, faCog } from '@fortawesome/free-solid-svg-icons
 
 const style = {
     container: {
+        flex: "0 0 35px",
         height: "100%",
         background: "var(--backgroundAccent)",
-        width: "35px",
         display: "flex",
         flexFlow: "column nowrap",
     },
@@ -31,7 +31,7 @@ const Navbar = (props) => {
     return (
         <div style={style.container}>
             <div style={style.menu}>
-                <FontAwesomeIcon style={style.icon} icon={faFolderOpen} onClick={() => props.changeSelection("tree")} />
+                <FontAwesomeIcon style={style.icon} icon={faFolderOpen} onClick={() => props.changeSelection("explorer")} />
                 <FontAwesomeIcon style={style.icon} icon={faSearch} onClick={() => props.changeSelection("search")} />
             </div>
             <div style={style.tools}>

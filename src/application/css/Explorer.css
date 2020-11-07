@@ -2,10 +2,20 @@
     margin-left: 10px;
 }
 
-.tree-item {
-    cursor: pointer;
+.text{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow: ellipsis;
 }
 
 .tree-item:hover {
     background-color: gray;
+}
+
+.tree-item .new-icon-container{
+    visibility: hidden;
+}
+
+.tree-item:hover .new-icon-container{
+    visibility: visible;
 }
