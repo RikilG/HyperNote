@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import Searchbar from './Searchbar';
 import Explorer from '../explorer/Explorer';
 import FileSystem from '../explorer/FileSystem';
+import UserPreferences from '../settings/UserPreferences';
 
 const style = {
     container: {
@@ -20,8 +21,7 @@ const style = {
 const Navspace = (props) => {
     let [selection, setSelection] = useState('explorer');
 
-    // let test = FileSystem.getTree('../../../../../KnowledgeBase');
-    let test = FileSystem.getTree('./src');
+    let test = FileSystem.getTree(UserPreferences.get('userStorage'));
     const EXPLORER = <Explorer
         key={test.id}
         id={test.id}

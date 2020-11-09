@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import UserPreferences from './settings/UserPreferences';
 
 import themes from './css/themes';
 const { Color } = window.require('custom-electron-titlebar');
@@ -15,22 +16,18 @@ export const ThemeContext = React.createContext({
 });
 
 const ThemeContextWrapper = ({ children, titlebar }) => {
-    const [themeName, setThemeName] = useState("material");
+    const [themeName, setThemeName] = useState(UserPreferences.get('theme'));
     const [theme, setTheme] = useState(themes[themeName]);
+
+    // works only the first time to remove the default black titlebar
+    titlebar.updateBackground(Color.fromHex(themes[themeName].backgroundAccent));
   
     const changeTheme = (newTheme) => {
-        // if (theme === themes.dark) {
-        //     setTheme(themes.light);
-        //     setThemeName("light");
-        // }
-        // else {
-        //     setTheme(themes.dark);
-        //     setThemeName("dark");
-        // }
         if (themes[newTheme]) {
             setTheme(themes[newTheme]);
             setThemeName(newTheme);
             titlebar.updateBackground(Color.fromHex(themes[newTheme].backgroundAccent));
+            UserPreferences.set('theme', newTheme);
         }
     };
 

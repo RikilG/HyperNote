@@ -48,4 +48,20 @@ export default class FileSystem {
         }
         return undefined
     }
+
+    static writeFile(filepath, content) {
+        if (window.isElectron) {
+            return window.require('fs').writeFileSync(filepath, content);
+        }
+    }
+
+    static exists(filepath) {
+        return (window.isElectron && window.require('fs').existsSync(filepath));
+    }
+
+    static newDirectory(folderpath) {
+        if (window.isElectron && !this.exists(folderpath)) {
+            window.require('fs').mkdirSync(folderpath);
+        }
+    }
 }
