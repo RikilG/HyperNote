@@ -33,6 +33,19 @@ const style = {
     },
 }
 
+export const showDialog = (onAccept, onReject, onCancel, setDialog) => {
+    setDialog({
+        visible: true,
+        onAccept: onAccept,
+        onReject: onReject,
+        onCancel: onCancel,
+    });
+}
+
+export const hideDialog = (setDialog) => {
+    setDialog({ visible: false });
+}
+
 const Dialog = (props) => {
     let accept = props.accept || props.config.accept || 'Yes';
     let reject = props.reject || props.config.reject || 'No';

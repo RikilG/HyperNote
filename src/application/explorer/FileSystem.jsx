@@ -70,4 +70,13 @@ export default class FileSystem {
             this.writeFile(filepath, "");
         }
     }
+
+    static browseFolder() { // Async function, returns Promise. take care
+        if (window.isElectron) {
+            const { dialog } = window.require('electron').remote;
+            return dialog.showOpenDialog({
+                properties: ['openDirectory']
+            });
+        }
+    }
 }

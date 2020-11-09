@@ -17,7 +17,7 @@ export default class UserPreferences {
                 this.preferences = JSON.parse(FileSystem.readFile(this.configPath));
             else {
                 this.preferences = this.defaults;
-                FileSystem.writeFile(this.configPath, JSON.stringify(this.defaults));
+                this.setPreferences();
             }
 
             if (!FileSystem.exists(this.preferences.userStorage)) {
@@ -50,6 +50,15 @@ export default class UserPreferences {
         if (contents.error === true) return;
         contents[key] = value || true;
         this.preferences = contents;
-        FileSystem.writeFile(this.configPath, JSON.stringify(contents));
+        this.setPreferences();
+    }
+
+    static setPreferences() {
+        FileSystem.writeFile(this.configPath, JSON.stringify(this.preferences));
+    }
+
+    static resetDefaults() {
+        this.preferences = this.defaults;
+        this.setPreferences();
     }
 }
