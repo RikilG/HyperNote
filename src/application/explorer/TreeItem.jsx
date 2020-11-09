@@ -2,6 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFolderOpen, faFolder, faFile, faCaretDown, faCaretRight, faFolderPlus, faPlus } from '@fortawesome/free-solid-svg-icons';
 // import { faFolderOpen, faFolder, faFile } from '@fortawesome/free-regular-svg-icons';
+import FileSystem from './FileSystem';
 import "../css/Explorer.css";
 const styles = {
     treeItem: {
@@ -38,6 +39,14 @@ export default class TreeItem extends React.Component {
         return faFolder;
     }
 
+    createFile(filepath) {
+        FileSystem.newFile(filepath + "/untitled.txt");
+    }
+
+    createFolder(filepath) {
+        FileSystem.newDirectory(filepath + "/newFolder")
+    }
+
     render() {
         let caret = false;
         if (this.props.type !== "file") {
@@ -56,8 +65,8 @@ export default class TreeItem extends React.Component {
                 </div>
                 {this.props.expanded && this.props.type !== 'file' && (
                     <div style={styles.newIconContainer} className="new-icon-container">
-                        <FontAwesomeIcon style={styles.pageIcon} className="page-icon" icon={faPlus} onClick={(e) => { e.stopPropagation(); }} />
-                        <FontAwesomeIcon style={styles.folderIcon} className="folder-icon" icon={faFolderPlus} onClick={(e) => { e.stopPropagation(); }} />
+                        <FontAwesomeIcon style={styles.pageIcon} className="page-icon" icon={faPlus} onClick={(e) => { e.stopPropagation(); this.createFile(this.props.path); }} />
+                        <FontAwesomeIcon style={styles.folderIcon} className="folder-icon" icon={faFolderPlus} onClick={(e) => { e.stopPropagation(); this.createFolder(this.props.path); }} />
                     </div>)
                 }
             </div>

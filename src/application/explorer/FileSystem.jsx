@@ -9,10 +9,10 @@ export default class FileSystem {
                 path: root,
                 name: path.basename(root),
             };
-    
+
             if (stats.isDirectory()) {
                 tree.type = "directory";
-                tree.children = fs.readdirSync(root).map((child) => FileSystem.getTree(root+'/'+child))
+                tree.children = fs.readdirSync(root).map((child) => FileSystem.getTree(root + '/' + child))
             }
             else {
                 tree.type = "file";
@@ -26,11 +26,11 @@ export default class FileSystem {
         let obj = [tree];
 
         var iterator = 0; // this is going to be your identifier
-        function loop(obj){
-            for(var i in obj){
+        function loop(obj) {
+            for (var i in obj) {
                 var c = obj[i];
-                if(typeof c === 'object'){
-                    if(c.length === undefined){ //c is not an array
+                if (typeof c === 'object') {
+                    if (c.length === undefined) { //c is not an array
                         c.id = iterator;
                         iterator++;
                     }
@@ -44,7 +44,7 @@ export default class FileSystem {
 
     static readFile(filepath) {
         if (window.isElectron) {
-            return window.require('fs').readFileSync(filepath, {encoding: "utf-8"});
+            return window.require('fs').readFileSync(filepath, { encoding: "utf-8" });
         }
         return undefined
     }
@@ -62,6 +62,12 @@ export default class FileSystem {
     static newDirectory(folderpath) {
         if (window.isElectron && !this.exists(folderpath)) {
             window.require('fs').mkdirSync(folderpath);
+        }
+    }
+
+    static newFile(filepath) {
+        if (!this.exists(filepath)) {
+            this.writeFile(filepath, "");
         }
     }
 
