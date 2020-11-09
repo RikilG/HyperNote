@@ -1,22 +1,15 @@
-import React, { useContext, useState } from 'react';
-import { toast } from 'react-toastify';
-import { ThemeContext } from '../ThemeContext';
-import themes from '../css/themes';
+import React, { useState } from 'react';
 
 import Dialog from '../ui/Dialog';
 import Button from '../ui/Button';
+import { toast } from 'react-toastify';
 
 const style = {
     container: {
         display: "flex",
         flexFlow: "column nowrap",
         height: "100%",
-    },
-    button: {
-        margin: "2% 5%",
-        display: "block",
-        padding: "10px",
-        background: "var(--primaryColor)",
+        textAlign: "center",
     },
 }
 
@@ -27,7 +20,6 @@ const InfoPane = (/*{ children }*/) => {
         onReject: () => {},
         onCancel: () => {},
     });
-    const { /*themeName,*/ changeTheme } = useContext(ThemeContext);
 
     const showDialog = (onAccept, onReject, onCancel) => {
         setDialog({
@@ -42,30 +34,20 @@ const InfoPane = (/*{ children }*/) => {
         setDialog({ visible: false });
     }
 
-    const handleThemeChange = (event) => {
-        let newTheme = event.target.getAttribute('value');
-        
+    const handleDialog = () => {
         showDialog(
-            () => {changeTheme(newTheme); hideDialog(); toast("Applied theme: "+newTheme)},
-            hideDialog,
-            hideDialog,
+            () => {toast("Mehheeh!"); hideDialog();}, // onAccept
+            () => {toast("Mary had a little lamb!"); hideDialog();}, // onReject
+            () => {toast("It's not hard! try recollecting the poem."); hideDialog();}, // onCancel
         );
-    }
-
-    const getThemeButtons = () => {
-        let output = [];
-
-        for (var theme in themes) {
-            output.push(<Button key={theme} onClick={handleThemeChange} value={theme} style={style.button}>{theme.charAt(0).toUpperCase() + theme.slice(1)} Theme</Button>)
-        }
-
-        return output;
     }
   
     return (
         <div style={style.container}>
-            {getThemeButtons()}
-            <Dialog config={dialog}>Are you sure?</Dialog>
+            <Button onClick={handleDialog}>Dialog Test</Button>
+            <p>Welcome!</p>
+            <p>Theme options have been migrated to Settings page</p>
+            <Dialog config={dialog}>Does mary have a horse?</Dialog>
         </div>
     );
 };

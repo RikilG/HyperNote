@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFolderOpen, faSearch, faCog } from '@fortawesome/free-solid-svg-icons';
+
+import Settings from '../settings/Settings';
 
 const style = {
     container: {
@@ -28,6 +30,12 @@ const style = {
 }
 
 const Navbar = (props) => {
+    let [showSettings, setShowSettings] = useState(false);
+
+    const toggleSettings = () => {
+        setShowSettings(!showSettings);
+    }
+
     return (
         <div style={style.container}>
             <div style={style.menu}>
@@ -35,8 +43,9 @@ const Navbar = (props) => {
                 <FontAwesomeIcon style={style.icon} icon={faSearch} onClick={() => props.changeSelection("search")} />
             </div>
             <div style={style.tools}>
-                <FontAwesomeIcon style={style.icon} icon={faCog} onClick={() => props.changeSelection("tools")} />
+                <FontAwesomeIcon style={style.icon} icon={faCog} onClick={toggleSettings} />
             </div>
+            {showSettings && <Settings onExit={toggleSettings} />}
         </div>
     );
 };
