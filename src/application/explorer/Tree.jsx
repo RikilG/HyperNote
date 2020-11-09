@@ -23,17 +23,17 @@ export default class Tree extends React.Component {
             this.props.openFile(file);
         }
         else { // toggle the tree (folder)
-            this.setState({expanded: !this.state.expanded});
+            this.setState({ expanded: !this.state.expanded });
         }
     }
 
     render() {
         return (
             <div>
-                <TreeItem key={'item'+this.props.id} type={this.props.type} name={this.props.name} expanded={this.state.expanded} onClick={this.expandTree} />
+                <TreeItem key={'item' + this.props.id} type={this.props.type} name={this.props.name} expanded={this.state.expanded} path={this.props.path} onClick={this.expandTree} />
                 <div className="explorerTree">
                     {this.props.subtree && this.state.expanded &&
-                        this.props.subtree.map(element => 
+                        this.props.subtree.map(element =>
                             <Tree
                                 key={element.id}
                                 id={element.id}
