@@ -5,6 +5,7 @@ import Pane from 'react-split-pane/lib/Pane'; // ignore error, no types for type
 import Navspace from './navspace/Navspace';
 import Workspace from './workspace/Workspace';
 
+import 'react-toastify/dist/ReactToastify.css';
 import './css/AppStyle.css';
 import './css/SplitPane.css';
 

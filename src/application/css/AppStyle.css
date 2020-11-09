@@ -27,3 +27,13 @@ body {
     transition: 0.2s;
     box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.1);
 }
+
+.Toastify__toast--default {
+    background: var(--backgroundAccent);
+    color: var(--primaryTextColor);
+}
+
+.Toastify__toast {
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+}

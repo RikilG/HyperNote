@@ -6,16 +6,16 @@ const themes = {
         backgroundColor: "#303030", // #121212
         backgroundAccent: "#202020",
         blockquoteColor: "rgba(255,255,255,0.20)",
-        dividerColor: "#808080",
+        dividerColor: "#656565",
     },
     light: {
         primaryColor: "#8BC34A",
-        accentColor: "#009688",
+        accentColor: "#809688",
         primaryTextColor: "black",
         backgroundColor: "white",
         backgroundAccent: "#e4e4e4",
         blockquoteColor: "rgba(0,0,0,0.80)",
-        dividerColor: "#808080",
+        dividerColor: "#BDBDBD",
     },
     material: {
         darkPrimaryColor: "#689F38",

@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { toast } from 'react-toastify';
 import { ThemeContext } from '../ThemeContext';
 import themes from '../css/themes';
 
@@ -45,7 +46,7 @@ const InfoPane = (/*{ children }*/) => {
         let newTheme = event.target.getAttribute('value');
         
         showDialog(
-            () => {changeTheme(newTheme); hideDialog();},
+            () => {changeTheme(newTheme); hideDialog(); toast("Applied theme: "+newTheme)},
             hideDialog,
             hideDialog,
         );
