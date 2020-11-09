@@ -1,8 +1,8 @@
 export default class FileSystem {
     static generateTree(root) {
         if (window.isElectron) { // set in preload.js
-            const fs = window.fs;
-            const path = window.path;
+            const fs = window.require('fs');
+            const path = window.require('path');
 
             let stats = fs.lstatSync(root);
             let tree = {
@@ -44,7 +44,7 @@ export default class FileSystem {
 
     static readFile(filepath) {
         if (window.isElectron) {
-            return window.fs.readFileSync(filepath, {encoding: "utf-8"});
+            return window.require('fs').readFileSync(filepath, {encoding: "utf-8"});
         }
         return undefined
     }
