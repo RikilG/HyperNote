@@ -64,4 +64,13 @@ export default class FileSystem {
             window.require('fs').mkdirSync(folderpath);
         }
     }
+
+    static browseFolder() { // Async function, returns Promise. take care
+        if (window.isElectron) {
+            const { dialog } = window.require('electron').remote;
+            return dialog.showOpenDialog({
+                properties: ['openDirectory']
+            });
+        }
+    }
 }

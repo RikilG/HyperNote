@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import Dialog from '../ui/Dialog';
+import Dialog, { showDialog, hideDialog } from '../ui/Dialog';
 import Button from '../ui/Button';
 import { toast } from 'react-toastify';
 
@@ -21,24 +21,12 @@ const InfoPane = (/*{ children }*/) => {
         onCancel: () => {},
     });
 
-    const showDialog = (onAccept, onReject, onCancel) => {
-        setDialog({
-            visible: true,
-            onAccept: onAccept,
-            onReject: onReject,
-            onCancel: onCancel,
-        });
-    }
-
-    const hideDialog = () => {
-        setDialog({ visible: false });
-    }
-
     const handleDialog = () => {
         showDialog(
-            () => {toast("Mehheeh!"); hideDialog();}, // onAccept
-            () => {toast("Mary had a little lamb!"); hideDialog();}, // onReject
-            () => {toast("It's not hard! try recollecting the poem."); hideDialog();}, // onCancel
+            () => {toast("Mehheeh!"); hideDialog(setDialog);}, // onAccept
+            () => {toast("Mary had a little lamb!"); hideDialog(setDialog);}, // onReject
+            () => {toast("It's not hard! try recollecting the poem."); hideDialog(setDialog);}, // onCancel
+            setDialog, // pass the function which changes the dialog properties
         );
     }
   
