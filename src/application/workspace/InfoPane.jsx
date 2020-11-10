@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import Dialog, { showDialog, hideDialog } from '../ui/Dialog';
 import Button from '../ui/Button';
+import Tooltip from '../ui/Tooltip';
 import { toast } from 'react-toastify';
 
 const style = {
@@ -32,7 +33,9 @@ const InfoPane = (/*{ children }*/) => {
   
     return (
         <div style={style.container}>
-            <Button onClick={handleDialog}>Dialog Test</Button>
+            <Tooltip value="Mary's lamb!">
+                <Button onClick={handleDialog}>Dialog Test</Button>
+            </Tooltip>
             <p>Welcome!</p>
             <p>Theme options have been migrated to Settings page</p>
             <Dialog config={dialog}>Does mary have a horse?</Dialog>

@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFolderOpen, faSearch, faCog } from '@fortawesome/free-solid-svg-icons';
 
 import Settings from '../settings/Settings';
+import Tooltip from '../ui/Tooltip';
 
 const style = {
     container: {
@@ -39,11 +40,17 @@ const Navbar = (props) => {
     return (
         <div style={style.container}>
             <div style={style.menu}>
-                <FontAwesomeIcon style={style.icon} icon={faFolderOpen} onClick={() => props.changeSelection("explorer")} />
-                <FontAwesomeIcon style={style.icon} icon={faSearch} onClick={() => props.changeSelection("search")} />
+                <Tooltip value="Explorer" position="right">
+                    <FontAwesomeIcon style={style.icon} icon={faFolderOpen} onClick={() => props.changeSelection("explorer")} />
+                </Tooltip>
+                <Tooltip value="Search" position="right">
+                    <FontAwesomeIcon style={style.icon} icon={faSearch} onClick={() => props.changeSelection("search")} />
+                </Tooltip>
             </div>
             <div style={style.tools}>
-                <FontAwesomeIcon style={style.icon} icon={faCog} onClick={toggleSettings} />
+                <Tooltip value="Settings" position="right">
+                    <FontAwesomeIcon style={style.icon} icon={faCog} onClick={toggleSettings} />
+                </Tooltip>
             </div>
             {showSettings && <Settings onExit={toggleSettings} />}
         </div>
