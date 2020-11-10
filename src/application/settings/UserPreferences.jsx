@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import FileSystem from '../explorer/FileSystem';
 // import { toast } from 'react-toastify';
 
@@ -46,6 +47,10 @@ export default class UserPreferences {
     }
    
     static set(key, value) {
+        if (key === 'userStorage' && typeof value !== "string") {
+            toast.error("Tryin to store true again?!", { autoClose: false });
+            return;
+        }
         let contents = this.getPreferences();
         if (contents.error === true) return;
         contents[key] = value || true;
