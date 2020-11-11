@@ -51,8 +51,9 @@ const Pomodoro = (props) => {
             path: id,
             id: id,
             inApp: true,
-            page: <PomodoroPage />,
+            page: undefined,
         }
+        task.page = <PomodoroPage winObj={task} />;
         openWindow(task);
     }
 
