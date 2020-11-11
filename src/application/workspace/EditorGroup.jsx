@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane';
 
+import WindowContext from '../WindowContext';
 import Editor from '../editor/Editor';
 import Renderer from '../renderer/Renderer';
 import EditorGroupBar from './EditorGroupBar';
@@ -17,82 +18,54 @@ const style = {
     }
 }
 
-export default class EditorGroup extends React.Component {
-    constructor(props) {
-        super(props);
+const EditorGroup = (props) => {
+    const { closeWindow } = useContext(WindowContext);
+    let [value, setValue] = useState('# Loading...');
+    let [modified, setModified] = useState(false);
+    let [currentChoice, setCurrentChoice] = useState(0);
 
-        this.state = {
-            value: '# Hello!',
-            showRender: false,
-            showEditor: true,
-            currentChoice: 0,
-            modified: false,
+    useEffect(() => {
+        if (props.fileObj) {
+            setValue(FileSystem.readFile(props.fileObj.path));
         }
+    }, [props.fileObj]) // runs ony once, componentDidMount or when props change
+
+    const handleTextChange = (event) => {
+        setValue(event.target.value);
+        setModified(true);
     }
 
-    componentDidMount() {
-        if (this.props.fileObj) {
-            this.setState({
-                value: FileSystem.readFile(this.props.fileObj.path)
-            });
-        }
+    const handleEditorGroup = () => {
+        let choice = (currentChoice + 1) % 3;
+        setCurrentChoice(choice);
     }
 
-    handleTextChange = (event) => {
-        this.setState({
-            value: event.target.value,
-            modified: true,
-        });
+    const handleClose = () => {
+        closeWindow(props.fileObj);
     }
 
-    /*handleShowRender = () => {
-        this.setState({ showRender: !this.state.showRender });
-    }
-
-    handleShowEditor = () => {
-        this.setState({ showEditor: !this.state.showEditor });
-    }*/
-
-    handleEditorGroup = () => {
-        let choice = (this.state.currentChoice + 1) % 3;
-        if (choice === 0) {
-            this.setState({ showEditor: true, showRender: false });
-        }
-        else if (choice === 1) {
-            this.setState({ showEditor: false, showRender: true });
-        }
-        else {
-            this.setState({ showEditor: true, showRender: true });
-        }
-        this.setState({ currentChoice: choice });
-    }
-
-    handleClose = () => {
-        this.props.closeFile(this.props.fileObj);
-    }
-
-    render() {
-        return (
-            <div className="fill-parent" style={style.container}>
-                <EditorGroupBar
-                    choice={this.state.currentChoice}
-                    handleEditorGroup={this.handleEditorGroup}
-                    handleClose={this.handleClose}
-                    filename={this.props.fileObj.name}
-                />
-                <SplitPane style={style.fill}>
-                    {this.state.showEditor &&
-                        <Pane minSize="50px">
-                            <Editor value={this.state.value} handleChange={this.handleTextChange} />
-                        </Pane>
-                    }
-                    {this.state.showRender &&
-                        <Pane minSize="50px">
-                            <Renderer value={this.state.value} />
-                        </Pane>
-                    }
-                </SplitPane>
-            </div>
-        );
-    }
+    return (
+        <div className="fill-parent" style={style.container}>
+            <EditorGroupBar
+                choice={currentChoice}
+                handleEditorGroup={handleEditorGroup}
+                handleClose={handleClose}
+                filename={props.fileObj.name}
+            />
+            <SplitPane style={style.fill}>
+                {(currentChoice === 0 || currentChoice === 2) &&
+                    <Pane minSize="50px">
+                        <Editor value={value} handleChange={handleTextChange} />
+                    </Pane>
+                }
+                {(currentChoice === 1 || currentChoice === 2) &&
+                    <Pane minSize="50px">
+                        <Renderer value={value} />
+                    </Pane>
+                }
+            </SplitPane>
+        </div>
+    );
 }
+
+export default EditorGroup;

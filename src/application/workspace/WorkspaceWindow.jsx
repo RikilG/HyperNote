@@ -6,7 +6,7 @@ const WorkspaceWindow = (props) => {
         {
             props.fileObj.inApp
             ? props.fileObj.page
-            : <EditorGroup key={props.fileObj.id} fileObj={props.fileObj} closeFile={props.closeFile} />
+            : <EditorGroup key={props.fileObj.id} fileObj={props.fileObj} />
         }
         </div>
     );

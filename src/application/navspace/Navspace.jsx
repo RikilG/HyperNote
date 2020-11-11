@@ -30,10 +30,9 @@ const Navspace = (props) => {
         type={test.type}
         path={test.path}
         subtree={test.children}
-        openFile={props.openFile}
     />;
     const SEARCH = <Searchbar />;
-    const POMODORO = <Pomodoro openTask={props.openFile} />
+    const POMODORO = <Pomodoro />
 
     const showSelection = () => {
         switch (selection) {

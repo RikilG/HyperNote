@@ -1,8 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Tooltip from '../../ui/Tooltip';
 import PomodoroPage from './PomodoroPage';
+import WindowContext from '../../WindowContext';
 
 const style = {
     container: {
@@ -40,6 +41,7 @@ const style = {
 
 const Pomodoro = (props) => {
     let [ taskList, setTaskList ] = useState(['Task1', "Task2", 'Task3']);
+    const { openWindow } = useContext(WindowContext);
 
     const handleTaskOpen = (e) => {
         let name = e.currentTarget.innerHTML;
@@ -51,7 +53,7 @@ const Pomodoro = (props) => {
             inApp: true,
             page: <PomodoroPage />,
         }
-        props.openTask(task);
+        openWindow(task);
     }
 
     return (
