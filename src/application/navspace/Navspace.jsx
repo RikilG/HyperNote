@@ -5,6 +5,7 @@ import Searchbar from './Searchbar';
 import Explorer from '../explorer/Explorer';
 import FileSystem from '../explorer/FileSystem';
 import UserPreferences from '../settings/UserPreferences';
+import Pomodoro from '../addons/pomodoro/Pomodoro';
 
 const style = {
     container: {
@@ -32,11 +33,13 @@ const Navspace = (props) => {
         openFile={props.openFile}
     />;
     const SEARCH = <Searchbar />;
+    const POMODORO = <Pomodoro openTask={props.openFile} />
 
     const showSelection = () => {
         switch (selection) {
             case "explorer": return EXPLORER;
             case "search": return SEARCH;
+            case "pomodoro": return POMODORO;
             default: return;
         }
     }

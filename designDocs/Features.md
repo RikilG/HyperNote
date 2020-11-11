@@ -11,6 +11,7 @@
   - Day Tracker (shift to sheets later)
   - Day log (integrated with day tracker but also seprable)
   - Trello type Project boards
+  - Pomodoro timer
 
 ### Medium Priority
 
