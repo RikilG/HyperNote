@@ -1,26 +1,29 @@
-import React from 'react';
+import { useContext } from 'react';
 import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane';
 
-import EditorGroup from './EditorGroup';
+import WorksapceWindow from './WorkspaceWindow';
 import InfoPane from './InfoPane';
+import WindowContext from '../WindowContext';
 
-export default class Workspace extends React.Component {
-    render() {
-        return (
-            <SplitPane split="horizontal">
-                {
-                    (this.props.openFiles && this.props.openFiles.length > 0)
-                        ? this.props.openFiles.map((fileObj, idx) => 
-                            <Pane minSize="50px" key={fileObj.id} >
-                                <EditorGroup key={fileObj.id} fileObj={fileObj} closeFile={this.props.closeFile} />
-                            </Pane>
-                        )
-                        : [<Pane minSize="50px" key={0}>
-                            <InfoPane />
-                        </Pane>]
-                }
-            </SplitPane>
-        );
-    }
+const Workspace = () => {
+    const { windowList } = useContext(WindowContext);
+
+    return (
+        <SplitPane split="horizontal">
+            {
+                (windowList && windowList.length > 0)
+                    ? windowList.map((fileObj, idx) => 
+                        <Pane minSize="50px" key={fileObj.id} >
+                            <WorksapceWindow key={fileObj.id} fileObj={fileObj} />
+                        </Pane>
+                    )
+                    : [<Pane minSize="50px" key={0}>
+                        <InfoPane />
+                    </Pane>]
+            }
+        </SplitPane>
+    );
 }
+
+export default Workspace;

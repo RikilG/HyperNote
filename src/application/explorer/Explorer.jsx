@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import TreeToolbar from './TreeToolbar';
 import Tree from './Tree';
+import WindowContext from '../WindowContext';
 
 const style = {
     explorer: {
@@ -12,6 +13,7 @@ const style = {
     }
 }
 const Explorer = (props) => {
+    const { openWindow } = useContext(WindowContext);
     return (
         <div style={style.explorer}>
             <TreeToolbar />
@@ -22,7 +24,7 @@ const Explorer = (props) => {
                 type={props.type}
                 path={props.path}
                 subtree={props.subtree}
-                openFile={props.openFile}
+                openFile={openWindow}
             />
         </div>
     );

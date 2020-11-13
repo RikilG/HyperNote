@@ -82,6 +82,7 @@ const Tooltip = (props) => {
             className="tooltip-wrapper"
             onMouseEnter={onShowTooltip}
             onMouseLeave={onHideTooltip}
+            style={props.style}
         >
             {props.children}
             <div
