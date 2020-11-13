@@ -8,6 +8,7 @@ import Appearance from './Appearance';
 import Core from './Core';
 import Modal from '../ui/Modal';
 import UserPreferences from './UserPreferences';
+import '../css/Settings.css';
 
 const style = {
     closeButton: {
@@ -29,27 +30,10 @@ const style = {
         height: "100%",
         borderRight: "3px solid var(--primaryColor)",
     },
-    category: {
-        padding: "0.4rem 0.2rem",
-        fontSize: "1.2rem",
-        borderBottom: "1px solid var(--primaryColor)",
-        cursor: "pointer",
-    },
-    activeCategory: {
-        background: "var(--primaryColor)",
-    },
     categoryOptions: {
         padding: "0.5rem",
         flex: "1",
     },
-    resetDefaults: {
-        color: "red",
-        fontSize: "1rem",
-        padding: "0.4rem 1rem",
-        fontWeight: "bold",
-        cursor: "pointer",
-        borderTop: "1px solid var(--primaryColor)",
-    }
 }
 
 const Settings = (props) => {
@@ -86,7 +70,13 @@ const Settings = (props) => {
     const handleResetDefaults = () => {
         UserPreferences.resetDefaults();
         props.onExit();
-        toast.warning('Application restart required', { autoClose: false });
+        toast.warning('Application restart required ("Reload App" from settings)', { autoClose: false });
+    }
+
+    const handleReload = () => {
+        if (window.isElectron) {
+            window.require('electron').remote.getCurrentWindow().reload();
+        }
     }
 
     return (
@@ -94,15 +84,15 @@ const Settings = (props) => {
             <div style={style.container}>
                 <div style={style.categories}>
                     {categories.map((category, ind) => {
-                        let customStyle;
-                        if (category === currentCategory) customStyle = {...style.category, ...style.activeCategory};
-                        else customStyle = style.category;
-                        return <div key={ind} value={category} style={customStyle} onClick={setCategory}>
+                        let customStyle = "category";
+                        if (category === currentCategory) customStyle += " active";
+                        return <div key={ind} value={category} className={customStyle} onClick={setCategory}>
                         {category}
                         </div>;
                     })}
                     <div style={{display: "flex", flexFlow: "column", justifyContent: "flex-end", flex: "1"}}>
-                        <div style={style.resetDefaults} onClick={handleDialog}>Reset Defaults</div>
+                        <div className="warnCategory" onClick={handleDialog}>Reset Defaults</div>
+                        <div className="warnCategory" onClick={handleReload}>Reload App</div>
                     </div>
                 </div>
                 <div style={style.categoryOptions}>{loadCurrentCategory()}</div>

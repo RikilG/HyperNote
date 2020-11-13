@@ -7,6 +7,9 @@ let mainWindow;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
+        title: "Hypernote",
+        backgroundColor: "#202020",
+        show: false,
         width: 800, 
         height: 600,
         webPreferences:{
@@ -23,6 +26,11 @@ function createWindow() {
     mainWindow.on('closed', function () {
         mainWindow = null
     })
+
+    mainWindow.on('ready-to-show', function() { 
+        mainWindow.show(); 
+        mainWindow.focus(); 
+    });
 }
     
 app.on('ready', createWindow);

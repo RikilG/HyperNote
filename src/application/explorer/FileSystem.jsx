@@ -1,10 +1,20 @@
+import { toast } from 'react-toastify';
+
 export default class FileSystem {
     static generateTree(root) {
         if (window.isElectron) { // set in preload.js
             const fs = window.require('fs');
             const path = window.require('path');
 
-            let stats = fs.lstatSync(root);
+            let stats;
+            try {
+                stats = fs.lstatSync(root);
+            }
+            catch (err) {
+                console.log(err);
+                toast.error("FAILED TO RETRIVE FILE TREE", { autoClose: false });
+                return { path: root, name: "FAILED TO RETRIVE FILE TREE", type: "file" };
+            }
             let tree = {
                 path: root,
                 name: path.basename(root),
@@ -12,7 +22,14 @@ export default class FileSystem {
 
             if (stats.isDirectory()) {
                 tree.type = "directory";
-                tree.children = fs.readdirSync(root).map((child) => FileSystem.getTree(root + '/' + child))
+                try {
+                    tree.children = fs.readdirSync(root).map((child) => FileSystem.getTree(root + '/' + child));
+                }
+                catch (err) {
+                    console.log(err);
+                    toast.error("FAILED TO RETRIVE SUB-TREE", { autoClose: false });
+                    tree.children = [{ path: root, name: "FAILED TO RETRIVE SUB-TREE", type: "file" }];
+                }
             }
             else {
                 tree.type = "file";
@@ -44,39 +61,76 @@ export default class FileSystem {
 
     static readFile(filepath) {
         if (window.isElectron) {
-            return window.require('fs').readFileSync(filepath, { encoding: "utf-8" });
+            try {
+                return window.require('fs').readFileSync(filepath, { encoding: "utf-8" });
+            }
+            catch (err) {
+                console.log(err);
+                toast.error("COULDN'T READ FILE", { autoClose: false });
+                return "COULDN'T READ FILE";
+            }
         }
         return undefined
     }
 
     static writeFile(filepath, content) {
         if (window.isElectron) {
-            return window.require('fs').writeFileSync(filepath, content);
+            try {
+                return window.require('fs').writeFileSync(filepath, content);
+            }
+            catch (err) {
+                console.log(err);
+                toast.error("COULDN'T WRITE FILE", { autoClose: false });
+            }
         }
     }
 
     static exists(filepath) {
-        return (window.isElectron && window.require('fs').existsSync(filepath));
+        try {
+            return (window.isElectron && window.require('fs').existsSync(filepath));
+        }
+        catch (err) {
+            console.log(err);
+            toast.error(err, { autoClose: false });
+        }
     }
 
     static newDirectory(folderpath) {
         if (window.isElectron && !this.exists(folderpath)) {
-            window.require('fs').mkdirSync(folderpath);
+            try {
+                window.require('fs').mkdirSync(folderpath);
+            }
+            catch (err) {
+                console.log(err);
+                toast.error("COULDN'T CREATE DIRECTORY", { autoClose: false });
+            }
         }
     }
 
     static newFile(filepath) {
         if (!this.exists(filepath)) {
-            this.writeFile(filepath, "");
+            try {
+                this.writeFile(filepath, "");
+            }
+            catch (err) {
+                console.log(err);
+                toast.error("COULDN'T WRITE FILE", { autoClose: false });
+            }
         }
     }
 
     static browseFolder() { // Async function, returns Promise. take care
         if (window.isElectron) {
-            const { dialog } = window.require('electron').remote;
-            return dialog.showOpenDialog({
-                properties: ['openDirectory']
-            });
+            try {
+                const { dialog } = window.require('electron').remote;
+                return dialog.showOpenDialog({
+                    properties: ['openDirectory']
+                });
+            }
+            catch (err) {
+                console.log(err);
+                toast.error("ERROR WHILE OPENING NATIVE DIALOG", { autoClose: false });
+            }
         }
     }
 }

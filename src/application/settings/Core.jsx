@@ -35,14 +35,22 @@ const Core = (props) => {
 
     const handleStorageChange = () => {
         FileSystem.browseFolder()
-            .then(response => response.filePaths[0])
-            .then(path => {
-                setUserStorage(path);
-                UserPreferences.set('userStorage', path);
-                toast('Storage path updated');
-                toast.warning("Application restart required to update Workspace", { autoClose: false });
+            .then(response => {
+                if (response.cancelled) return userStorage; // the old path
+                return response.filePaths[0];
             })
-        setUserStorage('Select a folder!')
+            .then(path => {
+                if (typeof path === "undefined") return;
+                else if (typeof path !== "string") {
+                    toast.error("Invalid path encountered. Please try again!");
+                }
+                else if (path !== userStorage) { // new path selected
+                    setUserStorage(path);
+                    UserPreferences.set('userStorage', path);
+                    toast('Storage path updated');
+                    toast.warning("Application restart required ('Reload App' from settings)", { autoClose: false });
+                }
+            })
     }
 
     return (
