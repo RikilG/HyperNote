@@ -33,7 +33,7 @@ const Tooltip = (props) => {
 
         if (align === "mouse") {
             x = e.clientX - 20; // 20 to take care of navbar
-            y = e.clientY - titlebarHeight;
+            y = e.clientY - titlebarHeight + 10; // 20 to shift tooltip below mouse
         }
         else if (align === "right") setRight();
         else if (align === "top") setTop();

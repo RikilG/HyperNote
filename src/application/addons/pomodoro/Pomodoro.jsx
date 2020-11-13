@@ -47,10 +47,9 @@ const Pomodoro = (props) => {
         let name = e.currentTarget.innerHTML;
         let id = `pomodoro/${name}`
         let task = {
+            addon: "pomodoro",
             name: name,
-            path: id,
             id: id,
-            inApp: true,
             page: undefined,
         }
         task.page = <PomodoroPage winObj={task} />;
