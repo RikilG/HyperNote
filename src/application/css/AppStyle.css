@@ -62,7 +62,7 @@ body {
 }
 
 .tooltip-wrapper {
-    display: inline-block;
+    display: block;
 }
 
 .tooltip-wrapper:hover .tooltip {
