@@ -3,6 +3,7 @@ import React from 'react';
 import TreeItem from './TreeItem';
 
 import '../css/Explorer.css';
+import EditorGroup from '../workspace/EditorGroup';
 
 export default class Tree extends React.Component {
     constructor(props) {
@@ -16,10 +17,13 @@ export default class Tree extends React.Component {
     expandTree = () => {
         if (this.props.type === "file") { // open the file
             let file = {
+                addon: "notes",
                 name: this.props.name,
                 path: this.props.path,
                 id: this.props.id,
+                page: undefined,
             }
+            file.page = <EditorGroup key={file.id} fileObj={file} />
             this.props.openFile(file);
         }
         else { // toggle the tree (folder)

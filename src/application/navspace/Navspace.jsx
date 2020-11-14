@@ -22,7 +22,7 @@ const style = {
 const Navspace = (props) => {
     let [selection, setSelection] = useState('explorer');
 
-    let test = FileSystem.getTree(UserPreferences.get('userStorage'));
+    let test = FileSystem.getTree(UserPreferences.get('noteStorage'));
     const EXPLORER = <Explorer
         key={test.id}
         id={test.id}
