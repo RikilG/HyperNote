@@ -16,7 +16,7 @@ const Explorer = (props) => {
     const { openWindow } = useContext(WindowContext);
     return (
         <div style={style.explorer}>
-            <TreeToolbar />
+            <TreeToolbar path={props.path} />
             <Tree
                 key={props.id}
                 id={props.id}

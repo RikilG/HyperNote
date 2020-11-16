@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane';
+import { toast } from 'react-toastify';
 
-import WindowContext from '../WindowContext';
 import Editor from '../editor/Editor';
 import Renderer from '../renderer/Renderer';
 import EditorGroupBar from './EditorGroupBar';
@@ -19,7 +19,6 @@ const style = {
 }
 
 const EditorGroup = (props) => {
-    const { closeWindow } = useContext(WindowContext);
     let [value, setValue] = useState('# Loading...');
     let [modified, setModified] = useState(false);
     let [currentChoice, setCurrentChoice] = useState(0);
@@ -40,8 +39,13 @@ const EditorGroup = (props) => {
         setCurrentChoice(choice);
     }
 
-    const handleClose = () => {
-        closeWindow(props.fileObj);
+    const handleSave = () => {
+        if (!modified) {
+            return;
+        }
+        else {
+            toast("File save functionality not yet done :)");
+        }
     }
 
     return (
@@ -49,8 +53,8 @@ const EditorGroup = (props) => {
             <EditorGroupBar
                 choice={currentChoice}
                 handleEditorGroup={handleEditorGroup}
-                handleClose={handleClose}
-                filename={props.fileObj.name}
+                fileObj={props.fileObj}
+                handleSave={handleSave}
             />
             <SplitPane style={style.fill}>
                 {(currentChoice === 0 || currentChoice === 2) &&

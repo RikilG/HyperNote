@@ -133,4 +133,28 @@ export default class FileSystem {
             }
         }
     }
+
+    static join(basename, filename) {
+        if (window.isElectron) {
+            return window.require('path').join(basename, filename);
+        }
+    }
+
+    static rename(oldpath, newpath) {
+        if (window.isElectron) {
+            try {
+                window.require('fs').renameSync(oldpath, newpath);
+            }
+            catch (err) {
+                console.log(err);
+                toast.error("ERROR WHILE RENAMING FILE", { autoClose: false });
+            }
+        }
+    }
+
+    static dirname(filepath) {
+        if (window.isElectron) {
+            return window.require('path').dirname(filepath);
+        }
+    }
 }

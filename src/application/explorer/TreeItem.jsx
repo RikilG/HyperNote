@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFolderOpen, faFolder, faFile, faCaretDown, faCaretRight, faFolderPlus, faPlus } from '@fortawesome/free-solid-svg-icons';
 // import { faFolderOpen, faFolder, faFile } from '@fortawesome/free-regular-svg-icons';
-import FileSystem from './FileSystem';
+
 import "../css/Explorer.css";
 import Tooltip from '../ui/Tooltip';
+import TreeTextbox from './TreeTextbox';
 
 const styles = {
     treeItem: {
@@ -34,81 +35,23 @@ const styles = {
         marginLeft: "10px"
     }
 }
+
 const TreeItem = (props) => {
-
     let [textbox, setTextbox] = useState(false);
-    let [name, setName] = useState("");
     let [clickEvent, setClickEvent] = useState("");
-    const [path, setPath] = useState(props.path);
-
-    const node = useRef();
-
-    useEffect(() => {
-        // add when mounted
-        document.addEventListener("mousedown", handleClick);
-        // return function to be called when unmounted
-        return () => {
-            document.removeEventListener("mousedown", handleClick);
-        };
-    });
+    let [caret, setCaret] = useState(false);
 
     const getIcon = () => {
         if (props.type === "file") return faFile;
         if (props.expanded === true) return faFolderOpen;
         return faFolder;
     }
-
-    const handleChange = (event) => {
-        event.stopPropagation();
-        setName(event.target.value);
-        if (clickEvent === 'file' && event.target.value.includes(".")) {
-            let filename = event.target.value;
-            let splitstring = filename.split(".");
-            let substring = splitstring[splitstring.length - 1];
-            switch (substring) {
-                case 'txt': case 'doc': case 'docx':
-                case 'pdf': case 'odt': case 'rtf':
-                case 'tex': case 'wpd': case 'c':
-                case 'pl': case 'class': case 'cpp':
-                case 'h': case 'java': case 'py':
-                case 'sh': case 'swift': case 'vb':
-                case 'php': case 'css': case 'html':
-                case 'js': case 'jpeg': case 'png':
-                case 'svg': case 'csv':
-                    setTextbox(false);
-                    FileSystem.newFile(path + '\\' + filename);
-                default:
-            }
+    
+    useEffect(() => {
+        if (props.type !== "file") {
+            setCaret(props.expanded ? faCaretDown : faCaretRight);
         }
-    }
-
-    const keyPress = (event) => {
-        if (event.key === 'Enter') {
-            setTextbox(false);
-            if (clickEvent === 'file')
-                FileSystem.newFile(path + '\\' + name);
-            else
-                FileSystem.newDirectory(path + '\\' + name);
-        }
-    }
-
-    const handleClick = e => {
-        if (node.current.contains(e.target)) {
-            return;
-        }
-        setTextbox(false);
-        if (name !== "") {
-            if (clickEvent === 'file')
-                FileSystem.newFile(path + '\\' + name);
-            else
-                FileSystem.newDirectory(path + '\\' + name);
-        }
-    };
-
-    let caret = false;
-    if (props.type !== "file") {
-        caret = (props.expanded ? faCaretDown : faCaretRight)
-    }
+    }, [props.expanded, props.type])
 
     return (
         <Tooltip value={props.name} position="mouse">
@@ -129,16 +72,7 @@ const TreeItem = (props) => {
                         </div>)
                     }
                 </div>
-                <div ref={node}>
-                    {textbox && ( //Require: Bugfix to follow file naming conventions
-                        <input
-                            type="text"
-                            onChange={handleChange}
-                            onKeyDown={keyPress}
-                        />
-                    )
-                    }
-                </div>
+                <TreeTextbox path={props.path} textbox={textbox} setTextbox={setTextbox} clickEvent={clickEvent} />
             </div>
         </Tooltip>
     );
