@@ -3,8 +3,8 @@ import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane';
 import { toast } from 'react-toastify';
 
-import Editor from '../editor/Editor';
-import Renderer from '../renderer/Renderer';
+import Editor from './Editor';
+import Renderer from './Renderer';
 import EditorGroupBar from './EditorGroupBar';
 import FileSystem from '../explorer/FileSystem';
 

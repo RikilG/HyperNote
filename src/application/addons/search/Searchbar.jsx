@@ -2,7 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
-import Textbox from '../ui/Textbox';
+import Textbox from '../../ui/Textbox';
 
 let style = {
     container: {

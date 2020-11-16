@@ -1,56 +1,132 @@
-# Getting Started with Create React App
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<br />
+<p align="center">
+  <!-- <a href="https://github.com/RikilG/HyperNote">
+    <img src="images/logo.png" alt="Logo" width="80" height="80">
+  </a> -->
 
-## TODO:
+  <h2 align="center">HyperNote</h2>
 
-- [ ] Give option to toggle b/w renderer and editor (or) split renderer
-- [ ] Provide a default page with info when no files are open (similar to vscode blank tab when no files are open)
+  <p align="center">
+    A productivity application and a personal wiki!
+    <!-- <br />
+    <a href="https://github.com/RikilG/HyperNote"><strong>Explore the docs »</strong></a> -->
+    <br />
+    <!-- <a href="https://github.com/RikilG/HyperNote">View Demo</a>
+    · -->
+    <a href="https://github.com/RikilG/HyperNote/issues">HyperNotert Bug</a>
+    ·
+    <a href="https://github.com/RikilG/HyperNote/issues">Request Feature</a>
+  </p>
+</p>
 
-## Available Scripts
 
-In the project directory, you can run:
+## Table of Contents
 
-### `npm start`
+- [Table of Contents](#table-of-contents)
+- [About The Project](#about-the-project)
+  - [Built With](#built-with)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contributors](#contributors)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## About The Project
 
-### `npm test`
+<!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
+The main aim behind this project was to build a general productivity 
+applicaiton and a personal wiki which can also be used as a general purpose note
+taking application or a diary. We still have plans to implement several other 
+features as addons to the current applications, so stay tuned!
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Built With
 
-### `npm run build`
+ - [Electron](https://www.electronjs.org)
+ - [React](https://www.reactjs.org)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Getting Started
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+To get a local copy up and running follow these simple steps. The current 
+build setup is run and tested on windows 10. So other platforms are not yet 
+fully supported.
 
-### `npm run eject`
+### Prerequisites
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+[npm](https://www.npmjs.com) is reqired to be installed on
+your PC to build the project from source
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Installation
+ 
+1. Clone the repo
+```sh
+git clone https://github.com/RikilG/HyperNote.git
+cd HyperNote
+```
+2. Install NPM packages
+```sh
+npm install
+```
+3. Run the application
+```sh
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Usage
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+The current application by default uses a working directory in your %APPDATA%
+folder. this can be changed in settings.  
+As of now, the application supports:
+- listing files
+- creating files/folders
+- rendering markdown (with realtime preview)
+- editing files (not saving yet :)
+- multiple splits for editing (horizontal only for now)
+- pomodoro timers
 
-## Learn More
+## Roadmap
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- [x] Give option to toggle b/w renderer and editor (or) split renderer
+- [x] Provide a default page with info when no files are open (similar to vscode blank tab when no files are open)
+- [ ] Add file save functionality
+- [x] Add pomodoro framework
+- [ ] Add trello framework
+- [ ] Add calendar
+- [ ] Integrate with desktop notifications
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Contributing
 
-### Code Splitting
+Have a feature you would like to add? know a solution to 
+the issue you are having? Follow the steps to contribute 
+to this project!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to the Branch         (`git push origin AmazingFeature`)
+5. Open a Pull Request
+
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## Contributors
+
+ - Rikil Gajarla ([github](https://www.github.com/RikilG))
+ - Srihari L ([github](https://www.github.com/SrihariLax))
+
+<!-- ### Code Splitting
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
@@ -58,18 +134,25 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/c
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
 ### Advanced Configuration
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
 ### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment) -->
 
-### `npm run build` fails to minify
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/RikilG/HyperNote.svg?style=flat-square
+[contributors-url]: https://github.com/RikilG/HyperNote/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/RikilG/HyperNote.svg?style=flat-square
+[forks-url]: https://github.com/RikilG/HyperNote/network/members
+[stars-shield]: https://img.shields.io/github/stars/RikilG/HyperNote.svg?style=flat-square
+[stars-url]: https://github.com/RikilG/HyperNote/stargazers
+[issues-shield]: https://img.shields.io/github/issues/RikilG/HyperNote.svg?style=flat-square
+[issues-url]: https://github.com/RikilG/HyperNote/issues
+[license-shield]: https://img.shields.io/github/license/RikilG/HyperNote.svg?style=flat-square
+[license-url]: https://github.com/RikilG/HyperNote/blob/master/LICENSE
+[product-screenshot]: images/screenshot.png

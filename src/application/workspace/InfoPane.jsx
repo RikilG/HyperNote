@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 import Dialog, { showDialog, hideDialog } from '../ui/Dialog';
-import Button from '../ui/Button';
-import Tooltip from '../ui/Tooltip';
-import { toast } from 'react-toastify';
+// import Button from '../ui/Button';
+// import Tooltip from '../ui/Tooltip';
 
 const style = {
     container: {
@@ -33,11 +33,10 @@ const InfoPane = (/*{ children }*/) => {
   
     return (
         <div style={style.container}>
-            <Tooltip value="Mary's lamb!">
+            {/* <Tooltip value="Mary's lamb!">
                 <Button onClick={handleDialog}>Dialog Test</Button>
-            </Tooltip>
-            <p>Welcome!</p>
-            <p>Theme options have been migrated to Settings page</p>
+            </Tooltip> */}
+            <div style={{fontSize: "3rem", margin: "9rem", color: "var(--primaryColor)"}}>Welcome to <br /> HyperNote!</div>
             <Dialog config={dialog}>Does mary have a horse?</Dialog>
         </div>
     );

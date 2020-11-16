@@ -3,7 +3,7 @@ import React from 'react';
 import TreeItem from './TreeItem';
 
 import '../css/Explorer.css';
-import EditorGroup from '../workspace/EditorGroup';
+import EditorGroup from '../editor/EditorGroup';
 
 export default class Tree extends React.Component {
     constructor(props) {

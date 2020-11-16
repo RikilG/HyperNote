@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
 import Navbar from './Navbar';
-import Searchbar from './Searchbar';
 import Explorer from '../explorer/Explorer';
 import FileSystem from '../explorer/FileSystem';
 import UserPreferences from '../settings/UserPreferences';
+import Searchbar from '../addons/search/Searchbar';
 import Pomodoro from '../addons/pomodoro/Pomodoro';
 
 const style = {
