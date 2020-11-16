@@ -1,6 +1,8 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useContext, useState } from 'react';
+import { toast } from 'react-toastify'
+
 import Tooltip from '../../ui/Tooltip';
 import PomodoroPage from './PomodoroPage';
 import WindowContext from '../../WindowContext';
@@ -40,8 +42,12 @@ const style = {
 };
 
 const Pomodoro = (props) => {
-    let [ taskList, setTaskList ] = useState(['Task1', "Task2", 'Task3']);
+    let [ taskList, setTaskList ] = useState(['Task1', 'Task2', 'Task3']);
     const { openWindow } = useContext(WindowContext);
+
+    const handleNewTask = () => {
+        setTaskList([...taskList, "newTask"]);
+    }
 
     const handleTaskOpen = (e) => {
         let name = e.currentTarget.innerHTML;
@@ -51,9 +57,20 @@ const Pomodoro = (props) => {
             name: name,
             id: id,
             page: undefined,
+            running: false,
         }
         task.page = <PomodoroPage winObj={task} />;
-        openWindow(task);
+        openWindow(task, true, async (winObj) => {
+            if (winObj.id !== id) { // other than current open window
+                if (winObj.running === true) { // if pomodoro is running
+                    toast("Pomodoro in progress, Reset to change")
+                    return false;
+                }
+                else {
+                    return true; // open new window
+                }
+            }
+        });
     }
 
     return (
@@ -61,7 +78,7 @@ const Pomodoro = (props) => {
             <div style={style.header}>Tasks</div>
             <div style={style.controls}>
                 <Tooltip style={style.controlItem} value="Add" position="bottom">
-                    <FontAwesomeIcon icon={faPlus} />
+                    <FontAwesomeIcon icon={faPlus} onClick={handleNewTask} />
                 </Tooltip>
                 <Tooltip style={style.controlItem} value="Edit" position="bottom">
                     <FontAwesomeIcon icon={faPen} />

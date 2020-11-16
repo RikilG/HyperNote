@@ -13,7 +13,6 @@ const Workspace = () => {
         for (let addon in windowList) {
             addonWindows = addonWindows.concat(windowList[addon]);
         }
-        console.log(addonWindows)
 
         if (addonWindows.length > 0) {
             return addonWindows.map((winObj) => 
@@ -23,9 +22,9 @@ const Workspace = () => {
             );
         }
         else {
-            return (<Pane minSize="50px" key={0}>
+            return [<Pane minSize="50px" key={0}>
                 <InfoPane />
-            </Pane>);
+            </Pane>];
         }
     }
 

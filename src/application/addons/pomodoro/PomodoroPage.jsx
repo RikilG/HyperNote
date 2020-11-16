@@ -62,6 +62,12 @@ const PomodoroPage = (props) => {
         setRunning(false);
         setTime(pomoDuration*60);
         setMinutesLeft(pomoDuration);
+        props.winObj.running = false;
+    }
+
+    const handlePlayPause = () => {
+        setRunning(!running);
+        props.winObj.running = true;
     }
 
     return (
@@ -90,7 +96,7 @@ const PomodoroPage = (props) => {
             <Progressbar completed={pomoDuration*60 - time} total={pomoDuration*60} />
             <div style={style.timers}>
                 <Tooltip value="Play/Pause">
-                    <div onClick={() => setRunning(!running)} className="button">Play/Pause</div>
+                    <div onClick={handlePlayPause} className="button">Play/Pause</div>
                 </Tooltip>
                 <Tooltip value="Reset">
                     <div onClick={handleReset} className="button">Reset</div>
