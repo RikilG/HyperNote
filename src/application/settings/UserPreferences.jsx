@@ -3,12 +3,16 @@ import FileSystem from '../explorer/FileSystem';
 // import { toast } from 'react-toastify';
 
 export default class UserPreferences {
-    static dataPath = window.require('electron').remote.app.getPath('userData');
-    static configPath = window.require('path').join(this.dataPath, 'config.json');
+    static path = window.require('path');
+    static basePath = window.require('electron').remote.app.getPath('userData');
+    static dataPath = this.path.join(this.basePath, 'userStorage');
+    static configPath = this.path.join(this.dataPath, 'config.json');
     static preferences = {};
     static defaults = {
         theme: "material",
-        userStorage: window.require('path').join(this.dataPath, 'userStorage'),
+        userStorage: this.dataPath,
+        noteStorage: this.path.join(this.dataPath, 'noteStorage'),
+        pomoStorage: this.path.join(this.dataPath, 'pomoStorage'),
     };
 
     static __loadPreferences() {
@@ -23,6 +27,12 @@ export default class UserPreferences {
 
             if (!FileSystem.exists(this.preferences.userStorage)) {
                 FileSystem.newDirectory(this.preferences.userStorage);
+            }
+            if (!FileSystem.exists(this.preferences.noteStorage)) {
+                FileSystem.newDirectory(this.preferences.noteStorage);
+            }
+            if (!FileSystem.exists(this.preferences.pomoStorage)) {
+                FileSystem.newDirectory(this.preferences.pomoStorage);
             }
 
             return this.preferences;

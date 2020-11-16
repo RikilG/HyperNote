@@ -3,6 +3,7 @@ const themes = {
         primaryColor: "#8BC34A",
         accentColor: "#009688",
         primaryTextColor: "white",
+        secondaryTextColor: "#252525",
         backgroundColor: "#303030", // #121212
         backgroundAccent: "#202020",
         blockquoteColor: "rgba(255,255,255,0.20)",
@@ -12,6 +13,7 @@ const themes = {
         primaryColor: "#8BC34A",
         accentColor: "#809688",
         primaryTextColor: "black",
+        secondaryTextColor: "#252525",
         backgroundColor: "white",
         backgroundAccent: "#e4e4e4",
         blockquoteColor: "rgba(0,0,0,0.80)",
@@ -24,7 +26,7 @@ const themes = {
         backgroundColor: "#DCEDC8", // lightPrimaryColor
         backgroundAccent: "#BCD0A8", // lightPrimaryColor
         primaryTextColor: "#212121",
-        secondaryTextColor: "#757575",
+        secondaryTextColor: "#252525",
         dividerColor: "#BDBDBD",
     },
 };

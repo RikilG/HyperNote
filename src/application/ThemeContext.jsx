@@ -33,7 +33,7 @@ const ThemeContextWrapper = ({ children, titlebar }) => {
 
     useEffect(() => { // similar to componentDidMount and componentDidUpdate
         setCSSVariables(theme);
-    })
+    }, [theme])
   
     return (
         <ThemeContext.Provider value={{ themeName, changeTheme }}>

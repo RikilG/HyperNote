@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFolderOpen, faSearch, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faFolderOpen, faSearch, faCog, faStopwatch20 } from '@fortawesome/free-solid-svg-icons';
 
 import Settings from '../settings/Settings';
 import Tooltip from '../ui/Tooltip';
@@ -45,6 +45,9 @@ const Navbar = (props) => {
                 </Tooltip>
                 <Tooltip value="Search" position="right">
                     <FontAwesomeIcon style={style.icon} icon={faSearch} onClick={() => props.changeSelection("search")} />
+                </Tooltip>
+                <Tooltip value="Pomodoro" position="right">
+                    <FontAwesomeIcon style={style.icon} icon={faStopwatch20} onClick={() => props.changeSelection("pomodoro")} />
                 </Tooltip>
             </div>
             <div style={style.tools}>
