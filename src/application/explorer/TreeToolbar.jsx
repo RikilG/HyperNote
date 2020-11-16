@@ -25,7 +25,7 @@ const TreeToolbar = (props) => {
     let [textbox, setTextbox] = useState(false);
     let [name, setName] = useState("");
     let [clickEvent, setClickEvent] = useState("");
-    let storageLocation = 'userStorage'; //change to noteStorage later
+    let storageLocation = 'noteStorage';
 
     const node = useRef();
 
