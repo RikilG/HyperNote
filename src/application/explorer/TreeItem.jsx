@@ -1,79 +1,110 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFolderOpen, faFolder, faFile, faCaretDown, faCaretRight, faFolderPlus, faPlus } from '@fortawesome/free-solid-svg-icons';
-// import { faFolderOpen, faFolder, faFile } from '@fortawesome/free-regular-svg-icons';
+import { faFolderPlus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import FileSystem from './FileSystem';
-import "../css/Explorer.css";
-import Tooltip from '../ui/Tooltip';
+import UserPreferences from '../settings/UserPreferences';
 
-const styles = {
-    treeItem: {
+const style = {
+    menu: {
         display: "flex",
-        flexFlow: "row nowrap",
-        cursor: "pointer"
-    },
-    caretIcon: {
-        marginLeft: "5px"
+        flexFlow: "row",
+        flex: "1",
+        justifyContent: "space-evenly",
+        borderColor: "var(--backgroundAccent)",
+        marginBottom: '0.3rem',
+        borderTop: "0",
+        borderLeft: "0"
     },
     icon: {
-        margin: "0 5px"
-    },
-    newIconContainer: {
-        display: "flex",
-        flexFlow: "row nowrap",
-        position: "absolute",
-        right: "5px",
-        zIndex: '1'
-    },
-    pageIcon: {
-        cursor: "pointer"
-    },
-    folderIcon: {
+        padding: '0.4rem',
         cursor: "pointer",
-        position: "relative",
-        marginLeft: "10px"
     }
 }
-export default class TreeItem extends React.Component {
-    getIcon() {
-        if (this.props.type === "file") return faFile;
-        if (this.props.expanded === true) return faFolderOpen;
-        return faFolder;
-    }
 
-    createFile(filepath) {
-        FileSystem.newFile(filepath + "/untitled.txt");
-    }
+const TreeToolbar = (props) => {
+    let [textbox, setTextbox] = useState(false);
+    let [name, setName] = useState("");
+    let [clickEvent, setClickEvent] = useState("");
+    let storageLocation = 'userStorage'; //change to noteStorage later
 
-    createFolder(filepath) {
-        FileSystem.newDirectory(filepath + "/newFolder")
-    }
+    const node = useRef();
 
-    render() {
-        let caret = false;
-        if (this.props.type !== "file") {
-            caret = (this.props.expanded ? faCaretDown : faCaretRight)
+    useEffect(() => {
+        // add when mounted
+        document.addEventListener("mousedown", handleClick);
+        // return function to be called when unmounted
+        return () => {
+            document.removeEventListener("mousedown", handleClick);
+        };
+    });
+
+    const handleChange = (event) => {
+        event.stopPropagation();
+        let path = UserPreferences.get(storageLocation);
+        setName(event.target.value);
+        if (clickEvent === 'file' && event.target.value.includes(".")) {
+            let filename = event.target.value;
+            let splitstring = filename.split(".");
+            let substring = splitstring[splitstring.length - 1];
+            switch (substring) {
+                case 'txt': case 'docx': case 'py':
+                case 'pdf': case 'odt': case 'rtf':
+                case 'tex': case 'wpd': case 'java':
+                case 'pl': case 'class': case 'cpp':
+                case 'sh': case 'swift': case 'vb':
+                case 'php': case 'css': case 'html':
+                case 'js': case 'jpeg': case 'png':
+                case 'svg': case 'csv':
+                    setTextbox(false);
+                    FileSystem.newFile(path + '\\' + filename);
+                default:
+            }
         }
-
-        return (
-            <Tooltip value={this.props.name} position="mouse">
-                <div onClick={this.props.onClick} style={styles.treeItem} className="tree-item">
-                    {caret ?
-                        <FontAwesomeIcon icon={caret} style={styles.caretIcon} /> :
-                        <span style={{ paddingLeft: "12px" }}></span>
-                    }
-                    <FontAwesomeIcon icon={this.getIcon()} style={styles.icon} />
-                    <div className='text'>
-                        {this.props.name}
-                    </div>
-                    {this.props.expanded && this.props.type !== 'file' && (
-                        <div style={styles.newIconContainer} className="new-icon-container">
-                            <FontAwesomeIcon style={styles.pageIcon} className="page-icon" icon={faPlus} onClick={(e) => { e.stopPropagation(); this.createFile(this.props.path); }} />
-                            <FontAwesomeIcon style={styles.folderIcon} className="folder-icon" icon={faFolderPlus} onClick={(e) => { e.stopPropagation(); this.createFolder(this.props.path); }} />
-                        </div>)
-                    }
-                </div>
-            </Tooltip>
-        );
     }
-}
+
+    const keyPress = (event) => {
+        let path = UserPreferences.get(storageLocation);
+        if (event.key === 'Enter') {
+            setTextbox(false);
+            if (clickEvent === 'file')
+                FileSystem.newFile(path + '\\' + name);
+            else
+                FileSystem.newDirectory(path + '\\' + name);
+        }
+    }
+
+    const handleClick = e => {
+        let path = UserPreferences.get(storageLocation);
+        if (node.current.contains(e.target)) {
+            return;
+        }
+        setTextbox(false);
+        if (name !== "") {
+            if (clickEvent === 'file')
+                FileSystem.newFile(path + '\\' + name);
+            else
+                FileSystem.newDirectory(path + '\\' + name);
+        }
+    };
+
+    return (
+        <div>
+            <div style={style.menu}>
+                <FontAwesomeIcon style={style.icon} icon={faPlus} onClick={() => { setTextbox(true); setClickEvent('file'); }} />
+                <FontAwesomeIcon style={style.icon} icon={faFolderPlus} onClick={() => { setTextbox(true); setClickEvent('folder'); }} />
+            </div>
+            <div ref={node}>
+                {textbox && ( //Require: Bugfix to follow file naming conventions
+                    <input
+                        type="text"
+                        onChange={handleChange}
+                        onKeyDown={keyPress}
+                    />
+                )
+                }
+            </div>
+        </div>
+    );
+};
+
+export default TreeToolbar;
