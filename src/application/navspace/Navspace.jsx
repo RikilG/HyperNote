@@ -6,6 +6,7 @@ import FileSystem from '../explorer/FileSystem';
 import UserPreferences from '../settings/UserPreferences';
 import Searchbar from '../addons/search/Searchbar';
 import Pomodoro from '../addons/pomodoro/Pomodoro';
+import Project from '../addons/projectBoard/Project';
 
 const style = {
     container: {
@@ -32,13 +33,15 @@ const Navspace = (props) => {
         subtree={test.children}
     />;
     const SEARCH = <Searchbar />;
-    const POMODORO = <Pomodoro />
+    const POMODORO = <Pomodoro />;
+    const PROJECT = <Project />;
 
     const showSelection = () => {
         switch (selection) {
             case "explorer": return EXPLORER;
             case "search": return SEARCH;
             case "pomodoro": return POMODORO;
+            case "project": return PROJECT;
             default: return;
         }
     }
