@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 
 const style = {
     container: {
-        margin: "2px 5px",
+        margin: "1px 5px",
         display: "flex",
         flexFlow: "row nowrap",
         flex: "1",
@@ -40,7 +40,7 @@ const Textbox = (props) => {
     const handleCancel = (type) => {
         if (props.handleCancel) {
             let newName = props.handleCancel(name, type);
-            if (newName && typeof newName === "string") setName(newName);
+            if ((newName || newName === "") && typeof newName === "string") setName(newName);
         }
     }
 
@@ -84,7 +84,7 @@ const Textbox = (props) => {
         return () => { // return function to be called when unmounted
             document.removeEventListener("mousedown", handleClick);
         };
-    });
+    }, [handleClick]);
 
     useEffect(() => { // run on componentDidMount!
         setName(props.initialValue);

@@ -10,7 +10,7 @@ import PomodoroTask from './PomodoroTask';
 import WindowContext from '../../WindowContext';
 import { openDatabase } from '../../Database';
 import UserPreferences from '../../settings/UserPreferences';
-import { createDb, listRows, addRow, deleteRow } from './PomodoroDB';
+import { createDb, listRows, addRow, deleteRow, editRow } from './PomodoroDB';
 
 const style = {
     container: {
@@ -107,7 +107,17 @@ const PomodoroNav = () => {
                 setOpenTask(null);
             }
             // TODO: re-fetching complete list is heavy. instead remove one from taskList directly
-            // look at closeWindow function for info
+            // look at closeWindow function for info on how to get index
+            listRows(db, setTaskList);
+        })
+    }
+
+    const handleEdit = (taskItem, newName) => {
+        taskItem.name = newName;
+        editRow(db, taskItem, (err) => {
+            if (err) return;
+            // TODO: re-fetching complete list is heavy. instead edit one from taskList directly
+            // look at closeWindow function for info on how to get index
             listRows(db, setTaskList);
         })
     }
@@ -143,7 +153,7 @@ const PomodoroNav = () => {
             />
             <div style={style.taskList}>
                 {
-                    taskList.map((taskItem) => <PomodoroTask key={`${taskItem.name}-${taskItem.id}`} onClick={handleTaskOpen} taskItem={taskItem} handleDelete={handleDelete} />)
+                    taskList.map((taskItem) => <PomodoroTask key={`${taskItem.name}-${taskItem.id}`} onClick={handleTaskOpen} taskItem={taskItem} handleDelete={handleDelete} handleEdit={handleEdit} />)
                 }
             </div>
         </div>
