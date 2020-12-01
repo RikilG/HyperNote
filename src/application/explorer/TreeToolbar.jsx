@@ -31,7 +31,7 @@ const TreeToolbar = (props) => {
                 <FontAwesomeIcon style={style.icon} icon={faPlus} onClick={() => { setTextbox(true); setClickEvent('file'); }} />
                 <FontAwesomeIcon style={style.icon} icon={faFolderPlus} onClick={() => { setTextbox(true); setClickEvent('folder'); }} />
             </div>
-            <TreeTextbox path={props.path} textbox={textbox} setTextbox={setTextbox} clickEvent={clickEvent} />
+            <TreeTextbox path={props.path} visible={textbox} setVisible={setTextbox} clickEvent={clickEvent} />
         </div>
     );
 };

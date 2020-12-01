@@ -58,7 +58,7 @@ const Core = (props) => {
             <div style={style.header}>Core</div>
             <div style={style.subheader}>Storage</div>
             <div style={{display: "flex"}}>
-                <Textbox value={userStorage} style={style.textbox} disabled />
+                <Textbox initialValue={userStorage} style={style.textbox} disabled={true} />
                 <Button style={style.button} onClick={handleStorageChange}>Change</Button>
             </div>
         </div>

@@ -45,6 +45,7 @@ const PomodoroPage = (props) => {
     let [running, setRunning] = useState(false);
     let [time, setTime] = useState(pomoDuration*60);
     let [minutesLeft, setMinutesLeft] = useState(pomoDuration);
+    const taskItem = props.winObj.taskItem;
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -73,8 +74,8 @@ const PomodoroPage = (props) => {
     return (
         <div style={style.container}>
             <WindowBar winObj={props.winObj} title={"Pomodoro"} />
-            <div style={style.title}>{props.winObj.name}</div>
-            <div style={style.description}>Some description</div>
+            <div style={style.title}>{taskItem.name}</div>
+            <div style={style.description}>{taskItem.desc}</div>
             <div style={style.timers}>
                 <div style={style.timer}>
                     <div>Time Left</div>
