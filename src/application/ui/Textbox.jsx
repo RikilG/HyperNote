@@ -40,7 +40,14 @@ const Textbox = (props) => {
     const handleCancel = (type) => {
         if (props.handleCancel) {
             let newName = props.handleCancel(name, type);
-            if (newName) setName(newName);
+            if (newName && typeof newName === "string") setName(newName);
+        }
+    }
+
+    const handleConfirm = () => {
+        if (props.handleConfirm) {
+            let newName = props.handleConfirm(name);
+            if ((newName || newName === "") && typeof newName === "string") setName(newName);
         }
     }
 
@@ -64,7 +71,7 @@ const Textbox = (props) => {
     const keyPress = (event) => {
         if (event.key === 'Enter') {
             setVisible(false);
-            if (props.handleConfirm) props.handleConfirm(name);
+            handleConfirm();
         }
         else if (event.key === 'Escape') {
             setVisible(false);
@@ -87,7 +94,7 @@ const Textbox = (props) => {
         <div ref={textboxRef} style={props.containerStyle || style.container}>
             {(props.visible === undefined ? true : props.visible) && 
                 <input
-                    value={name}
+                    value={name || ""}
                     style={props.style}
                     type={"text" || props.type}
                     className="textbox"

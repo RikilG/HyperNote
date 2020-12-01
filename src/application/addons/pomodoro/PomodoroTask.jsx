@@ -11,20 +11,23 @@ const style = {
         borderRadius: "0.3rem",
         cursor: "pointer",
     },
-    title: {
-
-    },
 };
 
 const PomodoroTask = (props) => {
+
+    const handleDelete = (e) => {
+        e.stopPropagation();
+        props.handleDelete(props.taskItem)
+    }
+
     return (
-        <div style={style.container} className="hover-item" onClick={props.onClick} task={props.task}>
-            <div style={style.title}>{props.task}</div>
+        <div style={style.container} className="hover-item" onClick={props.onClick} taskid={props.taskItem.id}>
+            <div style={style.title}>{props.taskItem.name}</div>
             <div className="hover-item-toolbar">
                 <div className="hover-item-tool">
                         <FontAwesomeIcon icon={faPen} />
                 </div>
-                <div className="hover-item-tool">
+                <div className="hover-item-tool" onClick={handleDelete}>
                     <FontAwesomeIcon icon={faTrash} />
                 </div>
             </div>

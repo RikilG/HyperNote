@@ -19,15 +19,15 @@ const createDb = (db, callback) => {
         desc TEXT
     );`;
     runQuery(query, db);
-    callback();
+    if (callback) callback();
 }
 
 const listRows = (db, updateList) => {
-    const query = `SELECT name FROM tasks;`;
+    const query = `SELECT * FROM tasks;`;
     db.all(query, (err, rows) => {
         handleSqlError(err);
         if (!rows) return;
-        if (updateList) updateList(rows.map((row) => row.name));
+        if (updateList) updateList(rows);
     })
 }
 
@@ -35,7 +35,15 @@ const addRow = (db, row, callback) => {
     const query = `INSERT INTO tasks VALUES (NULL, ?, ?);`;
     db.run(query, [row.name, row.desc], (err) => {
         handleSqlError(err);
-        callback(err);
+        if (callback) callback(err);
+    })
+}
+
+const deleteRow = (db, id, callback) => {
+    const query = `DELETE FROM tasks WHERE id=?;`;
+    db.run(query, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
     })
 }
 
@@ -43,4 +51,5 @@ export {
     createDb,
     listRows,
     addRow,
+    deleteRow,
 };
