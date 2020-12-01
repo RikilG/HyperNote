@@ -72,7 +72,7 @@ const TreeItem = (props) => {
                         </div>)
                     }
                 </div>
-                <TreeTextbox path={props.path} textbox={textbox} setTextbox={setTextbox} clickEvent={clickEvent} />
+                <TreeTextbox path={props.path} visible={textbox} setVisible={setTextbox} clickEvent={clickEvent} />
             </div>
         </Tooltip>
     );
