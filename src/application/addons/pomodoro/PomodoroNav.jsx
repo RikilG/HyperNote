@@ -1,11 +1,15 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSync } from '@fortawesome/free-solid-svg-icons';
 import { useContext, useState } from 'react';
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 
 import Tooltip from '../../ui/Tooltip';
 import PomodoroPage from './PomodoroPage';
+import PomodoroTask from './PomodoroTask';
 import WindowContext from '../../WindowContext';
+import { openDatabase } from '../../Database';
+import UserPreferences from '../../settings/UserPreferences';
+import { createDb, listRows, addRow } from './PomodoroDB';
 
 const style = {
     container: {
@@ -33,24 +37,30 @@ const style = {
         display: "flex",
         flexFlow: "column nowrap",
     },
-    task: {
-        margin: "0.15rem",
-        padding: "0.25rem",
-        borderRadius: "0.3rem",
-        cursor: "pointer",
-    }
 };
 
-const Pomodoro = (props) => {
+const Pomodoro = () => {
     let [ taskList, setTaskList ] = useState(['Task1', 'Task2', 'Task3']);
     const { openWindow } = useContext(WindowContext);
+    const db = openDatabase(UserPreferences.get('pomoStorage'));
+
+    createDb(db, () => listRows(db));
+
+    // useEffect(() => { // on unmount
+    //     return () => {
+    //         db.close();
+    //     }
+    // }, []);
 
     const handleNewTask = () => {
-        setTaskList([...taskList, "newTask"]);
+        addRow(db, {name: "newTask", desc: ""}, (err) => {
+            if (err) return;
+            setTaskList([...taskList, "newTask"]);
+        });
     }
 
     const handleTaskOpen = (e) => {
-        let name = e.currentTarget.innerHTML;
+        let name = e.currentTarget.getAttribute('task');
         let id = `pomodoro/${name}`
         let task = {
             addon: "pomodoro",
@@ -73,23 +83,28 @@ const Pomodoro = (props) => {
         });
     }
 
+    const handleRefresh = () => {
+        listRows(db, setTaskList);
+    }
+
     return (
         <div style={style.container}>
             <div style={style.header}>Tasks</div>
             <div style={style.controls}>
-                <Tooltip style={style.controlItem} value="Add" position="bottom">
-                    <FontAwesomeIcon icon={faPlus} onClick={handleNewTask} />
-                </Tooltip>
-                <Tooltip style={style.controlItem} value="Edit" position="bottom">
-                    <FontAwesomeIcon icon={faPen} />
-                </Tooltip>
-                <Tooltip style={style.controlItem} value="Delete" position="bottom">
-                    <FontAwesomeIcon icon={faTrash} />
-                </Tooltip>
+                <div style={style.controlItem} onClick={handleNewTask}>
+                    <Tooltip value="Add" position="bottom">
+                        <FontAwesomeIcon icon={faPlus}  />
+                    </Tooltip>
+                </div>
+                <div onClick={handleRefresh} style={style.controlItem}>
+                    <Tooltip  value="Refresh" position="bottom">
+                        <FontAwesomeIcon icon={faSync}  />
+                    </Tooltip>
+                </div>
             </div>
             <div style={style.taskList}>
                 {
-                    taskList.map((task) => <div key={task} style={style.task} className="tree-item" onClick={handleTaskOpen}>{task}</div>)
+                    taskList.map((task) => <PomodoroTask key={task} onClick={handleTaskOpen} task={task} />)
                 }
             </div>
         </div>

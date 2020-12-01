@@ -5,7 +5,7 @@ import Explorer from '../explorer/Explorer';
 import FileSystem from '../explorer/FileSystem';
 import UserPreferences from '../settings/UserPreferences';
 import Searchbar from '../addons/search/Searchbar';
-import Pomodoro from '../addons/pomodoro/Pomodoro';
+import Pomodoro from '../addons/pomodoro/PomodoroNav';
 
 const style = {
     container: {
