@@ -12,7 +12,7 @@ export default class UserPreferences {
         theme: "material",
         userStorage: this.dataPath,
         noteStorage: this.path.join(this.dataPath, 'noteStorage'),
-        pomoStorage: this.path.join(this.dataPath, 'pomoStorage'),
+        pomoStorage: this.path.join(this.dataPath, 'pomoStorage.db'),
     };
 
     static __loadPreferences() {
@@ -30,9 +30,6 @@ export default class UserPreferences {
             }
             if (!FileSystem.exists(this.preferences.noteStorage)) {
                 FileSystem.newDirectory(this.preferences.noteStorage);
-            }
-            if (!FileSystem.exists(this.preferences.pomoStorage)) {
-                FileSystem.newDirectory(this.preferences.pomoStorage);
             }
 
             return this.preferences;

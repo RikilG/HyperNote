@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 
+import UserPreferences from '../../settings/UserPreferences';
 import WindowBar from '../../workspace/WindowBar';
 import Progressbar from '../../ui/Progressbar';
+import { openDatabase } from '../../Database';
+import Textarea from '../../ui/Textarea';
+import { editRow } from './PomodoroDB';
 import Tooltip from '../../ui/Tooltip';
 
 const style = {
@@ -18,10 +22,17 @@ const style = {
         textAlign: "center",
     },
     description: {
-        height: "25%",
-        maxHeight: "25%",
+        display: "block",
+        margin: "auto",
+        height: "20%",
+        minHeight: "30px",
+        maxHeight: "35%",
+        width: "80%",
+        resize: "vertical",
         fontSize: "1.1rem",
         textAlign: "center",
+        background: "transparent",
+        color: "var(--primaryTextColor)",
     },
     timers: {
         margin: "0.6rem",
@@ -45,6 +56,8 @@ const PomodoroPage = (props) => {
     let [running, setRunning] = useState(false);
     let [time, setTime] = useState(pomoDuration*60);
     let [minutesLeft, setMinutesLeft] = useState(pomoDuration);
+    const taskItem = props.winObj.taskItem;
+    const db = openDatabase(UserPreferences.get('pomoStorage'));
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -70,11 +83,21 @@ const PomodoroPage = (props) => {
         props.winObj.running = true;
     }
 
+    const handleDescChange = (desc) => {
+        taskItem.desc = desc;
+        editRow(db, taskItem)
+    }
+
     return (
         <div style={style.container}>
             <WindowBar winObj={props.winObj} title={"Pomodoro"} />
-            <div style={style.title}>{props.winObj.name}</div>
-            <div style={style.description}>Some description</div>
+            <div style={style.title}>{taskItem.name}</div>
+            <Textarea
+                initialValue={taskItem.desc}
+                style={style.description}
+                handleCancel={handleDescChange}
+                placeholder={"<Enter description here>"}
+            />
             <div style={style.timers}>
                 <div style={style.timer}>
                     <div>Time Left</div>

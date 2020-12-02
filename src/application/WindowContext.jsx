@@ -23,6 +23,8 @@ export const WindowContextWrapper = ({ children }) => {
      * i.e., if returned true, only then, new window is opened. else it
      * is not opened
      * 
+     * winObj should have addon, id and page attributes at minimum
+     * 
      * @param {object} winObj 
      * @param {boolean} singleInstance 
      * @param {function} runOnAnotherInstance 

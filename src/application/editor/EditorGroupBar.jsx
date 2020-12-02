@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash, faSave, faWindowClose, faEdit, faColumns } from '@fortawesome/free-solid-svg-icons';
 
@@ -31,12 +31,11 @@ let styles = {
 };
 
 const EditorGroupBar = (props) => {
-    let [filename, setFilename] = useState(props.fileObj.name);
     let [active, setActive] = useState(false);
     const { closeWindow } = useContext(WindowContext);
-    const textboxRef = useRef(null);
 
-    const handleFileRename = () => {
+    const handleConfirm = (filename) => {
+        // TODO: modify props.fileObj.name after renaming
         if (active && filename !== props.fileObj.name) {
             const oldpath = props.fileObj.path;
             const newpath = FileSystem.join(FileSystem.dirname(oldpath), filename);
@@ -45,51 +44,33 @@ const EditorGroupBar = (props) => {
         setActive(false);
     }
 
-    const handleClick = (event) => {
-        if (textboxRef.current.contains(event.target)) {
-            setActive(true);
-            return; // click inside textbox, do nothing
+    const handleCancel = (filename, type) => {
+        setActive(false);
+        if (type === 'click') {
+            handleConfirm(filename);
+            return;
         }
-        handleFileRename();
-    }
-
-    useEffect(() => {
-        // add when mounted
-        document.addEventListener("mousedown", handleClick);
-        // return function to be called when unmounted
-        return () => {
-            document.removeEventListener("mousedown", handleClick);
-        };
-    });
-
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            handleFileRename();
-        }
-        else if (event.key === 'Escape') {
-            setActive(false);
-            setFilename(props.fileObj.name);
-        }
+        return props.fileObj.name; // return the original file name to be reset
     }
 
     const handleClose = () => {
         closeWindow(props.fileObj);
     }
 
-    const onChange = (event) => {
-        setFilename(event.target.value);
+    const handleChange = (name) => {
         setActive(true);
     }
 
     return (
         <div style={styles.bar}>
-            <div ref={textboxRef} style={styles.defaultMouse}>
+            <div style={styles.defaultMouse}>
                 <FontAwesomeIcon style={styles.icon} icon={faEdit} />
                 <Textbox
-                    value={filename}
+                    initialValue={props.fileObj.name}
                     style={styles.textbox}
-                    onChange={onChange}
-                    onKeyDown={handleKeyDown}
+                    handleChange={handleChange}
+                    handleConfirm={handleConfirm}
+                    handleCancel={handleCancel}
                 />
             </div>
             <div style={styles.button} onClick={props.handleEditorGroup}>

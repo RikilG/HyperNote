@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import Navbar from './Navbar';
-import Explorer from '../explorer/Explorer';
-import FileSystem from '../explorer/FileSystem';
-import UserPreferences from '../settings/UserPreferences';
-import Searchbar from '../addons/search/Searchbar';
-import Pomodoro from '../addons/pomodoro/Pomodoro';
-import Project from '../addons/projectBoard/Project';
+import Navbar from "./Navbar";
+import Explorer from "../explorer/Explorer";
+import Searchbar from "../addons/search/Searchbar";
+import Pomodoro from "../addons/pomodoro/PomodoroNav";
+import Project from "../addons/projectBoard/Project";
 
 const style = {
     container: {
@@ -16,44 +14,40 @@ const style = {
     },
     fillFlex: {
         flex: "1",
-        width: "calc(100% - 35px)"
-    }
-}
+        width: "calc(100% - 35px)",
+    },
+};
 
 const Navspace = (props) => {
-    let [selection, setSelection] = useState('explorer');
+    let [selection, setSelection] = useState("explorer");
 
-    let test = FileSystem.getTree(UserPreferences.get('noteStorage'));
-    const EXPLORER = <Explorer
-        key={test.id}
-        id={test.id}
-        name={test.name}
-        type={test.type}
-        path={test.path}
-        subtree={test.children}
-    />;
+    // TODO: convert these into an abject and index with strings directly instead of switch case
+    const EXPLORER = <Explorer />;
     const SEARCH = <Searchbar />;
     const POMODORO = <Pomodoro />;
     const PROJECT = <Project />;
 
     const showSelection = () => {
         switch (selection) {
-            case "explorer": return EXPLORER;
-            case "search": return SEARCH;
-            case "pomodoro": return POMODORO;
-            case "project": return PROJECT;
-            default: return;
+            case "explorer":
+                return EXPLORER;
+            case "search":
+                return SEARCH;
+            case "pomodoro":
+                return POMODORO;
+            case "project":
+                return PROJECT;
+            default:
+                return;
         }
-    }
+    };
 
     return (
         <div style={style.container}>
             <Navbar changeSelection={setSelection} />
-            <div style={style.fillFlex}>
-                {showSelection()}
-            </div>
+            <div style={style.fillFlex}>{showSelection()}</div>
         </div>
     );
-}
+};
 
 export default Navspace;

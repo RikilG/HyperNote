@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 // import style from '../css/Renderer.css';
 
@@ -12,34 +12,36 @@ let style = {
     }
 }
 
-export default class Renderer extends React.Component {
-    constructor(props) {
-        super(props);
+const Renderer = (props) => {
+    // let [ interval, setInterval ] = useState(null);
+    let [ markup, setMarkup ] = useState(props.value);
 
-        this.state = {
-            markup: '',
-        }
+    const getMarkdownText = () => {
+        return { __html: markup };
     }
 
-    componentDidMount() {
-        this.setState({
-                interval: setInterval(() => this.setState({
-                    markup: marked(this.props.value)
-                }), 500)
-        });
-    }
+    useEffect(() => {
+        setMarkup(marked(props.value));
+    }, [props.value]);
 
-    componentWillUnmount() {
-        clearInterval(this.state.interval);
-    }
+    // componentDidMount() {
+    //     this.setState({
+    //             interval: setInterval(() => this.setState({
+    //                 markup: marked(this.props.value)
+    //             }), 500)
+    //     });
+    // }
 
-    getMarkdownText() {
-        return { __html: this.state.markup };
-    }
+    // componentWillUnmount() {
+    //     clearInterval(this.state.interval);
+    // }
 
-    render() {
-        return (
-            <div style={style.container} dangerouslySetInnerHTML={this.getMarkdownText()} />
-        );
-    }
+    return (
+        <div
+            style={style.container}
+            dangerouslySetInnerHTML={getMarkdownText()}
+        />
+    );
 }
+
+export default Renderer;
