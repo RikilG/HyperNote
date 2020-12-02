@@ -52,11 +52,11 @@ const PomodoroNav = () => {
     const createNewTask = (taskName) => {
         const taskItem = {
             name: taskName,
-            desc: "<Enter description here>",
+            desc: "",
         }
         addRow(db, taskItem, (err) => {
             if (err) return;
-            setTaskList([...taskList, taskItem]);
+            listRows(db, setTaskList);
             setTextbox(false);
         });
         return ""; // make the textbox empty
@@ -127,6 +127,7 @@ const PomodoroNav = () => {
         return () => {
             db.close();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

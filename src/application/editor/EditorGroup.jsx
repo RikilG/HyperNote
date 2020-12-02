@@ -3,7 +3,8 @@ import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane';
 import { toast } from 'react-toastify';
 
-import Editor from './Editor';
+import '../css/Editor.css'
+import Textarea from '../ui/Textarea';
 import Renderer from './Renderer';
 import EditorGroupBar from './EditorGroupBar';
 import FileSystem from '../explorer/FileSystem';
@@ -29,8 +30,8 @@ const EditorGroup = (props) => {
         }
     }, [props.fileObj]) // runs ony once, componentDidMount or when props change
 
-    const handleTextChange = (event) => {
-        setValue(event.target.value);
+    const handleTextChange = (text) => {
+        setValue(text);
         setModified(true);
     }
 
@@ -59,7 +60,7 @@ const EditorGroup = (props) => {
             <SplitPane style={style.fill}>
                 {(currentChoice === 0 || currentChoice === 2) &&
                     <Pane minSize="50px">
-                        <Editor value={value} handleChange={handleTextChange} />
+                        <Textarea value={value} className="editor" handleChange={handleTextChange} />
                     </Pane>
                 }
                 {(currentChoice === 1 || currentChoice === 2) &&
