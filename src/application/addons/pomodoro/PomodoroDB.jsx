@@ -48,8 +48,8 @@ const deleteRow = (db, id, callback) => {
 }
 
 const editRow = (db, row, callback) => {
-    const query = `UPDATE tasks SET name=? WHERE id=?;`;
-    db.run(query, [row.name, row.id], (err) => {
+    const query = `UPDATE tasks SET name=?, desc=? WHERE id=?;`;
+    db.run(query, [row.name, row.desc, row.id], (err) => {
         handleSqlError(err);
         if (callback) callback(err);
     })

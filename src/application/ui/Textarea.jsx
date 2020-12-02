@@ -1,4 +1,8 @@
-// used in Searchbar.jsx
+// const Textarea = (props) => {
+//     return (
+//         <textarea {...props} />
+//     );
+// }
 
 import { useState, useRef, useEffect, useCallback } from "react";
 
@@ -14,61 +18,37 @@ const style = {
 /*
 Passable props:
 - initialValue
+- value
 - visible
 - setVisible
 - style
-- containerStyle
 - disabled
-- type
 - placeholder
 - handleCancel
-- handleConfirm
 - handleChange
-- handleKeyPress
+- className
 */
 
-const Textbox = (props) => {
-    let [ name, setName ] = useState(props.initialValue || "");
+const Textarea = (props) => {
+    const { setVisible, handleCancel } = props;
+    let [ name, setName ] = useState(props.value || props.initialValue || "");
     const textboxRef = useRef(null);
-    const { setVisible, handleCancel, initialValue } = props;
 
-    const handleCancelWrapper = useCallback((type) => {
+    const handleCancelWrapper = useCallback(() => {
         if (handleCancel) {
             setName((prevName) => {
-                if (prevName === "") return (initialValue || "");
-                let newName = handleCancel(prevName, type);
+                let newName = handleCancel(prevName);
                 if ((newName || newName === "") && typeof newName === "string") 
                     return newName;
                 return prevName
-            })
-            // let newName = handleCancel(name, type);
-            // if ((newName || newName === "") && typeof newName === "string") 
-            //     setName(newName);
+            });
         }
-    }, [handleCancel, initialValue]);
-
-    const handleConfirm = () => {
-        if (props.handleConfirm) {
-            let newName = props.handleConfirm(name);
-            if ((newName || newName === "") && typeof newName === "string") setName(newName);
-        }
-    }
+    }, [handleCancel]);
 
     const handleChange = (event) => {
         event.stopPropagation();
         setName(event.target.value);
         if (props.handleChange) props.handleChange(event.target.value);
-    }
-
-    const keyPress = (event) => {
-        if (event.key === 'Enter') {
-            if (setVisible) setVisible(false);
-            handleConfirm();
-        }
-        else if (event.key === 'Escape') {
-            if (setVisible) setVisible(false);
-            handleCancelWrapper('key');
-        }
     }
 
     useEffect(() => { // add when mounted
@@ -92,21 +72,20 @@ const Textbox = (props) => {
     }, [props.initialValue])
 
     return (
-        <div ref={textboxRef} style={props.containerStyle || style.container}>
+        <>
             {(props.visible === undefined ? true : props.visible) && 
-                <input
-                    value={name || ""}
-                    style={props.style}
-                    type={"text" || props.type}
-                    className="textbox"
+                <textarea
+                    ref={textboxRef}
+                    value={props.value || name || ""}
+                    style={props.style || style.container}
+                    className={props.className}
                     onChange={handleChange}
-                    onKeyDown={props.handleKeyPress || keyPress}
                     placeholder={props.placeholder}
                     disabled={props.disabled}
                 />
             }
-        </div>
+        </>
     );
 }
 
-export default Textbox;
+export default Textarea;
