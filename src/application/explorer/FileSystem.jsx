@@ -23,12 +23,12 @@ export default class FileSystem {
             if (stats.isDirectory()) {
                 tree.type = "directory";
                 try {
-                    tree.children = fs.readdirSync(root).map((child) => FileSystem.getTree(root + '/' + child));
+                    tree.subtree = fs.readdirSync(root).map((child) => FileSystem.getTree(root + '/' + child));
                 }
                 catch (err) {
                     console.log(err);
                     toast.error("FAILED TO RETRIVE SUB-TREE", { autoClose: false });
-                    tree.children = [{ path: root, name: "FAILED TO RETRIVE SUB-TREE", type: "file" }];
+                    tree.subtree = [{ path: root, name: "FAILED TO RETRIVE SUB-TREE", type: "file" }];
                 }
             }
             else {

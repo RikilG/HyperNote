@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 
 import Navbar from './Navbar';
 import Explorer from '../explorer/Explorer';
-import FileSystem from '../explorer/FileSystem';
-import UserPreferences from '../settings/UserPreferences';
 import Searchbar from '../addons/search/Searchbar';
 import Pomodoro from '../addons/pomodoro/PomodoroNav';
 
@@ -22,15 +20,8 @@ const style = {
 const Navspace = (props) => {
     let [selection, setSelection] = useState('explorer');
 
-    let test = FileSystem.getTree(UserPreferences.get('noteStorage'));
-    const EXPLORER = <Explorer
-        key={test.id}
-        id={test.id}
-        name={test.name}
-        type={test.type}
-        path={test.path}
-        subtree={test.children}
-    />;
+    // TODO: convert these into an abject and index with strings directly instead of switch case
+    const EXPLORER = <Explorer />;
     const SEARCH = <Searchbar />;
     const POMODORO = <Pomodoro />
 

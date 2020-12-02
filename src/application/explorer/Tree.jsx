@@ -1,56 +1,55 @@
-import React from 'react';
-
-import TreeItem from './TreeItem';
+import React, { useEffect, useState } from 'react';
 
 import '../css/Explorer.css';
+import TreeItem from './TreeItem';
 import EditorGroup from '../editor/EditorGroup';
 
-export default class Tree extends React.Component {
-    constructor(props) {
-        super(props);
+const Tree = (props) => {
+    let [ expanded, setExpanded ] = useState(false);
+    let { type, name, path, id, subtree } = props.treeObj;
 
-        this.state = {
-            expanded: false,
-        }
-    }
-
-    expandTree = () => {
-        if (this.props.type === "file") { // open the file
+    const expandTree = () => {
+        if (type === "file") { // open the file
             let file = {
                 addon: "notes",
-                name: this.props.name,
-                path: this.props.path,
-                id: this.props.id,
+                name: name,
+                path: path,
+                id: id,
                 page: undefined,
             }
             file.page = <EditorGroup key={file.id} fileObj={file} />
-            this.props.openFile(file);
+            props.openWindow(file);
         }
         else { // toggle the tree (folder)
-            this.setState({ expanded: !this.state.expanded });
+            setExpanded((prevState) => !prevState);
         }
     }
 
-    render() {
-        return (
-            <div>
-                <TreeItem key={'item' + this.props.id} type={this.props.type} name={this.props.name} expanded={this.state.expanded} path={this.props.path} onClick={this.expandTree} />
-                <div className="explorerTree">
-                    {this.props.subtree && this.state.expanded &&
-                        this.props.subtree.map(element =>
-                            <Tree
-                                key={element.id}
-                                id={element.id}
-                                name={element.name}
-                                type={element.type}
-                                path={element.path}
-                                subtree={element.children}
-                                openFile={this.props.openFile}
-                            />
-                        )
-                    }
-                </div>
-            </div>
-        );
-    }
+    return (
+        <>
+        {(!props.root) && 
+            <TreeItem
+                key={'item' + id}
+                type={type}
+                name={name}
+                expanded={expanded}
+                path={path}
+                onClick={expandTree}
+            />
+        }
+        <div className={props.root ? "" : "explorerTree"}>
+            {subtree && (props.root || expanded) &&
+                subtree.map(element =>
+                    <Tree
+                        key={element.id}
+                        treeObj={element}
+                        openWindow={props.openWindow}
+                    />
+                )
+            }
+        </div>
+        </>
+    );
 }
+
+export default Tree;

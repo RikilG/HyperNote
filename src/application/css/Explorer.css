@@ -2,20 +2,14 @@
     margin-left: 10px;
 }
 
-.text{
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow: ellipsis;
-}
-
 .tree-item:hover {
     background-color: gray;
 }
 
-.tree-item .new-icon-container{
+.tree-item .new-icon-container {
     visibility: hidden;
 }
 
-.tree-item:hover .new-icon-container{
+.tree-item:hover .new-icon-container {
     visibility: visible;
 }
