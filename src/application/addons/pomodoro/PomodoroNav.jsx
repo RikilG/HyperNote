@@ -18,7 +18,7 @@ const style = {
         padding: "0.2rem",
     },
     header: {
-        fontSize: "2rem",
+        fontSize: "1.5rem",
         padding: "0.2rem 0.6rem",
         color: "var(--primaryColor)",
     },
@@ -136,12 +136,12 @@ const PomodoroNav = () => {
             <div style={style.controls}>
                 <div style={style.controlItem} onClick={() => setTextbox(true)}>
                     <Tooltip value="Add" position="bottom">
-                        <FontAwesomeIcon icon={faPlus}  />
+                        <FontAwesomeIcon icon={faPlus} />
                     </Tooltip>
                 </div>
-                <div onClick={handleRefresh} style={style.controlItem}>
+                <div style={style.controlItem} onClick={handleRefresh}>
                     <Tooltip  value="Refresh" position="bottom">
-                        <FontAwesomeIcon icon={faSync}  />
+                        <FontAwesomeIcon icon={faSync} />
                     </Tooltip>
                 </div>
             </div>

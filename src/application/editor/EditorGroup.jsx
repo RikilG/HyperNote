@@ -45,7 +45,8 @@ const EditorGroup = (props) => {
             return;
         }
         else {
-            toast("File save functionality not yet done :)");
+            FileSystem.writeFile(props.fileObj.path, value);
+            toast("File saved successfully!");
         }
     }
 

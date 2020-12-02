@@ -1,5 +1,8 @@
+import { useContext } from 'react';
+
 import FileSystem from './FileSystem';
 import Textbox from '../ui/Textbox';
+import { ExplorerContext } from '../explorer/Explorer';
 
 const style = {
     container: {
@@ -18,6 +21,7 @@ Passable props:
 */
 
 const TreeTextbox = (props) => {
+    const { refreshTree } = useContext(ExplorerContext);
     const path = props.path;
 
     const handleConfirm = (newName) => {
@@ -26,6 +30,7 @@ const TreeTextbox = (props) => {
                 FileSystem.newFile(FileSystem.join(path, newName));
             else
                 FileSystem.newDirectory(FileSystem.join(path, newName));
+            refreshTree();
         }
     }
 
@@ -47,7 +52,8 @@ const TreeTextbox = (props) => {
                 case 'ini': case 'json': case 'yml':
                 case 'asciidoc':
                     props.setVisible(false);
-                    FileSystem.newFile(FileSystem.join(path, filename));
+                    handleConfirm(filename);
+                    // FileSystem.newFile(FileSystem.join(path, filename));
                     break;
                 default:
             }

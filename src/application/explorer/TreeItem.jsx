@@ -11,29 +11,35 @@ const styles = {
     treeItem: {
         display: "flex",
         flexFlow: "row nowrap",
-        cursor: "pointer"
+        cursor: "pointer",
+        padding: "0.15rem",
+        margin: "0 0.15rem 0 0",
+        borderRadius: "0.3rem",
     },
     caretIcon: {
-        marginLeft: "5px"
+        margin: "1px 0 0 5px",
     },
-    icon: {
+    fileIcon: {
         margin: "0 5px"
     },
     newIconContainer: {
         display: "flex",
         flexFlow: "row nowrap",
         position: "absolute",
-        right: "5px",
-        zIndex: '1'
+        right: "7px",
+        zIndex: '1',
     },
-    pageIcon: {
-        cursor: "pointer"
-    },
-    folderIcon: {
+    newIcon: {
         cursor: "pointer",
         position: "relative",
-        marginLeft: "10px"
-    }
+        margin: "2px 5px"
+    },
+    text: {
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+        userSelect: "none",
+    },
 }
 
 const TreeItem = (props) => {
@@ -57,19 +63,27 @@ const TreeItem = (props) => {
         <Tooltip value={props.name} position="mouse">
             <div className="textbox-wrapper">
                 <div onClick={props.onClick} style={styles.treeItem} className="tree-item">
-                    {caret ?
-                        <FontAwesomeIcon icon={caret} style={styles.caretIcon} /> :
-                        <span style={{ paddingLeft: "12px" }}></span>
+                    {caret 
+                        ? <FontAwesomeIcon icon={caret} style={styles.caretIcon} />
+                        : <span style={{ paddingLeft: "12px" }}></span>
                     }
-                    <FontAwesomeIcon icon={getIcon()} style={styles.icon} />
-                    <div className='text'>
+                    <FontAwesomeIcon icon={getIcon()} style={styles.fileIcon} />
+                    <div style={styles.text}>
                         {props.name}
                     </div>
-                    {props.expanded && props.type !== 'file' && (
+                    {/*props.expanded &&*/ props.type !== 'file' && 
                         <div style={styles.newIconContainer} className="new-icon-container">
-                            <FontAwesomeIcon style={styles.pageIcon} className="page-icon" icon={faPlus} onClick={(e) => { e.stopPropagation(); setTextbox(true); setClickEvent('file'); }} />
-                            <FontAwesomeIcon style={styles.folderIcon} className="folder-icon" icon={faFolderPlus} onClick={(e) => { e.stopPropagation(); setTextbox(true); setClickEvent('folder'); }} />
-                        </div>)
+                            <FontAwesomeIcon
+                                style={styles.newIcon}
+                                icon={faPlus}
+                                onClick={(e) => { e.stopPropagation(); setTextbox(true); setClickEvent('file'); }}
+                            />
+                            <FontAwesomeIcon
+                                style={styles.newIcon}
+                                icon={faFolderPlus}
+                                onClick={(e) => { e.stopPropagation(); setTextbox(true); setClickEvent('folder'); }}
+                            />
+                        </div>
                     }
                 </div>
                 <TreeTextbox path={props.path} visible={textbox} setVisible={setTextbox} clickEvent={clickEvent} />
