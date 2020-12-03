@@ -3,6 +3,12 @@ body {
     color: var(--primaryTextColor);
 }
 
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
 .y-scrollable {
     overflow-y: auto;
     /* overflow-x: hidden; */
@@ -37,6 +43,10 @@ body {
     padding: 3px;
     border: 0;
     border-radius: 5px;
+}
+
+.menu-item:hover {
+    background: gray;
 }
 
 .tooltip {
@@ -84,8 +94,6 @@ body {
     border-width: 5px 5px 5px 0;
     border-right-color: #000;
 }
-
-
 
 .tooltip.top .tooltip-arrow {
     top: auto;
