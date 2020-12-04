@@ -1,9 +1,4 @@
-import React, {
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 import Tree from "./Tree";
@@ -60,9 +55,7 @@ const Explorer = (props) => {
         // TODO: make getTree() async to remove file system parsing from main thread
         // TODO: modify prevTree from setTree (using func syntax of setState) to reduce disk load
         // TODO: sort the resulting tree to show folders first and next files
-        setTree(
-            FileSystem.getTree(UserPreferences.get("noteStorage"))
-        );
+        setTree(FileSystem.getTree(UserPreferences.get("noteStorage")));
     };
 
     useEffect(() => {
