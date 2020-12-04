@@ -45,14 +45,14 @@ const Explorer = (props) => {
 
     const contextMenuOptions = [
         {
-            name: "edit",
+            name: "rename",
             icon: faPen,
-            action: () => console.log("edit"),
+            action: (target) => console.log("rename", target),
         },
         {
             name: "delete",
             icon: faTrash,
-            action: () => console.log("delete"),
+            action: (target) => console.log("delete", target),
         },
     ];
 

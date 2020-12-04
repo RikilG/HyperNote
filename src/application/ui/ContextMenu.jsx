@@ -35,10 +35,12 @@ const useContextMenu = ({ x, y, width, height }) => {
     const [xPos, setXPos] = useState("0px");
     const [yPos, setYPos] = useState("0px");
     const [showMenu, setShowMenu] = useState(false);
+    const [target, setTarget] = useState(undefined);
 
     const handleContextMenu = useCallback(
         (e) => {
             e.preventDefault();
+            setTarget(e.target);
             if (
                 e.pageX >= x &&
                 e.pageY >= y &&
@@ -69,11 +71,11 @@ const useContextMenu = ({ x, y, width, height }) => {
         };
     }, [handleClick, handleContextMenu]);
 
-    return { xPos, yPos, showMenu };
+    return { xPos, yPos, showMenu, target };
 };
 
 const ContextMenu = ({ children, bounds, menu }) => {
-    const { xPos, yPos, showMenu } = useContextMenu(bounds);
+    const { xPos, yPos, showMenu, target } = useContextMenu(bounds);
 
     return (
         <>
@@ -90,7 +92,7 @@ const ContextMenu = ({ children, bounds, menu }) => {
                             key={index}
                             style={style.menuItem}
                             className="menu-item"
-                            onClick={item.action}
+                            onClick={() => item.action(target)}
                         >
                             <FontAwesomeIcon
                                 icon={item.icon || faWrench}
