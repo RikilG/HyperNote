@@ -3,7 +3,7 @@ body {
     color: var(--primaryTextColor);
 }
 
-.clearfix::after {
+.clearfix:after {
     content: "";
     clear: both;
     display: table;

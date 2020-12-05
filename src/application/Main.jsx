@@ -13,6 +13,14 @@ import { WindowContextWrapper } from "./WindowContext";
 
 const Main = () => {
     let [activeAddon, setActiveAddon] = useState("explorer");
+    let [navbarActive, setNavbarActive] = useState(true);
+
+    const handleAddonChange = (addon) => {
+        if (!navbarActive) {
+            setNavbarActive(true);
+        }
+        setActiveAddon(addon);
+    };
 
     return (
         <WindowContextWrapper>
@@ -24,16 +32,18 @@ const Main = () => {
                 }}
             >
                 <div style={{ width: "35px" }}>
-                    <Navbar changeSelection={setActiveAddon} />
+                    <Navbar
+                        navbarActive={navbarActive}
+                        setNavbarActive={setNavbarActive}
+                        changeSelection={handleAddonChange}
+                    />
                 </div>
                 <SplitPane split="vertical">
-                    <Pane
-                        minSize="120px"
-                        maxSize="50%"
-                        initialSize="180px"
-                    >
-                        <Navspace addon={activeAddon} />
-                    </Pane>
+                    {navbarActive && (
+                        <Pane minSize="120px" maxSize="50%" initialSize="180px">
+                            <Navspace addon={activeAddon} />
+                        </Pane>
+                    )}
                     <Pane minSize="50px">
                         <Workspace />
                     </Pane>
