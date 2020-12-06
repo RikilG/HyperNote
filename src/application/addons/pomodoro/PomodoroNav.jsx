@@ -34,10 +34,6 @@ const style = {
         padding: "0.3rem",
         cursor: "pointer",
     },
-    taskList: {
-        display: "flex",
-        flexFlow: "column nowrap",
-    },
 };
 
 const PomodoroNav = () => {
@@ -121,15 +117,18 @@ const PomodoroNav = () => {
                 handleCancel={() => setTextbox(false)}
                 placeholder=" New Task "
             />
-            <div style={style.taskList}>
+            <div>
                 {taskList.map((taskItem) => (
-                    <PomodoroTask
-                        key={`${taskItem.name}-${taskItem.id}`}
-                        setOpenTask={setOpenTask}
-                        taskItem={taskItem}
-                        handleDelete={handleDelete}
-                        handleEdit={handleEdit}
-                    />
+                    <>
+                        <PomodoroTask
+                            key={`${taskItem.name}-${taskItem.id}`}
+                            setOpenTask={setOpenTask}
+                            taskItem={taskItem}
+                            handleDelete={handleDelete}
+                            handleEdit={handleEdit}
+                        />
+                        <div className="divider" />
+                    </>
                 ))}
             </div>
         </div>
