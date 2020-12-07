@@ -1,10 +1,19 @@
-import React, { useState, useContext } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEye, faEyeSlash, faSave, faWindowClose, faEdit, faColumns } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useContext } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faEye,
+    faICursor,
+    faSave,
+    faWindowClose,
+    faScroll,
+    faColumns,
+    faPen,
+} from "@fortawesome/free-solid-svg-icons";
 
-import Textbox from '../ui/Textbox';
-import WindowContext from '../WindowContext';
-import FileSystem from '../explorer/FileSystem';
+import Textbox from "../ui/Textbox";
+import WindowContext from "../WindowContext";
+import FileSystem from "../explorer/FileSystem";
+import Tooltip from "../ui/Tooltip";
 
 let styles = {
     bar: {
@@ -20,14 +29,6 @@ let styles = {
     button: {
         cursor: "pointer",
     },
-    defaultMouse: {
-        display: "flex",
-        flex: "1",
-    },
-    textbox: {
-        background: "var(--backgroundColor)",
-        flex: "1",
-    },
 };
 
 const EditorGroupBar = (props) => {
@@ -38,52 +39,90 @@ const EditorGroupBar = (props) => {
         // TODO: modify props.fileObj.name after renaming
         if (active && filename !== props.fileObj.name) {
             const oldpath = props.fileObj.path;
-            const newpath = FileSystem.join(FileSystem.dirname(oldpath), filename);
+            const newpath = FileSystem.join(
+                FileSystem.dirname(oldpath),
+                filename
+            );
             FileSystem.rename(oldpath, newpath);
+            // wait for it to write to disk
+            setTimeout(props.fileObj.refresh, 400);
         }
         setActive(false);
-    }
+    };
 
     const handleCancel = (filename, type) => {
         setActive(false);
-        if (type === 'click') {
+        if (type === "click") {
             handleConfirm(filename);
             return;
         }
         return props.fileObj.name; // return the original file name to be reset
-    }
+    };
 
     const handleClose = () => {
         closeWindow(props.fileObj);
-    }
+    };
 
-    const handleChange = (name) => {
-        setActive(true);
-    }
+    const handleActive = () => {
+        setActive((value) => !value);
+    };
 
     return (
         <div style={styles.bar}>
-            <div style={styles.defaultMouse}>
-                <FontAwesomeIcon style={styles.icon} icon={faEdit} />
-                <Textbox
-                    initialValue={props.fileObj.name}
-                    style={styles.textbox}
-                    handleChange={handleChange}
-                    handleConfirm={handleConfirm}
-                    handleCancel={handleCancel}
-                />
+            <FontAwesomeIcon style={styles.icon} icon={faScroll} />
+            <Textbox
+                initialValue={props.fileObj.name}
+                style={{
+                    background: active
+                        ? "var(--backgroundColor)"
+                        : "var(--backgroundAccent)",
+                    flex: "1",
+                    width: "20px",
+                }}
+                handleConfirm={handleConfirm}
+                handleCancel={handleCancel}
+                disabled={!active}
+            />
+            <div style={styles.button} onClick={handleActive}>
+                <Tooltip value="Rename" position="bottom">
+                    <FontAwesomeIcon style={styles.icon} icon={faPen} />
+                </Tooltip>
             </div>
             <div style={styles.button} onClick={props.handleEditorGroup}>
-                <FontAwesomeIcon style={styles.icon} icon={props.choice === 0 ? faEye : props.choice === 1 ? faColumns : faEyeSlash} />
+                <Tooltip
+                    value={
+                        props.choice === 0
+                            ? "Renderer"
+                            : props.choice === 1
+                            ? "Editor & Renderer"
+                            : "Editor"
+                    }
+                    position="bottom"
+                >
+                    <FontAwesomeIcon
+                        style={styles.icon}
+                        icon={
+                            props.choice === 0
+                                ? faEye
+                                : props.choice === 1
+                                ? faColumns
+                                : faICursor
+                        }
+                    />
+                </Tooltip>
             </div>
             <div style={styles.button} onClick={props.handleSave}>
-                <FontAwesomeIcon style={styles.icon} icon={faSave} />
+                <Tooltip value="Save" position="bottom">
+                    <FontAwesomeIcon style={styles.icon} icon={faSave} />
+                </Tooltip>
             </div>
             <div style={styles.button} onClick={handleClose}>
-                <FontAwesomeIcon style={styles.icon} icon={faWindowClose} />
+                <Tooltip value="Close" position="bottom">
+                    <FontAwesomeIcon style={styles.icon} icon={faWindowClose} />
+                </Tooltip>
             </div>
         </div>
     );
-}
+};
 
 export default EditorGroupBar;

@@ -1,28 +1,56 @@
-import React from 'react';
-import SplitPane from 'react-split-pane';
-import Pane from 'react-split-pane/lib/Pane';
+import React, { useState } from "react";
+import SplitPane from "react-split-pane";
+import Pane from "react-split-pane/lib/Pane";
 
-import Navspace from './navspace/Navspace';
-import Workspace from './workspace/Workspace';
+import Navbar from "./navspace/Navbar";
+import Navspace from "./navspace/Navspace";
+import Workspace from "./workspace/Workspace";
 
-import 'react-toastify/dist/ReactToastify.css';
-import './css/AppStyle.css';
-import './css/SplitPane.css';
-import { WindowContextWrapper } from './WindowContext';
+import "react-toastify/dist/ReactToastify.css";
+import "./css/AppStyle.css";
+import "./css/SplitPane.css";
+import { WindowContextWrapper } from "./WindowContext";
 
 const Main = () => {
+    let [activeAddon, setActiveAddon] = useState("explorer");
+    let [navbarActive, setNavbarActive] = useState(true);
+
+    const handleAddonChange = (addon) => {
+        if (!navbarActive) {
+            setNavbarActive(true);
+        }
+        setActiveAddon(addon);
+    };
+
     return (
         <WindowContextWrapper>
-            <SplitPane split="vertical">
-                <Pane minSize="120px" maxSize="50%" initialSize="225px">
-                    <Navspace />
-                </Pane>
-                <Pane minSize="50px">
-                    <Workspace />
-                </Pane>
-            </SplitPane>
+            <div
+                style={{
+                    display: "flex",
+                    flexFlow: "row nowrap",
+                    height: "100%",
+                }}
+            >
+                <div style={{ width: "35px" }}>
+                    <Navbar
+                        navbarActive={navbarActive}
+                        setNavbarActive={setNavbarActive}
+                        changeSelection={handleAddonChange}
+                    />
+                </div>
+                <SplitPane split="vertical">
+                    {navbarActive && (
+                        <Pane minSize="120px" maxSize="50%" initialSize="180px">
+                            <Navspace addon={activeAddon} />
+                        </Pane>
+                    )}
+                    <Pane minSize="50px">
+                        <Workspace />
+                    </Pane>
+                </SplitPane>
+            </div>
         </WindowContextWrapper>
     );
-}
+};
 
 export default Main;

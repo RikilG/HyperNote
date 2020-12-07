@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFolderOpen, faSearch, faCog, faStopwatch20 } from '@fortawesome/free-solid-svg-icons';
+import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faFolderOpen,
+    faSearch,
+    faCog,
+    faStopwatch20,
+    faChevronLeft,
+    faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 
-import Settings from '../settings/Settings';
-import Tooltip from '../ui/Tooltip';
+import Settings from "../settings/Settings";
+import Tooltip from "../ui/Tooltip";
 
 const style = {
     container: {
@@ -28,31 +35,59 @@ const style = {
         padding: "25% 5%",
         cursor: "pointer",
     },
-}
+};
 
 const Navbar = (props) => {
     let [showSettings, setShowSettings] = useState(false);
 
     const toggleSettings = () => {
         setShowSettings(!showSettings);
-    }
+    };
 
     return (
         <div style={style.container}>
             <div style={style.menu}>
+                <Tooltip
+                    value={props.navbarActive ? "Collapse" : "Expand"}
+                    position="right"
+                >
+                    <FontAwesomeIcon
+                        style={style.icon}
+                        icon={
+                            props.navbarActive ? faChevronLeft : faChevronRight
+                        }
+                        onClick={() => props.setNavbarActive((prev) => !prev)}
+                    />
+                </Tooltip>
                 <Tooltip value="Explorer" position="right">
-                    <FontAwesomeIcon style={style.icon} icon={faFolderOpen} onClick={() => props.changeSelection("explorer")} />
+                    <FontAwesomeIcon
+                        style={style.icon}
+                        icon={faFolderOpen}
+                        onClick={() => props.changeSelection("explorer")}
+                    />
                 </Tooltip>
                 <Tooltip value="Search" position="right">
-                    <FontAwesomeIcon style={style.icon} icon={faSearch} onClick={() => props.changeSelection("search")} />
+                    <FontAwesomeIcon
+                        style={style.icon}
+                        icon={faSearch}
+                        onClick={() => props.changeSelection("search")}
+                    />
                 </Tooltip>
                 <Tooltip value="Pomodoro" position="right">
-                    <FontAwesomeIcon style={style.icon} icon={faStopwatch20} onClick={() => props.changeSelection("pomodoro")} />
+                    <FontAwesomeIcon
+                        style={style.icon}
+                        icon={faStopwatch20}
+                        onClick={() => props.changeSelection("pomodoro")}
+                    />
                 </Tooltip>
             </div>
             <div style={style.tools}>
                 <Tooltip value="Settings" position="right">
-                    <FontAwesomeIcon style={style.icon} icon={faCog} onClick={toggleSettings} />
+                    <FontAwesomeIcon
+                        style={style.icon}
+                        icon={faCog}
+                        onClick={toggleSettings}
+                    />
                 </Tooltip>
             </div>
             {showSettings && <Settings onExit={toggleSettings} />}

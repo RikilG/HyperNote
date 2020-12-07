@@ -30,50 +30,62 @@ Passable props:
 */
 
 const Textarea = (props) => {
+    let [activeSelection, setActiveSelection] = useState(false);
     const { setVisible, handleCancel } = props;
-    let [ name, setName ] = useState(props.value || props.initialValue || "");
+    let [name, setName] = useState(
+        props.value || props.initialValue || ""
+    );
     const textboxRef = useRef(null);
 
     const handleCancelWrapper = useCallback(() => {
-        if (handleCancel) {
+        if (activeSelection && handleCancel) {
+            setActiveSelection(false);
             setName((prevName) => {
                 let newName = handleCancel(prevName);
-                if ((newName || newName === "") && typeof newName === "string") 
+                if (
+                    (newName || newName === "") &&
+                    typeof newName === "string"
+                )
                     return newName;
-                return prevName
+                return prevName;
             });
         }
-    }, [handleCancel]);
+    }, [handleCancel, activeSelection]);
 
     const handleChange = (event) => {
         event.stopPropagation();
         setName(event.target.value);
-        if (props.handleChange) props.handleChange(event.target.value);
-    }
+        if (props.handleChange)
+            props.handleChange(event.target.value);
+    };
 
-    useEffect(() => { // add when mounted
+    useEffect(() => {
+        // add when mounted
         const handleClick = (event) => {
             if (textboxRef.current.contains(event.target)) {
                 // click inside textbox
+                setActiveSelection(true);
                 return;
             }
             if (setVisible) setVisible(false);
-            handleCancelWrapper('click');
-        }
+            handleCancelWrapper("click");
+        };
 
         document.addEventListener("mousedown", handleClick);
-        return () => { // return function to be called when unmounted
+        return () => {
+            // return function to be called when unmounted
             document.removeEventListener("mousedown", handleClick);
         };
     }, [handleCancelWrapper, setVisible]);
 
-    useEffect(() => { // run on componentDidMount!
+    useEffect(() => {
+        // run on componentDidMount!
         setName(props.initialValue);
-    }, [props.initialValue])
+    }, [props.initialValue]);
 
     return (
         <>
-            {(props.visible === undefined ? true : props.visible) && 
+            {(props.visible === undefined ? true : props.visible) && (
                 <textarea
                     ref={textboxRef}
                     value={props.value || name || ""}
@@ -83,9 +95,9 @@ const Textarea = (props) => {
                     placeholder={props.placeholder}
                     disabled={props.disabled}
                 />
-            }
+            )}
         </>
     );
-}
+};
 
 export default Textarea;
