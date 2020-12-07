@@ -1,19 +1,25 @@
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 export default class FileSystem {
     static generateTree(root) {
-        if (window.isElectron) { // set in preload.js
-            const fs = window.require('fs');
-            const path = window.require('path');
+        if (window.isElectron) {
+            // set in preload.js
+            const fs = window.require("fs");
+            const path = window.require("path");
 
             let stats;
             try {
                 stats = fs.lstatSync(root);
-            }
-            catch (err) {
+            } catch (err) {
                 console.log(err);
-                toast.error("FAILED TO RETRIVE FILE TREE", { autoClose: false });
-                return { path: root, name: "FAILED TO RETRIVE FILE TREE", type: "file" };
+                toast.error("FAILED TO RETRIVE FILE TREE", {
+                    autoClose: false,
+                });
+                return {
+                    path: root,
+                    name: "FAILED TO RETRIVE FILE TREE",
+                    type: "file",
+                };
             }
             let tree = {
                 path: root,
@@ -23,15 +29,23 @@ export default class FileSystem {
             if (stats.isDirectory()) {
                 tree.type = "directory";
                 try {
-                    tree.subtree = fs.readdirSync(root).map((child) => FileSystem.getTree(root + '/' + child));
-                }
-                catch (err) {
+                    tree.subtree = fs
+                        .readdirSync(root)
+                        .map((child) => FileSystem.getTree(root + "/" + child));
+                } catch (err) {
                     console.log(err);
-                    toast.error("FAILED TO RETRIVE SUB-TREE", { autoClose: false });
-                    tree.subtree = [{ path: root, name: "FAILED TO RETRIVE SUB-TREE", type: "file" }];
+                    toast.error("FAILED TO RETRIVE SUB-TREE", {
+                        autoClose: false,
+                    });
+                    tree.subtree = [
+                        {
+                            path: root,
+                            name: "FAILED TO RETRIVE SUB-TREE",
+                            type: "file",
+                        },
+                    ];
                 }
-            }
-            else {
+            } else {
                 tree.type = "file";
             }
             return tree;
@@ -46,8 +60,9 @@ export default class FileSystem {
         function loop(obj) {
             for (var i in obj) {
                 var c = obj[i];
-                if (typeof c === 'object') {
-                    if (c.length === undefined) { //c is not an array
+                if (typeof c === "object") {
+                    if (c.length === undefined) {
+                        //c is not an array
                         c.id = iterator;
                         iterator++;
                     }
@@ -62,23 +77,23 @@ export default class FileSystem {
     static readFile(filepath) {
         if (window.isElectron) {
             try {
-                return window.require('fs').readFileSync(filepath, { encoding: "utf-8" });
-            }
-            catch (err) {
+                return window
+                    .require("fs")
+                    .readFileSync(filepath, { encoding: "utf-8" });
+            } catch (err) {
                 console.log(err);
                 toast.error("COULDN'T READ FILE", { autoClose: false });
                 return "COULDN'T READ FILE";
             }
         }
-        return undefined
+        return undefined;
     }
 
     static writeFile(filepath, content) {
         if (window.isElectron) {
             try {
-                return window.require('fs').writeFileSync(filepath, content);
-            }
-            catch (err) {
+                return window.require("fs").writeFileSync(filepath, content);
+            } catch (err) {
                 console.log(err);
                 toast.error("COULDN'T WRITE FILE", { autoClose: false });
             }
@@ -87,9 +102,10 @@ export default class FileSystem {
 
     static exists(filepath) {
         try {
-            return (window.isElectron && window.require('fs').existsSync(filepath));
-        }
-        catch (err) {
+            return (
+                window.isElectron && window.require("fs").existsSync(filepath)
+            );
+        } catch (err) {
             console.log(err);
             toast.error(err, { autoClose: false });
         }
@@ -98,9 +114,8 @@ export default class FileSystem {
     static newDirectory(folderpath) {
         if (window.isElectron && !this.exists(folderpath)) {
             try {
-                window.require('fs').mkdirSync(folderpath);
-            }
-            catch (err) {
+                window.require("fs").mkdirSync(folderpath);
+            } catch (err) {
                 console.log(err);
                 toast.error("COULDN'T CREATE DIRECTORY", { autoClose: false });
             }
@@ -111,41 +126,41 @@ export default class FileSystem {
         if (!this.exists(filepath)) {
             try {
                 this.writeFile(filepath, "");
-            }
-            catch (err) {
+            } catch (err) {
                 console.log(err);
                 toast.error("COULDN'T WRITE FILE", { autoClose: false });
             }
         }
     }
 
-    static browseFolder() { // Async function, returns Promise. take care
+    static browseFolder() {
+        // Async function, returns Promise. take care
         if (window.isElectron) {
             try {
-                const { dialog } = window.require('electron').remote;
+                const { dialog } = window.require("electron").remote;
                 return dialog.showOpenDialog({
-                    properties: ['openDirectory']
+                    properties: ["openDirectory"],
                 });
-            }
-            catch (err) {
+            } catch (err) {
                 console.log(err);
-                toast.error("ERROR WHILE OPENING NATIVE DIALOG", { autoClose: false });
+                toast.error("ERROR WHILE OPENING NATIVE DIALOG", {
+                    autoClose: false,
+                });
             }
         }
     }
 
     static join(basename, filename) {
         if (window.isElectron) {
-            return window.require('path').join(basename, filename);
+            return window.require("path").join(basename, filename);
         }
     }
 
     static rename(oldpath, newpath) {
         if (window.isElectron) {
             try {
-                window.require('fs').renameSync(oldpath, newpath);
-            }
-            catch (err) {
+                window.require("fs").renameSync(oldpath, newpath);
+            } catch (err) {
                 console.log(err);
                 toast.error("ERROR WHILE RENAMING FILE", { autoClose: false });
             }
@@ -154,7 +169,24 @@ export default class FileSystem {
 
     static dirname(filepath) {
         if (window.isElectron) {
-            return window.require('path').dirname(filepath);
+            return window.require("path").dirname(filepath);
+        }
+    }
+
+    static delete(filepath) {
+        if (window.isElectron) {
+            const fs = window.require("fs");
+            try {
+                const stats = fs.lstatSync(filepath);
+                if (stats.isDirectory()) {
+                    fs.rmdirSync(filepath, { recursive: true });
+                } else {
+                    fs.unlinkSync(filepath);
+                }
+            } catch (err) {
+                console.log(err);
+                toast.error("ERROR WHILE DELETING", { autoClose: false });
+            }
         }
     }
 }

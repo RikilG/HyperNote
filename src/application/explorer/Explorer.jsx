@@ -1,12 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import React, { useContext, useEffect, useState } from "react";
 
 import Tree from "./Tree";
 import TreeToolbar from "./TreeToolbar";
 import WindowContext from "../WindowContext";
 import FileSystem from "../explorer/FileSystem";
 import UserPreferences from "../settings/UserPreferences";
-import ContextMenu from "../ui/ContextMenu";
 
 const style = {
     explorer: {
@@ -35,20 +33,6 @@ const ExplorerContext = React.createContext({
 const Explorer = (props) => {
     const { openWindow } = useContext(WindowContext);
     let [tree, setTree] = useState({});
-    const explorerRef = useRef(null);
-
-    const contextMenuOptions = [
-        {
-            name: "rename",
-            icon: faPen,
-            action: (target) => console.log("rename", target),
-        },
-        {
-            name: "delete",
-            icon: faTrash,
-            action: (target) => console.log("delete", target),
-        },
-    ];
 
     const refreshTree = () => {
         // TODO: make getTree() async to remove file system parsing from main thread
@@ -61,17 +45,12 @@ const Explorer = (props) => {
         refreshTree();
     }, []);
 
-    const getContextMenuBounds = () => {
-        if (!explorerRef.current) return {};
-        return explorerRef.current.getBoundingClientRect();
-    };
-
     return (
         <div style={style.explorer}>
             <ExplorerContext.Provider value={{ refreshTree }}>
                 <div style={style.header}>Explorer</div>
                 <TreeToolbar path={tree.path} />
-                <div style={style.tree} ref={explorerRef}>
+                <div style={style.tree}>
                     <Tree
                         key={tree.id}
                         treeObj={tree}
@@ -79,10 +58,6 @@ const Explorer = (props) => {
                         root={true}
                     />
                 </div>
-                <ContextMenu
-                    bounds={getContextMenuBounds()}
-                    menu={contextMenuOptions}
-                />
             </ExplorerContext.Provider>
         </div>
     );

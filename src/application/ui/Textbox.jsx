@@ -56,10 +56,7 @@ const Textbox = (props) => {
     const handleConfirm = () => {
         if (props.handleConfirm) {
             let newName = props.handleConfirm(name);
-            if (
-                (newName || newName === "") &&
-                typeof newName === "string"
-            )
+            if ((newName || newName === "") && typeof newName === "string")
                 setName(newName);
         }
     };
@@ -67,8 +64,7 @@ const Textbox = (props) => {
     const handleChange = (event) => {
         event.stopPropagation();
         setName(event.target.value);
-        if (props.handleChange)
-            props.handleChange(event.target.value);
+        if (props.handleChange) props.handleChange(event.target.value);
     };
 
     const keyPress = (event) => {
@@ -89,6 +85,7 @@ const Textbox = (props) => {
                 textboxRef.current.contains(event.target)
             ) {
                 // click inside textbox
+                event.stopPropagation();
                 return;
             }
             if (setVisible) setVisible(false);
@@ -108,14 +105,11 @@ const Textbox = (props) => {
     }, [props.initialValue]);
 
     return (
-        <div
-            ref={textboxRef}
-            style={props.containerStyle || style.container}
-        >
+        <div ref={textboxRef} style={props.containerStyle || style.container}>
             {(props.visible === undefined ? true : props.visible) && (
                 <input
                     value={name || ""}
-                    style={props.style}
+                    style={props.style || { width: "100%" }}
                     type={"text" || props.type}
                     className="textbox"
                     onChange={handleChange}

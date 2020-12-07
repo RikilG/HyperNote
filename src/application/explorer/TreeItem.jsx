@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, {
+    useState,
+    useEffect,
+    useRef,
+    useContext,
+    useCallback,
+} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faFolderOpen,
@@ -8,12 +14,18 @@ import {
     faCaretRight,
     faFolderPlus,
     faPlus,
+    faPen,
+    faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 // import { faFolderOpen, faFolder, faFile } from '@fortawesome/free-regular-svg-icons';
 
 import "../css/Explorer.css";
 import Tooltip from "../ui/Tooltip";
+import Textbox from "../ui/Textbox";
+import FileSystem from "./FileSystem";
 import TreeTextbox from "./TreeTextbox";
+import ContextMenu from "../ui/ContextMenu";
+import { ExplorerContext } from "./Explorer";
 
 const styles = {
     treeItem: {
@@ -24,6 +36,7 @@ const styles = {
         margin: "0 0.15rem 0 0",
         borderRadius: "0.3rem",
         position: "relative",
+        alignItems: "center",
     },
     caretIcon: {
         margin: "1px 0 0 5px",
@@ -51,10 +64,45 @@ const styles = {
     },
 };
 
+function useHookWithRefCallback() {
+    // for the original useHookWIthRefCallback, go here:
+    // https://gist.github.com/thebuilder/fb07c989093d4a82811625de361884e7
+    const [bounds, setBounds] = useState({});
+    const ref = useRef(null);
+    const setRef = useCallback((node) => {
+        if (node) {
+            setBounds(node.getBoundingClientRect());
+        }
+
+        ref.current = node;
+    }, []);
+
+    return [setRef, bounds];
+}
+
 const TreeItem = (props) => {
     let [textbox, setTextbox] = useState(false);
+    let [isEditable, setIsEditable] = useState(false);
     let [clickEvent, setClickEvent] = useState("");
-    let [caret, setCaret] = useState(false);
+    let [caret, setCaret] = useState(null);
+    let [setContextMenuRef, bounds] = useHookWithRefCallback();
+    let { refreshTree } = useContext(ExplorerContext);
+
+    const contextMenuOptions = [
+        {
+            name: "rename",
+            icon: faPen,
+            action: () => setIsEditable(true),
+        },
+        {
+            name: "delete",
+            icon: faTrash,
+            action: () => {
+                FileSystem.delete(props.path);
+                refreshTree();
+            },
+        },
+    ];
 
     const getIcon = () => {
         if (props.type === "file") return faFile;
@@ -62,19 +110,37 @@ const TreeItem = (props) => {
         return faFolder;
     };
 
+    const handleRenameConfirm = (newName) => {
+        if (newName !== "") {
+            const newPath = FileSystem.join(
+                FileSystem.dirname(props.path),
+                newName
+            );
+            FileSystem.rename(props.path, newPath);
+            refreshTree();
+        }
+    };
+
+    const handleRenameCancel = (newName, type) => {
+        return props.name;
+    };
+
     useEffect(() => {
         if (props.type !== "file") {
             setCaret(props.expanded ? faCaretDown : faCaretRight);
+        } else {
+            setCaret(null);
         }
     }, [props.expanded, props.type]);
 
     return (
         <Tooltip value={props.name} position="mouse">
-            <div className="textbox-wrapper">
+            <div>
                 <div
-                    onClick={props.onClick}
+                    onClick={(e) => !isEditable && props.onClick(e)}
                     style={styles.treeItem}
                     className="tree-item"
+                    ref={setContextMenuRef}
                 >
                     {caret ? (
                         <FontAwesomeIcon
@@ -84,46 +150,53 @@ const TreeItem = (props) => {
                     ) : (
                         <span style={{ paddingLeft: "12px" }}></span>
                     )}
-                    <FontAwesomeIcon
-                        icon={getIcon()}
-                        style={styles.fileIcon}
-                    />
-                    <div style={styles.text}>{props.name}</div>
-                    {
-                        /*props.expanded &&*/ props.type !==
-                            "file" && (
-                            <div
-                                style={styles.newIconContainer}
-                                className="new-icon-container"
-                            >
-                                <FontAwesomeIcon
-                                    style={styles.newIcon}
-                                    icon={faPlus}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setTextbox(true);
-                                        setClickEvent("file");
-                                    }}
-                                />
-                                <FontAwesomeIcon
-                                    style={styles.newIcon}
-                                    icon={faFolderPlus}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setTextbox(true);
-                                        setClickEvent("folder");
-                                    }}
-                                />
-                            </div>
-                        )
-                    }
+                    <FontAwesomeIcon icon={getIcon()} style={styles.fileIcon} />
+                    {isEditable ? (
+                        <Textbox
+                            initialValue={props.name}
+                            visible={isEditable}
+                            setVisible={setIsEditable}
+                            handleConfirm={handleRenameConfirm}
+                            handleCancel={handleRenameCancel}
+                        />
+                    ) : (
+                        <div style={styles.text}>{props.name}</div>
+                    )}
+                    {!isEditable && props.type !== "file" && (
+                        <div
+                            style={styles.newIconContainer}
+                            className="new-icon-container"
+                        >
+                            <FontAwesomeIcon
+                                style={styles.newIcon}
+                                icon={faPlus}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setTextbox(true);
+                                    setClickEvent("file");
+                                }}
+                            />
+                            <FontAwesomeIcon
+                                style={styles.newIcon}
+                                icon={faFolderPlus}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setTextbox(true);
+                                    setClickEvent("folder");
+                                }}
+                            />
+                        </div>
+                    )}
                 </div>
-                <TreeTextbox
-                    path={props.path}
-                    visible={textbox}
-                    setVisible={setTextbox}
-                    clickEvent={clickEvent}
-                />
+                {textbox && (
+                    <TreeTextbox
+                        path={props.path}
+                        visible={textbox}
+                        setVisible={setTextbox}
+                        clickEvent={clickEvent}
+                    />
+                )}
+                <ContextMenu bounds={bounds} menu={contextMenuOptions} />
             </div>
         </Tooltip>
     );

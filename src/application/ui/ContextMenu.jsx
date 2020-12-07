@@ -39,6 +39,7 @@ const useContextMenu = ({ x, y, width, height }) => {
 
     const handleContextMenu = useCallback(
         (e) => {
+            if (!x && !y && !height && !width) return;
             e.preventDefault();
             setTarget(e.target);
             if (
