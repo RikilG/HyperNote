@@ -77,6 +77,7 @@ body {
 
 .tooltip-wrapper:hover .tooltip {
     display: inline-block;
+    pointer-events: none;
 }
 
 .tooltip .tooltip-arrow {

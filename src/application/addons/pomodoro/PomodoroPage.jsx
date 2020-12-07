@@ -32,7 +32,6 @@ const style = {
         fontSize: "1.1rem",
         textAlign: "center",
         background: "transparent",
-        color: "var(--primaryTextColor)",
     },
     timers: {
         margin: "0.6rem",
@@ -42,7 +41,6 @@ const style = {
     },
     timer: {
         background: "var(--primaryColor)",
-        color: "var(--secondaryTextColor)",
         paddingTop: "0.5rem",
         borderRadius: "0.4rem",
         fontSize: "1.5rem",
@@ -112,10 +110,7 @@ const PomodoroPage = (props) => {
                     <div style={style.title}>
                         00:
                         {String(
-                            Math.max(
-                                pomoDuration - minutesLeft - 1,
-                                0
-                            )
+                            Math.max(pomoDuration - minutesLeft - 1, 0)
                         ).padStart(2, "0")}
                         :{String(60 - (time % 60)).padStart(2, "0")}
                     </div>

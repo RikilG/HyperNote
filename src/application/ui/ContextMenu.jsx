@@ -6,20 +6,29 @@ const style = {
     container: {
         position: "absolute",
         padding: "0.3rem 0",
-        borderRadius: "0.4rem",
+        borderRadius: "0.2rem",
         minWidth: "100px",
         color: "var(--primaryTextColor)",
         background: "var(--backgroundAccent)",
         zIndex: "5",
-        boxShadow: "4px 4px 4px var(--backgroundAccent)",
+        boxShadow: "4px 4px 6px var(--secondaryTextColor)",
     },
     menuItem: {
         cursor: "pointer",
         userSelect: "none",
         borderRadius: "0.1rem",
         margin: "0.1rem",
-        padding: "0.1rem 0.5rem",
+        padding: "0.2rem 0.5rem",
         fontSize: "0.95rem",
+    },
+    menuItemDisabled: {
+        cursor: "default",
+        userSelect: "none",
+        borderRadius: "0.1rem",
+        margin: "0.1rem",
+        padding: "0.2rem 0.5rem",
+        fontSize: "0.95rem",
+        color: "var(--dividerColor)",
     },
     menuIcon: {
         margin: "0 10px 0 1px",
@@ -39,6 +48,7 @@ const useContextMenu = ({ x, y, width, height }) => {
 
     const handleContextMenu = useCallback(
         (e) => {
+            if (!x && !y && !height && !width) return;
             e.preventDefault();
             setTarget(e.target);
             if (
@@ -87,15 +97,20 @@ const ContextMenu = ({ children, bounds, menu }) => {
                     {menu.map((item, index) => (
                         <div
                             key={index}
-                            style={style.menuItem}
+                            style={
+                                item.disabled
+                                    ? style.menuItemDisabled
+                                    : style.menuItem
+                            }
                             className="menu-item"
-                            onClick={() => item.action(target)}
+                            onClick={() =>
+                                !item.disabled && item.action(target)
+                            }
                         >
                             <FontAwesomeIcon
                                 icon={item.icon || faWrench}
                                 style={style.menuIcon}
                             />
-
                             {capitalize(item.name)}
                         </div>
                     ))}

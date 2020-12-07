@@ -1,11 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useContext, useState } from "react";
+import { useContext, useState, useRef, useCallback } from "react";
 import { toast } from "react-toastify";
 
 import "./Pomodoro.css";
 import PomodoroPage from "./PomodoroPage";
 import Textbox from "../../ui/Textbox";
+import ContextMenu from "../../ui/ContextMenu";
 import WindowContext from "../../WindowContext";
 
 const style = {
@@ -18,12 +19,42 @@ const style = {
     },
 };
 
+function useHookWithRefCallback() {
+    // for the original useHookWIthRefCallback, go here:
+    // https://gist.github.com/thebuilder/fb07c989093d4a82811625de361884e7
+    const [bounds, setBounds] = useState({});
+    const ref = useRef(null);
+    const setRef = useCallback((node) => {
+        if (node) {
+            setBounds(node.getBoundingClientRect());
+        }
+
+        ref.current = node;
+    }, []);
+
+    return [setRef, bounds];
+}
+
 const PomodoroTask = (props) => {
     let [textbox, setTextbox] = useState(false);
+    let [setContextMenuRef, bounds] = useHookWithRefCallback();
     const { openWindow } = useContext(WindowContext);
 
+    const contextMenuOptions = [
+        {
+            name: "rename",
+            icon: faPen,
+            action: () => setTextbox(true),
+        },
+        {
+            name: "delete",
+            icon: faTrash,
+            action: () => handleDelete(),
+        },
+    ];
+
     const handleDelete = (e) => {
-        e.stopPropagation();
+        if (e) e.stopPropagation();
         props.handleDelete(props.taskItem);
     };
 
@@ -41,6 +72,7 @@ const PomodoroTask = (props) => {
     };
 
     const handleTaskOpen = () => {
+        if (textbox) return; // rename textbox is open
         const taskItem = props.taskItem;
         let id = `pomodoro/${taskItem.name}-${taskItem.id}`;
         let task = {
@@ -68,39 +100,43 @@ const PomodoroTask = (props) => {
     };
 
     return (
-        <div
-            style={style.container}
-            className="hover-item"
-            onClick={handleTaskOpen}
-        >
-            {textbox ? (
-                <Textbox
-                    initialValue={props.taskItem.name}
-                    visible={textbox}
-                    setVisible={setTextbox}
-                    handleConfirm={handleConfirm}
-                    handleCancel={handleCancel}
-                />
-            ) : (
-                <div style={style.title}>{props.taskItem.name}</div>
-            )}
-            {!textbox && (
-                <div className="hover-item-toolbar">
-                    <div
-                        className="hover-item-tool"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setTextbox(true);
-                        }}
-                    >
-                        <FontAwesomeIcon icon={faPen} />
+        <>
+            <div
+                style={style.container}
+                className="hover-item"
+                onClick={handleTaskOpen}
+                ref={setContextMenuRef}
+            >
+                {textbox ? (
+                    <Textbox
+                        initialValue={props.taskItem.name}
+                        visible={textbox}
+                        setVisible={setTextbox}
+                        handleConfirm={handleConfirm}
+                        handleCancel={handleCancel}
+                    />
+                ) : (
+                    <div style={style.title}>{props.taskItem.name}</div>
+                )}
+                {!textbox && (
+                    <div className="hover-item-toolbar">
+                        <div
+                            className="hover-item-tool"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setTextbox(true);
+                            }}
+                        >
+                            <FontAwesomeIcon icon={faPen} />
+                        </div>
+                        <div className="hover-item-tool" onClick={handleDelete}>
+                            <FontAwesomeIcon icon={faTrash} />
+                        </div>
                     </div>
-                    <div className="hover-item-tool" onClick={handleDelete}>
-                        <FontAwesomeIcon icon={faTrash} />
-                    </div>
-                </div>
-            )}
-        </div>
+                )}
+            </div>
+            <ContextMenu bounds={bounds} menu={contextMenuOptions} />
+        </>
     );
 };
 
