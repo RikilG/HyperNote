@@ -1,18 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-    faPlus,
-    faSync,
-    faPen,
-    faTrash,
-} from "@fortawesome/free-solid-svg-icons";
-import { useContext, useState, useEffect, useRef } from "react";
+import { faPlus, faSync } from "@fortawesome/free-solid-svg-icons";
+import { useContext, useState, useEffect } from "react";
 
 import Tooltip from "../../ui/Tooltip";
 import Textbox from "../../ui/Textbox";
 import PomodoroTask from "./PomodoroTask";
 import WindowContext from "../../WindowContext";
 import { openDatabase } from "../../Database";
-import ContextMenu from "../../ui/ContextMenu";
 import UserPreferences from "../../settings/UserPreferences";
 import { createDb, listRows, addRow, deleteRow, editRow } from "./PomodoroDB";
 
@@ -52,21 +46,7 @@ const PomodoroNav = () => {
     let [textbox, setTextbox] = useState(false);
     let [openTask, setOpenTask] = useState(null); // currently open pomo task
     const { closeWindow } = useContext(WindowContext);
-    const contextMenuRef = useRef(null);
     const db = openDatabase(UserPreferences.get("pomoStorage"));
-
-    const contextMenuOptions = [
-        {
-            name: "rename",
-            icon: faPen,
-            action: (target) => console.log("rename", target),
-        },
-        {
-            name: "delete",
-            icon: faTrash,
-            action: (target) => console.log("delete", target),
-        },
-    ];
 
     createDb(db, () => listRows(db));
 
@@ -111,11 +91,6 @@ const PomodoroNav = () => {
         });
     };
 
-    const getContextMenuBounds = () => {
-        if (!contextMenuRef.current) return {};
-        return contextMenuRef.current.getBoundingClientRect();
-    };
-
     useEffect(() => {
         // on mount and unmount
         listRows(db, setTaskList);
@@ -149,7 +124,7 @@ const PomodoroNav = () => {
                     placeholder=" New Task "
                 />
             )}
-            <div style={style.pomodoroItems} ref={contextMenuRef}>
+            <div style={style.pomodoroItems}>
                 {taskList.map((taskItem) => (
                     <div key={`${taskItem.id}`}>
                         <PomodoroTask
@@ -162,10 +137,6 @@ const PomodoroNav = () => {
                     </div>
                 ))}
             </div>
-            <ContextMenu
-                bounds={getContextMenuBounds()}
-                menu={contextMenuOptions}
-            />
         </div>
     );
 };
