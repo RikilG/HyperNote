@@ -1,6 +1,6 @@
 const themes = {
     dark: {
-        primaryColor: "#8BC34A",
+        primaryColor: "#5a9614",
         accentColor: "#009688",
         primaryTextColor: "white",
         secondaryTextColor: "#252525",
@@ -13,7 +13,7 @@ const themes = {
         primaryColor: "#8BC34A",
         accentColor: "#809688",
         primaryTextColor: "black",
-        secondaryTextColor: "#252525",
+        secondaryTextColor: "#959595",
         backgroundColor: "white",
         backgroundAccent: "#e4e4e4",
         blockquoteColor: "rgba(0,0,0,0.80)",
@@ -26,9 +26,9 @@ const themes = {
         backgroundColor: "#DCEDC8", // lightPrimaryColor
         backgroundAccent: "#BCD0A8", // lightPrimaryColor
         primaryTextColor: "#212121",
-        secondaryTextColor: "#252525",
+        secondaryTextColor: "#959595",
         dividerColor: "#BDBDBD",
     },
 };
-  
+
 export default themes;
