@@ -12,7 +12,6 @@ const style = {
     explorer: {
         display: "flex",
         flexFlow: "column nowrap",
-        position: "relative",
         flex: "1",
         maxWidth: "100%",
     },

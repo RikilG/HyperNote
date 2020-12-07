@@ -48,7 +48,7 @@ const useContextMenu = ({ x, y, width, height }) => {
                 e.pageY <= y + height
             )
                 setShowMenu(true);
-            setXPos(`${e.pageX - 33}px`); // 35 px of navbar
+            setXPos(`${e.pageX - 10}px`); // 10 for better feel :)
             setYPos(`${e.pageY - 28}px`); // 30 px of titlebar
         },
         [setXPos, setYPos, width, height, x, y]
@@ -64,10 +64,7 @@ const useContextMenu = ({ x, y, width, height }) => {
 
         return () => {
             document.addEventListener("click", handleClick);
-            document.removeEventListener(
-                "contextmenu",
-                handleContextMenu
-            );
+            document.removeEventListener("contextmenu", handleContextMenu);
         };
     }, [handleClick, handleContextMenu]);
 
