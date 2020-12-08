@@ -4,9 +4,7 @@ import FileSystem from "../explorer/FileSystem";
 
 export default class UserPreferences {
     static path = window.require("path");
-    static basePath = window
-        .require("electron")
-        .remote.app.getPath("userData");
+    static basePath = window.require("electron").remote.app.getPath("userData");
     static dataPath = this.path.join(this.basePath, "userStorage");
     static configPath = this.path.join(this.dataPath, "config.json");
     static preferences = {};
@@ -15,6 +13,7 @@ export default class UserPreferences {
         userStorage: this.dataPath,
         noteStorage: this.path.join(this.dataPath, "noteStorage"),
         pomoStorage: this.path.join(this.dataPath, "pomoStorage.db"),
+        calendarStorage: this.path.join(this.dataPath, "calendarStorage.db"),
     };
 
     static __loadPreferences() {
@@ -71,10 +70,7 @@ export default class UserPreferences {
     }
 
     static setPreferences() {
-        FileSystem.writeFile(
-            this.configPath,
-            JSON.stringify(this.preferences)
-        );
+        FileSystem.writeFile(this.configPath, JSON.stringify(this.preferences));
     }
 
     static resetDefaults() {

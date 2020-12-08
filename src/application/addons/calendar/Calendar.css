@@ -1,0 +1,42 @@
+.calendar-bar {
+    display: flex;
+    margin: 0 0.5rem;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 25px repeat(5, 1fr);
+    background: var(--dividerColor);
+    height: 100%;
+}
+
+.calendar-grid > div:not(.weekday) {
+    background: var(--backgroundColor);
+    border-radius: 0.4rem;
+    margin: 0.5px;
+    padding: 0.1rem;
+}
+
+.calendar-grid > div:nth-child(7n + 1) {
+    background: rgb(235, 133, 25);
+}
+
+.calendar-grid > div:not(.empty):not(.weekday):hover {
+    background: var(--dividerColor);
+    cursor: pointer;
+}
+
+.weekday {
+    width: 100%;
+    padding-top: 0.2rem;
+    text-align: center;
+    justify-self: center;
+    align-self: end;
+    font-weight: bold;
+    background: var(--backgroundColor);
+    border-bottom: 2px solid var(--primaryTextColor);
+}
