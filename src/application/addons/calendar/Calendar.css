@@ -1,3 +1,35 @@
+.month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    background: var(--dividerColor);
+    justify-items: stretch;
+}
+
+.month-grid > div {
+    background: var(--backgroundColor);
+    border-radius: 0.4rem;
+    margin: 2px;
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.year-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    background: var(--dividerColor);
+    height: 90%;
+}
+
+.year-grid > div {
+    background: var(--backgroundColor);
+    border-radius: 0.4rem;
+    margin: 2px;
+    text-align: center;
+    padding: 2rem 0;
+}
+
 .calendar-bar {
     display: flex;
     margin: 0 0.5rem;
@@ -18,14 +50,16 @@
     background: var(--backgroundColor);
     border-radius: 0.4rem;
     margin: 0.5px;
-    padding: 0.1rem;
+    padding: 0.3rem;
 }
 
 .calendar-grid > div:nth-child(7n + 1) {
     background: rgb(235, 133, 25);
 }
 
-.calendar-grid > div:not(.empty):not(.weekday):hover {
+.calendar-grid > div:not(.empty):not(.weekday):hover,
+.month-grid > div:hover,
+.year-grid > div:hover {
     background: var(--dividerColor);
     cursor: pointer;
 }
@@ -36,6 +70,7 @@
     text-align: center;
     justify-self: center;
     align-self: end;
+    user-select: none;
     font-weight: bold;
     background: var(--backgroundColor);
     border-bottom: 2px solid var(--primaryTextColor);
