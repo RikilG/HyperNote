@@ -21,7 +21,8 @@ body {
 
 .button {
     background: var(--primaryColor);
-    padding: 0.6rem 1.6rem;
+    padding: 0.6rem;
+    user-select: none;
     /* box-shadow: 1px 1px 3px var(--primaryTextColor); */
     border-radius: 0.2rem;
     margin: 1rem;

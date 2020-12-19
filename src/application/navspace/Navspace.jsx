@@ -4,6 +4,7 @@ import React from "react";
 import Explorer from "../explorer/Explorer";
 import Searchbar from "../addons/search/Searchbar";
 import Pomodoro from "../addons/pomodoro/PomodoroNav";
+import Calendar from "../addons/calendar/CalendarNav";
 
 const style = {
     fillFlex: {
@@ -23,6 +24,7 @@ const Navspace = (props) => {
         explorer: <Explorer />,
         search: <Searchbar />,
         pomodoro: <Pomodoro />,
+        calendar: <Calendar />,
     };
 
     const showSelection = () => {

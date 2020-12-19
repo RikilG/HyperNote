@@ -1,7 +1,7 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
+
 const style = {
-    container: {
-        display: "flex",
-    },
     backDrop: {
         display: "flex",
         background: "var(--backgroundColor)",
@@ -19,7 +19,7 @@ const style = {
         height: "70%",
         transform: "translateY(2.5%)",
         background: "var(--backgroundAccent)",
-        borderRadius: "0.3rem",
+        borderRadius: "0.4rem",
         padding: "0.5rem",
         zIndex: "11",
         position: "fixed",
@@ -29,27 +29,27 @@ const style = {
         top: "0",
         margin: "auto",
     },
-    header: {
-        textAlign: "center",
-        paddingBottom: "1rem",
+    closeButton: {
+        position: "absolute",
+        top: "0.4rem",
+        right: "0.5rem",
+        cursor: "pointer",
+        padding: "0.5rem",
     },
-}
+};
 
-const Modal = (props) => {
-
-    // const noAction = (e) => {
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    // }
-
+const Modal = ({ children, onExit }) => {
     return (
-        <div style={style.container}>
+        <div>
             <div style={style.backDrop}></div>
             <div style={style.modalBox}>
-                {props.children}
+                {children}
+                <div onClick={onExit} style={style.closeButton}>
+                    <FontAwesomeIcon icon={faTimes} />
+                </div>
             </div>
         </div>
     );
-}
+};
 
 export default Modal;
