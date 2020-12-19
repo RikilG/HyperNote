@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faChevronCircleLeft,
     faChevronCircleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
-// import UserPreferences from "../../settings/UserPreferences";
+import UserPreferences from "../../settings/UserPreferences";
 import WindowBar from "../../workspace/WindowBar";
-// import { openDatabase } from "../../Database";
+import { openDatabase } from "../../Database";
 import Tooltip from "../../ui/Tooltip";
+import CalendarDB from "./CalendarDB";
 
 const style = {
     container: {
@@ -77,8 +78,8 @@ const monthToDays = (month, year) => {
 };
 
 const CalendarPage = (props) => {
-    const taskItem = props.winObj.taskItem;
-    // const db = openDatabase(UserPreferences.get("calendarStorage"));
+    const { changeSelection } = props.winObj;
+    const db = openDatabase(UserPreferences.get("calendarStorage"));
     const today = new Date();
     let [curDate, setCurDate] = useState(today);
     let [selectMonth, setSelectMonth] = useState(false);
@@ -141,9 +142,24 @@ const CalendarPage = (props) => {
         );
     };
 
+    useEffect(() => {
+        // on mount and unmount
+        CalendarDB.create(db);
+        changeSelection(curDate);
+        // listRows(db, setCalendarList);
+        return () => {
+            db.close();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        changeSelection(curDate);
+    }, [curDate, changeSelection]);
+
     return (
         <div style={style.container}>
-            <WindowBar winObj={props.winObj} title={taskItem.name} />
+            <WindowBar winObj={props.winObj} title="Calendar" />
             <div style={style.calendar}>
                 <div className="calendar-bar">
                     <div onClick={getPrevSection} style={style.calendarIcon}>
@@ -196,6 +212,11 @@ const CalendarPage = (props) => {
                                     setSelectMonth(false);
                                     setSelectYear(false);
                                 }}
+                                className={
+                                    ind === curDate.getMonth()
+                                        ? "active-selection"
+                                        : ""
+                                }
                             >
                                 {month}
                             </div>
@@ -219,6 +240,11 @@ const CalendarPage = (props) => {
                                     setSelectYear(false);
                                     setSelectMonth(true);
                                 }}
+                                className={
+                                    yearItem.isSelected
+                                        ? "active-selection"
+                                        : ""
+                                }
                             >
                                 {yearItem.year}
                             </div>
@@ -235,7 +261,25 @@ const CalendarPage = (props) => {
                         {getCalendarDates().map((dateItem, ind) => (
                             <div
                                 key={ind}
-                                className={dateItem.date === 0 ? "empty" : ""}
+                                className={
+                                    dateItem.date === 0
+                                        ? "empty"
+                                        : dateItem.isToday
+                                        ? "today"
+                                        : dateItem.isSelected
+                                        ? "active-selection"
+                                        : ""
+                                }
+                                onClick={() =>
+                                    setCurDate(
+                                        (prev) =>
+                                            new Date(
+                                                prev.getFullYear(),
+                                                prev.getMonth(),
+                                                dateItem.date
+                                            )
+                                    )
+                                }
                             >
                                 {dateItem.date === 0 ? "" : dateItem.date}
                             </div>
