@@ -1,19 +1,32 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { useContext, useState } from 'react';
-import { toast } from 'react-toastify'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faSync } from "@fortawesome/free-solid-svg-icons";
+import { useContext, useState, useEffect } from "react";
 
-import Tooltip from '../../ui/Tooltip';
-import ProjectPage from './ProjectPage';
-import WindowContext from '../../WindowContext';
+import Tooltip from "../../ui/Tooltip";
+import Textbox from "../../ui/Textbox";
+import ProjectEntry from "./ProjectEntry";
+import WindowContext from "../../WindowContext";
+import { openDatabase } from "../../Database";
+import UserPreferences from "../../settings/UserPreferences";
+import {
+    createProjectsDb,
+    listProjectRows,
+    addProjectRow,
+    deleteProjectRow,
+    editProjectRow,
+} from "./ProjectDB";
 
 const style = {
     container: {
         height: "100%",
         padding: "0.2rem",
+        width: "100%",
+        maxWidth: "100%",
+        display: "flex",
+        flexFlow: "column",
     },
     header: {
-        fontSize: "2rem",
+        fontSize: "1.5rem",
         padding: "0.2rem 0.6rem",
         color: "var(--primaryColor)",
     },
@@ -30,58 +43,101 @@ const style = {
         cursor: "pointer",
     },
     projectList: {
-        display: "flex",
-        flexFlow: "column nowrap",
+        flex: "10",
     },
-    project: {
-        margin: "0.15rem",
-        padding: "0.25rem",
-        borderRadius: "0.3rem",
-        cursor: "pointer",
-    }
 };
 
-const Project = (props) => {
-    let [projectList, setProjectList] = useState(['Project1', 'Project2', 'Project3']);
-    const { openWindow } = useContext(WindowContext);
+const Project = () => {
+    let [projectList, setProjectList] = useState([]);
+    let [textbox, setTextbox] = useState(false);
+    let [openProject, setOpenProject] = useState(null);
+    const { openWindow, closeWindow } = useContext(WindowContext);
+    const db = openDatabase(UserPreferences.get("projectStorage"));
 
-    const handleNewProject = () => {
-        setProjectList([...projectList, "newProject"]);
-    }
+    createProjectsDb(db, () => listProjectRows(db));
 
-    const handleProjectOpen = (e) => {
-        let name = e.currentTarget.innerHTML;
-        let id = `project/${name}`
-        let project = {
-            addon: "project",
-            name: name,
-            id: id,
-            page: undefined,
-            running: false,
-        }
-    }
+    const createNewProject = (projectName) => {
+        const projectItem = {
+            name: projectName,
+        };
+        addProjectRow(db, projectItem, (err) => {
+            if (err) return;
+            listProjectRows(db, setProjectList);
+            setTextbox(false);
+        });
+        return "";
+    };
+
+    const handleRefresh = () => {
+        listProjectRows(db, setProjectList);
+        console.log(projectList);
+    };
+
+    const handleDelete = (projectItem) => {
+        deleteProjectRow(db, projectItem.id, (err) => {
+            if (err) return;
+            if (openProject && openProject.projectItem.id === projectItem.id) {
+                closeWindow(openProject);
+                setOpenProject(null);
+            }
+            listProjectRows(db, setProjectList);
+        });
+    };
+
+    const handleEdit = (projectItem, newName) => {
+        projectItem.name = newName;
+        editProjectRow(db, projectItem, (err) => {
+            if (err) return;
+            listProjectRows(db, setProjectList);
+        });
+    };
+
+    useEffect(() => {
+        listProjectRows(db, setProjectList);
+        return () => {
+            db.close();
+        };
+    }, []);
 
     return (
         <div style={style.container}>
-            <div style={style.header}>Projects</div>
+            <div style={style.header}>Tasks</div>
             <div style={style.controls}>
-                <Tooltip style={style.controlItem} value="Add" position="bottom">
-                    <FontAwesomeIcon icon={faPlus} onClick={handleNewProject} />
-                </Tooltip>
-                <Tooltip style={style.controlItem} value="Edit" position="bottom">
-                    <FontAwesomeIcon icon={faPen} />
-                </Tooltip>
-                <Tooltip style={style.controlItem} value="Delete" position="bottom">
-                    <FontAwesomeIcon icon={faTrash} />
-                </Tooltip>
+                <div style={style.controlItem} onClick={() => setTextbox(true)}>
+                    <Tooltip value="Add" position="bottom">
+                        <FontAwesomeIcon icon={faPlus} />
+                    </Tooltip>
+                </div>
+                <div style={style.controlItem} onClick={handleRefresh}>
+                    <Tooltip value="Refresh" position="bottom">
+                        <FontAwesomeIcon icon={faSync} />
+                    </Tooltip>
+                </div>
             </div>
+            {textbox && (
+                <Textbox
+                    visible={textbox}
+                    setVisible={setTextbox}
+                    handleConfirm={createNewProject}
+                    handleCancel={() => setTextbox(false)}
+                    placeholder="New Project"
+                />
+            )}
             <div style={style.projectList}>
-                {
-                    projectList.map((project) => <div key={project} style={style.project} className="tree-item" onClick={handleProjectOpen}>{project}</div>)
-                }
+                {projectList.map((projectItem) => (
+                    <div key={`${projectItem.id}`}>
+                        <ProjectEntry
+                            setOpenProject={setOpenProject}
+                            projectItem={projectItem}
+                            handleDelete={handleDelete}
+                            handleEdit={handleEdit}
+                        />
+                        <div className="divider" />
+                    </div>
+                ))}
             </div>
         </div>
     );
-}
+};
 
 export default Project;

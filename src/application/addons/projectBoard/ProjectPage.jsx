@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import WindowBar from '../../workspace/WindowBar';
-import Progressbar from '../../ui/Progressbar';
-import Tooltip from '../../ui/Tooltip';
+import WindowBar from "../../workspace/WindowBar";
+import Tooltip from "../../ui/Tooltip";
 
 const style = {
     container: {
@@ -12,8 +11,8 @@ const style = {
         padding: "0 0.5rem",
     },
     title: {
-        margin: "0.8rem",
-        fontSize: "2rem",
+        margin: "0.2rem",
+        fontSize: "1.5rem",
         fontWeight: "bold",
         textAlign: "center",
     },
@@ -22,13 +21,17 @@ const style = {
         maxHeight: "25%",
         fontSize: "1.1rem",
         textAlign: "center",
-    }
-}
+    },
+};
 
 const ProjectPage = (props) => {
+    const projectItem = props.winObj.projectItem;
     return (
-        <></>
+        <div style={style.container}>
+            <WindowBar winObj={props.winObj} title={"Project"} />
+            <div style={style.title}>{projectItem.name}</div>
+        </div>
     );
-}
+};
 
 export default ProjectPage;
