@@ -5,6 +5,7 @@ import {
     faSearch,
     faCog,
     faStopwatch20,
+    faCalendarDay,
     faChevronLeft,
     faWindowRestore,
     faChevronRight,
@@ -72,6 +73,13 @@ const Navbar = (props) => {
                         style={style.icon}
                         icon={faSearch}
                         onClick={() => props.changeSelection("search")}
+                    />
+                </Tooltip>
+                <Tooltip value="Calendar" position="right">
+                    <FontAwesomeIcon
+                        style={style.icon}
+                        icon={faCalendarDay}
+                        onClick={() => props.changeSelection("calendar")}
                     />
                 </Tooltip>
                 <Tooltip value="Pomodoro" position="right">

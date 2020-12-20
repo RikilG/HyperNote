@@ -1,0 +1,108 @@
+.month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    background: var(--dividerColor);
+    justify-items: stretch;
+}
+
+.month-grid > div {
+    background: var(--backgroundColor);
+    border-radius: 0.4rem;
+    margin: 2px;
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.year-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    background: var(--dividerColor);
+    height: 90%;
+}
+
+.year-grid > div {
+    background: var(--backgroundColor);
+    border-radius: 0.4rem;
+    margin: 2px;
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.calendar-bar {
+    display: flex;
+    margin: 0 0.5rem;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 25px repeat(5, 1fr);
+    background: var(--dividerColor);
+    height: 100%;
+}
+
+.calendar-grid > div:not(.weekday) {
+    background: var(--backgroundColor);
+    border-radius: 0.4rem;
+    margin: 0.5px;
+    padding: 0.3rem;
+}
+
+.calendar-grid > div:nth-child(7n + 1) {
+    background: rgb(235, 133, 25);
+}
+
+.calendar-grid > div:not(.empty):not(.weekday):hover,
+.month-grid > div:hover,
+.year-grid > div:hover {
+    -webkit-backface-visibility: hidden;
+    box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transform: scale(1.05);
+    transition: 0.2s ease;
+}
+
+.weekday {
+    width: 100%;
+    padding-top: 0.2rem;
+    text-align: center;
+    justify-self: center;
+    align-self: end;
+    user-select: none;
+    font-weight: bold;
+    background: var(--backgroundColor);
+    border-bottom: 2px solid var(--primaryTextColor);
+}
+
+.active-selection {
+    background: rgb(219, 219, 23) !important;
+    color: var(--secondaryTextColor);
+    border-radius: 0.4rem;
+    margin: 0.5px;
+    padding: 0.3rem;
+}
+
+.today {
+    background: var(--primaryColor) !important;
+}
+
+.new-event-grid {
+    max-height: 74%;
+    margin: 0.2rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* grid-template-rows: repeat(4, 1fr); */
+    justify-items: center;
+    align-items: center;
+}
+
+.new-event-grid > div {
+    text-align: center;
+    padding: 0.2rem;
+    user-select: none;
+}
