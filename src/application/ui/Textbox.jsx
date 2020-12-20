@@ -28,75 +28,88 @@ Passable props:
 */
 
 const Textbox = (props) => {
-    let [ name, setName ] = useState(props.initialValue || "");
+    let [name, setName] = useState(props.initialValue || "");
     const textboxRef = useRef(null);
     const { setVisible, handleCancel, initialValue } = props;
 
-    const handleCancelWrapper = useCallback((type) => {
-        if (handleCancel) {
-            setName((prevName) => {
-                if (prevName === "") return (initialValue || "");
-                let newName = handleCancel(prevName, type);
-                if ((newName || newName === "") && typeof newName === "string") 
-                    return newName;
-                return prevName
-            })
-            // let newName = handleCancel(name, type);
-            // if ((newName || newName === "") && typeof newName === "string") 
-            //     setName(newName);
-        }
-    }, [handleCancel, initialValue]);
+    const handleCancelWrapper = useCallback(
+        (type) => {
+            if (handleCancel) {
+                setName((prevName) => {
+                    if (prevName === "") return initialValue || "";
+                    let newName = handleCancel(prevName, type);
+                    if (
+                        (newName || newName === "") &&
+                        typeof newName === "string"
+                    )
+                        return newName;
+                    return prevName;
+                });
+                // let newName = handleCancel(name, type);
+                // if ((newName || newName === "") && typeof newName === "string")
+                //     setName(newName);
+            }
+        },
+        [handleCancel, initialValue]
+    );
 
     const handleConfirm = () => {
         if (props.handleConfirm) {
             let newName = props.handleConfirm(name);
-            if ((newName || newName === "") && typeof newName === "string") setName(newName);
+            if ((newName || newName === "") && typeof newName === "string")
+                setName(newName);
         }
-    }
+    };
 
     const handleChange = (event) => {
         event.stopPropagation();
         setName(event.target.value);
         if (props.handleChange) props.handleChange(event.target.value);
-    }
+    };
 
     const keyPress = (event) => {
-        if (event.key === 'Enter') {
+        if (event.key === "Enter") {
             if (setVisible) setVisible(false);
             handleConfirm();
-        }
-        else if (event.key === 'Escape') {
+        } else if (event.key === "Escape") {
             if (setVisible) setVisible(false);
-            handleCancelWrapper('key');
+            handleCancelWrapper("key");
         }
-    }
+    };
 
-    useEffect(() => { // add when mounted
+    useEffect(() => {
+        // add when mounted
         const handleClick = (event) => {
-            if (textboxRef.current.contains(event.target)) {
+            if (
+                !textboxRef.current || // textbox is undefined
+                textboxRef.current.contains(event.target)
+            ) {
                 // click inside textbox
+                event.stopPropagation();
                 return;
             }
             if (setVisible) setVisible(false);
-            handleCancelWrapper('click');
-        }
+            handleCancelWrapper("click");
+        };
 
         document.addEventListener("mousedown", handleClick);
-        return () => { // return function to be called when unmounted
+        return () => {
+            // return function to be called when unmounted
             document.removeEventListener("mousedown", handleClick);
         };
     }, [handleCancelWrapper, setVisible]);
 
-    useEffect(() => { // run on componentDidMount!
+    useEffect(() => {
+        // run on componentDidMount!
         setName(props.initialValue);
-    }, [props.initialValue])
+    }, [props.initialValue]);
 
     return (
         <div ref={textboxRef} style={props.containerStyle || style.container}>
-            {(props.visible === undefined ? true : props.visible) && 
+            {(props.visible === undefined ? true : props.visible) && (
                 <input
                     value={name || ""}
-                    style={props.style}
+                    style={props.style || { width: "100%" }}
                     type={"text" || props.type}
                     className="textbox"
                     onChange={handleChange}
@@ -104,9 +117,9 @@ const Textbox = (props) => {
                     placeholder={props.placeholder}
                     disabled={props.disabled}
                 />
-            }
+            )}
         </div>
     );
-}
+};
 
 export default Textbox;

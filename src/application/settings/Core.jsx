@@ -1,10 +1,10 @@
-import { toast } from 'react-toastify';
-import { useState } from 'react';
+import { toast } from "react-toastify";
+import { useState } from "react";
 
-import Button from '../ui/Button';
-import Textbox from '../ui/Textbox';
-import UserPreferences from '../settings/UserPreferences';
-import FileSystem from '../explorer/FileSystem';
+import Button from "../ui/Button";
+import Textbox from "../ui/Textbox";
+import UserPreferences from "../settings/UserPreferences";
+import FileSystem from "../explorer/FileSystem";
 
 const style = {
     container: {
@@ -27,42 +27,58 @@ const style = {
         background: "var(--backgroundColor)",
         margin: "0.6rem 1.2rem",
         padding: "0.2rem 1rem",
-    }
-}
+    },
+};
 
 const Core = (props) => {
-    let [userStorage, setUserStorage] = useState(UserPreferences.get('userStorage'));
+    let [noteStorage, setNoteStorage] = useState(
+        UserPreferences.get("noteStorage")
+    );
 
     const handleStorageChange = () => {
         FileSystem.browseFolder()
-            .then(response => {
-                if (response.cancelled) return userStorage; // the old path
+            .then((response) => {
+                if (response.cancelled) return noteStorage; // the old path
                 return response.filePaths[0];
             })
-            .then(path => {
+            .then((path) => {
                 if (typeof path === "undefined") return;
                 else if (typeof path !== "string") {
-                    toast.error("Invalid path encountered. Please try again!");
+                    toast.error(
+                        "Invalid path encountered. Please try again!"
+                    );
+                } else if (path !== noteStorage) {
+                    // new path selected
+                    setNoteStorage(path);
+                    UserPreferences.set("noteStorage", path);
+                    toast("Storage path updated");
+                    toast.warning(
+                        "Application restart required ('Reload App' from settings)",
+                        { autoClose: false }
+                    );
                 }
-                else if (path !== userStorage) { // new path selected
-                    setUserStorage(path);
-                    UserPreferences.set('userStorage', path);
-                    toast('Storage path updated');
-                    toast.warning("Application restart required ('Reload App' from settings)", { autoClose: false });
-                }
-            })
-    }
+            });
+    };
 
     return (
         <div style={style.container}>
             <div style={style.header}>Core</div>
             <div style={style.subheader}>Storage</div>
-            <div style={{display: "flex"}}>
-                <Textbox initialValue={userStorage} style={style.textbox} disabled={true} />
-                <Button style={style.button} onClick={handleStorageChange}>Change</Button>
+            <div style={{ display: "flex" }}>
+                <Textbox
+                    initialValue={noteStorage}
+                    style={style.textbox}
+                    disabled={true}
+                />
+                <Button
+                    style={style.button}
+                    onClick={handleStorageChange}
+                >
+                    Change
+                </Button>
             </div>
         </div>
     );
-}
+};
 
 export default Core;

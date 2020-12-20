@@ -1,25 +1,28 @@
-import { toast } from 'react-toastify';
-import FileSystem from '../explorer/FileSystem';
+import { toast } from "react-toastify";
+import FileSystem from "../explorer/FileSystem";
 // import { toast } from 'react-toastify';
 
 export default class UserPreferences {
-    static path = window.require('path');
-    static basePath = window.require('electron').remote.app.getPath('userData');
-    static dataPath = this.path.join(this.basePath, 'userStorage');
-    static configPath = this.path.join(this.dataPath, 'config.json');
+    static path = window.require("path");
+    static basePath = window.require("electron").remote.app.getPath("userData");
+    static dataPath = this.path.join(this.basePath, "userStorage");
+    static configPath = this.path.join(this.dataPath, "config.json");
     static preferences = {};
     static defaults = {
         theme: "material",
         userStorage: this.dataPath,
-        noteStorage: this.path.join(this.dataPath, 'noteStorage'),
-        pomoStorage: this.path.join(this.dataPath, 'pomoStorage.db'),
+        noteStorage: this.path.join(this.dataPath, "noteStorage"),
+        pomoStorage: this.path.join(this.dataPath, "pomoStorage.db"),
+        projectStorage: this.path.join(this.dataPath, "projectStorage.db"),
     };
 
     static __loadPreferences() {
         const defaultData = { error: true };
         try {
             if (FileSystem.exists(this.configPath))
-                this.preferences = JSON.parse(FileSystem.readFile(this.configPath));
+                this.preferences = JSON.parse(
+                    FileSystem.readFile(this.configPath)
+                );
             else {
                 this.preferences = this.defaults;
                 this.setPreferences();
@@ -33,8 +36,7 @@ export default class UserPreferences {
             }
 
             return this.preferences;
-        }
-        catch(error) {
+        } catch (error) {
             return defaultData;
         }
     }
@@ -52,10 +54,12 @@ export default class UserPreferences {
         }
         return this.preferences[key];
     }
-   
+
     static set(key, value) {
-        if (key === 'userStorage' && typeof value !== "string") {
-            toast.error("Tryin to store true again?!", { autoClose: false });
+        if (key === "userStorage" && typeof value !== "string") {
+            toast.error("Tryin to store true again?!", {
+                autoClose: false,
+            });
             return;
         }
         let contents = this.getPreferences();
