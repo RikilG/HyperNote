@@ -1,0 +1,20 @@
+.hover-item:hover {
+    background-color: gray;
+}
+
+.hover-item-toolbar {
+    visibility: hidden;
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    top: 0;
+}
+
+.hover-item-tool {
+    display: inline-block;
+    padding: 5px;
+}
+
+.hover-item:hover .hover-item-toolbar {
+    visibility: visible;
+}

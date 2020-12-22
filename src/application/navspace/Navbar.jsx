@@ -7,6 +7,7 @@ import {
     faStopwatch20,
     faCalendarDay,
     faChevronLeft,
+    faWindowRestore,
     faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -86,6 +87,13 @@ const Navbar = (props) => {
                         style={style.icon}
                         icon={faStopwatch20}
                         onClick={() => props.changeSelection("pomodoro")}
+                    />
+                </Tooltip>
+                <Tooltip value="Project" position="right">
+                    <FontAwesomeIcon
+                        style={style.icon}
+                        icon={faWindowRestore}
+                        onClick={() => props.changeSelection("project")}
                     />
                 </Tooltip>
             </div>

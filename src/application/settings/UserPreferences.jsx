@@ -13,6 +13,7 @@ export default class UserPreferences {
         userStorage: this.dataPath,
         noteStorage: this.path.join(this.dataPath, "noteStorage"),
         pomoStorage: this.path.join(this.dataPath, "pomoStorage.db"),
+        projectStorage: this.path.join(this.dataPath, "projectStorage.db"),
         calendarStorage: this.path.join(this.dataPath, "calendarStorage.db"),
     };
 

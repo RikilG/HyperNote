@@ -13,6 +13,7 @@ export const WindowContextWrapper = ({ children }) => {
         notes: [],
         pomodoro: [],
         calendar: [],
+        project: [],
     });
 
     /**
