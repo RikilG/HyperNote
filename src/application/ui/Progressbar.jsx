@@ -41,16 +41,27 @@ const Progressbar = (props) => {
 
     }
     */
-    
+
     useEffect(() => {
-        let temp = (props.completed/props.total)*100 || 0;
+        let temp = (props.completed / props.total) * 100 || 0;
         setProgress(Math.max(0, Math.min(temp, 100)));
-    }, [props.completed, props.total])
+    }, [props.completed, props.total]);
 
     return (
         <div style={style.container}>
-            <div style={{...style.empty, height: props.backThickness || "15px"}}>
-                <div style={{...style.full, width: `${progress}%`, padding: props.foreThickness || "3px"}}>
+            <div
+                style={{
+                    ...style.empty,
+                    height: props.backThickness || "15px",
+                }}
+            >
+                <div
+                    style={{
+                        ...style.full,
+                        width: `${progress}%`,
+                        padding: props.foreThickness || "3px",
+                    }}
+                >
                     <div style={style.progressText}>
                         {Math.round(progress)}%
                     </div>
@@ -58,6 +69,6 @@ const Progressbar = (props) => {
             </div>
         </div>
     );
-}
+};
 
 export default Progressbar;

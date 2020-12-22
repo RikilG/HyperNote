@@ -6,10 +6,7 @@ const { Color } = window.require("custom-electron-titlebar");
 
 const setCSSVariables = (theme) => {
     for (const value in theme) {
-        document.documentElement.style.setProperty(
-            `--${value}`,
-            theme[value]
-        );
+        document.documentElement.style.setProperty(`--${value}`, theme[value]);
     }
     const docWidth = document.documentElement.clientWidth;
     const docHeight = document.documentElement.clientHeight;
@@ -29,9 +26,7 @@ export const ThemeContext = React.createContext({
 });
 
 const ThemeContextWrapper = ({ children, titlebar }) => {
-    const [themeName, setThemeName] = useState(
-        UserPreferences.get("theme")
-    );
+    const [themeName, setThemeName] = useState(UserPreferences.get("theme"));
     const [theme, setTheme] = useState(themes[themeName]);
 
     // works only the first time to remove the default black titlebar

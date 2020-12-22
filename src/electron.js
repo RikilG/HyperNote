@@ -1,5 +1,5 @@
-const path = require('path');
-const electron = require('electron');
+const path = require("path");
+const electron = require("electron");
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
@@ -10,40 +10,40 @@ function createWindow() {
         title: "Hypernote",
         backgroundColor: "#202020",
         show: false,
-        width: 800, 
+        width: 800,
         height: 600,
-        webPreferences:{
+        webPreferences: {
             nodeIntegration: false,
             enableRemoteModule: true, // for accessing userData
             preload: path.join(__dirname, "preload.js"),
         },
         frame: false,
     });
-    
-    mainWindow.loadURL('http://localhost:3000');
-    mainWindow.webContents.openDevTools();
-    
-    mainWindow.on('closed', function () {
-        mainWindow = null
-    })
 
-    mainWindow.on('ready-to-show', function() { 
-        mainWindow.show(); 
-        mainWindow.focus(); 
+    mainWindow.loadURL("http://localhost:3000");
+    mainWindow.webContents.openDevTools();
+
+    mainWindow.on("closed", function () {
+        mainWindow = null;
+    });
+
+    mainWindow.on("ready-to-show", function () {
+        mainWindow.show();
+        mainWindow.focus();
     });
 }
-    
-app.on('ready', createWindow);
 
-app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') {
-        app.quit()
+app.on("ready", createWindow);
+
+app.on("window-all-closed", function () {
+    if (process.platform !== "darwin") {
+        app.quit();
     }
 });
 
-app.on('activate', function () {
+app.on("activate", function () {
     if (mainWindow === null) {
-        createWindow()
+        createWindow();
     }
 });
 

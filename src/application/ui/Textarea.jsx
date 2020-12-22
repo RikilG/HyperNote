@@ -32,9 +32,7 @@ Passable props:
 const Textarea = (props) => {
     let [activeSelection, setActiveSelection] = useState(false);
     const { setVisible, handleCancel } = props;
-    let [name, setName] = useState(
-        props.value || props.initialValue || ""
-    );
+    let [name, setName] = useState(props.value || props.initialValue || "");
     const textboxRef = useRef(null);
 
     const handleCancelWrapper = useCallback(() => {
@@ -42,10 +40,7 @@ const Textarea = (props) => {
             setActiveSelection(false);
             setName((prevName) => {
                 let newName = handleCancel(prevName);
-                if (
-                    (newName || newName === "") &&
-                    typeof newName === "string"
-                )
+                if ((newName || newName === "") && typeof newName === "string")
                     return newName;
                 return prevName;
             });
@@ -55,8 +50,7 @@ const Textarea = (props) => {
     const handleChange = (event) => {
         event.stopPropagation();
         setName(event.target.value);
-        if (props.handleChange)
-            props.handleChange(event.target.value);
+        if (props.handleChange) props.handleChange(event.target.value);
     };
 
     useEffect(() => {

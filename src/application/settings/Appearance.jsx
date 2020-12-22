@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
-import { toast } from 'react-toastify';
-import { ThemeContext } from '../ThemeContext';
-import themes from '../css/themes';
+import React, { useContext } from "react";
+import { toast } from "react-toastify";
+import { ThemeContext } from "../ThemeContext";
+import themes from "../css/themes";
 
-import Button from '../ui/Button';
+import Button from "../ui/Button";
 
 const style = {
     container: {
@@ -22,24 +22,33 @@ const style = {
         padding: "10px",
         background: "var(--primaryColor)",
     },
-}
+};
 
 const Appearance = (props) => {
     const { /*themeName,*/ changeTheme } = useContext(ThemeContext);
 
     const handleThemeChange = (event) => {
-        let newTheme = event.target.getAttribute('value');
+        let newTheme = event.target.getAttribute("value");
         changeTheme(newTheme);
         toast("Applied theme: " + newTheme);
-    }
+    };
 
     const getThemeButtons = () => {
         let output = [];
         for (var theme in themes) {
-            output.push(<Button key={theme} onClick={handleThemeChange} value={theme} style={style.button}>{theme.charAt(0).toUpperCase() + theme.slice(1)} Theme</Button>)
+            output.push(
+                <Button
+                    key={theme}
+                    onClick={handleThemeChange}
+                    value={theme}
+                    style={style.button}
+                >
+                    {theme.charAt(0).toUpperCase() + theme.slice(1)} Theme
+                </Button>
+            );
         }
         return output;
-    }
+    };
 
     return (
         <div style={style.container}>
@@ -48,6 +57,6 @@ const Appearance = (props) => {
             {getThemeButtons()}
         </div>
     );
-}
+};
 
 export default Appearance;

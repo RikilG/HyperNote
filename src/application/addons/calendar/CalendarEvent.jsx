@@ -130,7 +130,7 @@ const CalendarEvent = ({ onExit, selectedDate }) => {
                 {advanced && <div>None</div>} */}
 
                 {advanced && <div>Separation</div>}
-                {advanced && (
+                {advanced && recurrence !== "norepeat" && (
                     <div>
                         <div style={style.rowFlex}>
                             Leave

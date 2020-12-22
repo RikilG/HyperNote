@@ -1,4 +1,4 @@
-import Button from './Button';
+import Button from "./Button";
 
 const style = {
     backDrop: {
@@ -31,7 +31,7 @@ const style = {
         // justifyContent: "space-evenly",
         justifyContent: "flex-end",
     },
-}
+};
 
 export const showDialog = (onAccept, onReject, onCancel, setDialog) => {
     setDialog({
@@ -40,24 +40,24 @@ export const showDialog = (onAccept, onReject, onCancel, setDialog) => {
         onReject: onReject,
         onCancel: onCancel,
     });
-}
+};
 
 export const hideDialog = (setDialog) => {
     setDialog({ visible: false });
-}
+};
 
 const Dialog = (props) => {
-    let accept = props.accept || props.config.accept || 'Yes';
-    let reject = props.reject || props.config.reject || 'No';
+    let accept = props.accept || props.config.accept || "Yes";
+    let reject = props.reject || props.config.reject || "No";
 
     const noAction = (e) => {
         e.preventDefault();
         e.stopPropagation();
-    }
+    };
 
     return (
         <div>
-            {props.config.visible &&
+            {props.config.visible && (
                 <div style={style.backDrop} onClick={props.config.onCancel}>
                     <div style={style.dialogBox} onClick={noAction}>
                         <div style={style.header}>{props.children}</div>
@@ -71,9 +71,9 @@ const Dialog = (props) => {
                         </div>
                     </div>
                 </div>
-            }
+            )}
         </div>
     );
-}
+};
 
 export default Dialog;

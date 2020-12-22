@@ -81,7 +81,7 @@
 
 .active-selection {
     background: rgb(219, 219, 23) !important;
-    color: var(--secondaryTextColor);
+    color: black;
     border-radius: 0.4rem;
     margin: 0.5px;
     padding: 0.3rem;

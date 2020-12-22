@@ -1,10 +1,14 @@
-import React, { useContext, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFolderPlus, faPlus, faRedo } from '@fortawesome/free-solid-svg-icons';
+import React, { useContext, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faFolderPlus,
+    faPlus,
+    faRedo,
+} from "@fortawesome/free-solid-svg-icons";
 
-import TreeTextbox from './TreeTextbox';
-import { ExplorerContext } from './Explorer';
-import Tooltip from '../ui/Tooltip';
+import TreeTextbox from "./TreeTextbox";
+import { ExplorerContext } from "./Explorer";
+import Tooltip from "../ui/Tooltip";
 
 const style = {
     menu: {
@@ -20,7 +24,7 @@ const style = {
         padding: "0.3rem",
         cursor: "pointer",
     },
-}
+};
 
 const TreeToolbar = (props) => {
     let [textbox, setTextbox] = useState(false);
@@ -30,23 +34,45 @@ const TreeToolbar = (props) => {
     return (
         <div>
             <div style={style.menu}>
-                <div style={style.icon} onClick={() => { setTextbox(true); setClickEvent('file'); }} >
+                <div
+                    style={style.icon}
+                    onClick={() => {
+                        setTextbox(true);
+                        setClickEvent("file");
+                    }}
+                >
                     <Tooltip value="New File" position="bottom">
                         <FontAwesomeIcon icon={faPlus} />
                     </Tooltip>
                 </div>
-                <div style={style.icon} onClick={() => { setTextbox(true); setClickEvent('folder'); }} >
+                <div
+                    style={style.icon}
+                    onClick={() => {
+                        setTextbox(true);
+                        setClickEvent("folder");
+                    }}
+                >
                     <Tooltip value="New Folder" position="bottom">
                         <FontAwesomeIcon icon={faFolderPlus} />
                     </Tooltip>
                 </div>
-                <div style={style.icon} onClick={() => { refreshTree(); }} >
-                    <Tooltip  value="Refresh" position="bottom">
-                        <FontAwesomeIcon icon={faRedo}  />
+                <div
+                    style={style.icon}
+                    onClick={() => {
+                        refreshTree();
+                    }}
+                >
+                    <Tooltip value="Refresh" position="bottom">
+                        <FontAwesomeIcon icon={faRedo} />
                     </Tooltip>
                 </div>
             </div>
-            <TreeTextbox path={props.path} visible={textbox} setVisible={setTextbox} clickEvent={clickEvent} />
+            <TreeTextbox
+                path={props.path}
+                visible={textbox}
+                setVisible={setTextbox}
+                clickEvent={clickEvent}
+            />
         </div>
     );
 };

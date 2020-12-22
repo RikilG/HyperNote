@@ -44,9 +44,7 @@ const Core = (props) => {
             .then((path) => {
                 if (typeof path === "undefined") return;
                 else if (typeof path !== "string") {
-                    toast.error(
-                        "Invalid path encountered. Please try again!"
-                    );
+                    toast.error("Invalid path encountered. Please try again!");
                 } else if (path !== noteStorage) {
                     // new path selected
                     setNoteStorage(path);
@@ -70,10 +68,7 @@ const Core = (props) => {
                     style={style.textbox}
                     disabled={true}
                 />
-                <Button
-                    style={style.button}
-                    onClick={handleStorageChange}
-                >
+                <Button style={style.button} onClick={handleStorageChange}>
                     Change
                 </Button>
             </div>

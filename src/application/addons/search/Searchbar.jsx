@@ -13,10 +13,7 @@ const style = {
 const Searchbar = () => {
     return (
         <div style={style.container}>
-            <FontAwesomeIcon
-                icon={faSearch}
-                style={{ margin: "5px" }}
-            />
+            <FontAwesomeIcon icon={faSearch} style={{ margin: "5px" }} />
             <Textbox placeholder=" Search " />
         </div>
     );
