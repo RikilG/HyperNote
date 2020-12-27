@@ -51,7 +51,7 @@ const Project = () => {
     let [projectList, setProjectList] = useState([]);
     let [textbox, setTextbox] = useState(false);
     let [openProject, setOpenProject] = useState(null);
-    const { openWindow, closeWindow } = useContext(WindowContext);
+    const { closeWindow } = useContext(WindowContext);
     const db = openDatabase(UserPreferences.get("projectStorage"));
 
     createProjectsDb(db, () => listProjectRows(db));
@@ -97,6 +97,7 @@ const Project = () => {
         return () => {
             db.close();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

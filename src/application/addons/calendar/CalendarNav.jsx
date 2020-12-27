@@ -11,6 +11,9 @@ import Tooltip from "../../ui/Tooltip";
 import CalendarPage from "./CalendarPage";
 import CalendarEvent from "./CalendarEvent";
 import WindowContext from "../../WindowContext";
+import CalendarDB from "./CalendarDB";
+import { openDatabase } from "../../Database";
+import UserPreferences from "../../settings/UserPreferences";
 
 const style = {
     container: {
@@ -75,6 +78,7 @@ const CalendarNav = () => {
         id: "calendar/default-0",
         page: undefined,
         changeSelection: () => {},
+        db: null,
     });
 
     const handleRefresh = () => {
@@ -91,13 +95,23 @@ const CalendarNav = () => {
     };
 
     useEffect(() => {
+        // on mount and unmount
+        const dbRef = openDatabase(UserPreferences.get("calendarStorage"));
         setWinObj((winObj) => {
             let newObj = { ...winObj };
             newObj.page = <CalendarPage winObj={newObj} />;
+            newObj.db = dbRef;
             newObj.changeSelection = changeSelection;
             openWindow(newObj, true);
             return newObj;
         });
+
+        CalendarDB.create(dbRef);
+        changeSelection(curDate);
+        // listRows(db, setCalendarList);
+        return () => {
+            dbRef.close();
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -136,6 +150,11 @@ const CalendarNav = () => {
                 <CalendarEvent
                     onExit={() => setShowModal((prev) => !prev)}
                     selectedDate={curDate}
+                    saveEvent={(event, callback) =>
+                        CalendarDB.saveEvent(winObj.db, event, (err) => {
+                            if (callback) callback(err);
+                        })
+                    }
                 />
             )}
         </div>

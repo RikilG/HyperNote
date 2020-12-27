@@ -5,11 +5,8 @@ import {
     faChevronCircleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
-import UserPreferences from "../../settings/UserPreferences";
 import WindowBar from "../../workspace/WindowBar";
-import { openDatabase } from "../../Database";
 import Tooltip from "../../ui/Tooltip";
-import CalendarDB from "./CalendarDB";
 
 const style = {
     container: {
@@ -78,8 +75,7 @@ const monthToDays = (month, year) => {
 };
 
 const CalendarPage = (props) => {
-    const { changeSelection } = props.winObj;
-    const db = openDatabase(UserPreferences.get("calendarStorage"));
+    const { changeSelection /*db*/ } = props.winObj;
     const today = new Date();
     let [curDate, setCurDate] = useState(today);
     let [selectMonth, setSelectMonth] = useState(false);
@@ -143,13 +139,7 @@ const CalendarPage = (props) => {
     };
 
     useEffect(() => {
-        // on mount and unmount
-        CalendarDB.create(db);
         changeSelection(curDate);
-        // listRows(db, setCalendarList);
-        return () => {
-            db.close();
-        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

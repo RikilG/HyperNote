@@ -1,7 +1,11 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
+
 import Modal from "../../ui/Modal";
 import Button from "../../ui/Button";
 import Textbox from "../../ui/Textbox";
+import DatePicker from "../../ui/DatePicker";
+import TimePicker from "../../ui/TimePicker";
 
 const style = {
     header: {
@@ -29,13 +33,6 @@ const style = {
         margin: "0.2rem 0.5rem",
         fontSize: "1.2rem",
     },
-    timeBox: {
-        background: "var(--backgroundColor)",
-        padding: "0.2rem",
-        margin: "0 0.2rem",
-        width: "30px",
-        textAlign: "center",
-    },
     footer: {
         position: "absolute",
         width: "100%",
@@ -43,23 +40,95 @@ const style = {
     },
 };
 
-const CalendarEvent = ({ onExit, selectedDate }) => {
-    const now = new Date();
-    let [advanced, setAdvanced] = useState(false);
-    let [allDay, setAllDay] = useState(false);
+const invalidTime = (st, et) => {
+    if (et.hrs > st.hrs) return true;
+    if (et.hrs === st.hrs && et.mins > st.mins) return true;
+    return false;
+};
+
+const CalendarEvent = ({ onExit, selectedDate, saveEvent }) => {
+    let [eventName, setEventName] = useState("");
+    let [startDate, setStartDate] = useState(selectedDate);
+    let [endDate, setEndDate] = useState(selectedDate);
     let [recurrence, setRecurrence] = useState("norepeat");
+    let [allDay, setAllDay] = useState(false);
+    let [startTime, setStartTime] = useState({ hrs: 0, mins: 0, fmt: "hrs" });
+    let [endTime, setEndTime] = useState({ hrs: 0, mins: 0, fmt: "hrs" });
+    let [separation, setSeparation] = useState(0);
+    let [advanced, setAdvanced] = useState(false);
+
+    const onSave = () => {
+        if (eventName === "")
+            return toast.error("You forgot to enter the event name!");
+
+        if (advanced) {
+            if (
+                endDate < startDate ||
+                (endDate === startDate && invalidTime(startTime, endTime))
+            )
+                return toast.error("Event cannot end before it starts!");
+        } else {
+            if (recurrence === "norepeat") {
+                setEndDate(startDate);
+            } else {
+                setEndDate(null); // repeat indefinetely
+            }
+        }
+
+        saveEvent(
+            {
+                eventName: eventName,
+                description: "desc",
+                startDate: startDate,
+                endDate: endDate,
+                recurrence: recurrence,
+                allDay: allDay,
+                startTime: `${startTime.hrs}:${startTime.mins} ${startTime.fmt}`,
+                endTime: `${endTime.hrs}:${endTime.mins} ${endTime.fmt}`,
+                separation: separation,
+            },
+            (err) => {
+                if (!err) {
+                    toast.success("Event created!");
+                    onExit();
+                }
+            }
+        );
+    };
 
     return (
         <Modal onExit={onExit}>
             <div style={style.header}>New Event</div>
-            <Textbox style={style.eventBox} placeholder="Add event for ..." />
+            <Textbox
+                style={style.eventBox}
+                placeholder="Add event for ..."
+                handleChange={(name) => setEventName(name)}
+            />
             <div className="new-event-grid">
                 {/* <div>Type</div>
                 <div>Event</div> */}
-                <div>Date</div>
-                <div>{selectedDate.toDateString()}</div>
 
-                <div>Recurrent</div>
+                <div>{advanced && "Start"} Date</div>
+                <div>
+                    <DatePicker value={startDate} onChange={setStartDate} />
+                </div>
+
+                {advanced && <div>End Date</div>}
+                {advanced && (
+                    <div>
+                        <DatePicker
+                            value={endDate}
+                            onChange={setEndDate}
+                            tileDisabled={({ date, view }) => {
+                                if (view === "month") {
+                                    return date < startDate;
+                                }
+                            }}
+                        />
+                    </div>
+                )}
+
+                <div>Recurrence</div>
                 <div>
                     <select onChange={(e) => setRecurrence(e.target.value)}>
                         <option value="norepeat">Does Not Repeat</option>
@@ -70,9 +139,6 @@ const CalendarEvent = ({ onExit, selectedDate }) => {
                     </select>
                 </div>
 
-                {advanced && <div>End Date</div>}
-                {advanced && <div>Today</div>}
-
                 <div>All Day</div>
                 <div>
                     <input
@@ -82,54 +148,16 @@ const CalendarEvent = ({ onExit, selectedDate }) => {
                     {allDay ? " (Selected)" : " (Not Selected)"}
                 </div>
 
-                {!allDay && <div>Time</div>}
-                {!allDay && (
-                    <div style={style.rowFlex}>
-                        <Textbox
-                            style={style.timeBox}
-                            placeholder="HH"
-                            initialValue={now.getHours()}
-                        />
-                        <div>:</div>
-                        <Textbox
-                            style={style.timeBox}
-                            placeholder="MM"
-                            initialValue={now.getMinutes()}
-                        />
-                        <select>
-                            <option>24-Hour</option>
-                            <option>AM</option>
-                            <option>PM</option>
-                        </select>
-                    </div>
-                )}
+                {!allDay && <div>{advanced && "Start"} Time</div>}
+                {!allDay && <TimePicker setTime={setStartTime} />}
 
                 {advanced && !allDay && <div>End Time</div>}
-                {advanced && !allDay && (
-                    <div style={style.rowFlex}>
-                        <Textbox
-                            style={style.timeBox}
-                            placeholder="HH"
-                            initialValue={now.getHours()}
-                        />
-                        <div>:</div>
-                        <Textbox
-                            style={style.timeBox}
-                            placeholder="MM"
-                            initialValue={now.getMinutes()}
-                        />
-                        <select>
-                            <option>24-Hour</option>
-                            <option>AM</option>
-                            <option>PM</option>
-                        </select>
-                    </div>
-                )}
+                {advanced && !allDay && <TimePicker setTime={setEndTime} />}
 
                 {/* {advanced && <div>Max occurences</div>}
                 {advanced && <div>None</div>} */}
 
-                {advanced && <div>Separation</div>}
+                {advanced && recurrence !== "norepeat" && <div>Separation</div>}
                 {advanced && recurrence !== "norepeat" && (
                     <div>
                         <div style={style.rowFlex}>
@@ -137,7 +165,8 @@ const CalendarEvent = ({ onExit, selectedDate }) => {
                             <Textbox
                                 style={style.timeBox}
                                 placeholder="0"
-                                initialValue="0"
+                                initialValue={separation}
+                                handleChange={(val) => setSeparation(val)}
                             />
                             {recurrence === "norepeat"
                                 ? ""
@@ -166,8 +195,12 @@ const CalendarEvent = ({ onExit, selectedDate }) => {
                     Next occurence on - To be calculated -
                 </div>
                 <div style={style.rowFlex}>
-                    <Button style={style.button}>Cancel</Button>
-                    <Button style={style.button}>Save</Button>
+                    <Button style={style.button} onClick={onExit}>
+                        Cancel
+                    </Button>
+                    <Button style={style.button} onClick={onSave}>
+                        Save
+                    </Button>
                 </div>
             </div>
             {/* {textbox && (

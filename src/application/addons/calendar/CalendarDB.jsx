@@ -3,6 +3,13 @@ import { toast } from "react-toastify";
 // max no of tables sqlite allows is 64
 // schema from: https://www.vertabelo.com/blog/again-and-again-managing-recurring-events-in-a-data-model/
 
+let recurID = {
+    daily: 1,
+    weekly: 2,
+    monthly: 3,
+    yearly: 4,
+};
+
 const handleSqlError = (err) => {
     if (err) {
         toast.error(err);
@@ -30,7 +37,7 @@ const create = (db, callback) => {
             start_time TEXT,
             end_time TEXT,
             created_date TEXT,
-            is_full_day BOOLEAN NOT NULL,
+            is_all_day BOOLEAN NOT NULL,
             is_recurring BOOLEAN NOT NULL
         );`,
         `CREATE TABLE IF NOT EXISTS recurring_type(
@@ -64,38 +71,85 @@ const create = (db, callback) => {
     if (callback) callback();
 };
 
-const listRows = (db, updateList) => {
-    const query = `SELECT * FROM calendars;`;
-    db.all(query, (err, rows) => {
-        handleSqlError(err);
-        if (!rows) return;
-        if (updateList) updateList(rows);
-    });
+const saveEvent = (db, event, callback) => {
+    // id title description start_date end_date start_time end_time
+    // created_date is_all_day is_recurring
+    const now = new Date();
+    const query = `INSERT INTO events VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+    db.run(
+        query,
+        [
+            event.eventName,
+            event.description,
+            event.startDate.toDateString(),
+            event.endDate.toDateString(),
+            event.startTime,
+            event.endTime,
+            now.toDateString(),
+            event.allDay,
+            event.recurrence !== "norepeat",
+        ],
+        function (err) {
+            // arrow function will not give you "this" to get id
+            if (err) return handleSqlError(err);
+
+            console.log(event);
+            const eventID = this.lastID;
+            const recQuery = `INSERT INTO recurring_pattern VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
+            db.run(
+                recQuery,
+                [
+                    eventID,
+                    recurID[event.recurrence],
+                    event.separation,
+                    null,
+                    // TODO: make these fields useful
+                    event.startDate.getDay(),
+                    null, // TODO: week of month
+                    event.startDate.getDate(),
+                    event.startDate.getMonth(),
+                ],
+                function (err) {
+                    handleSqlError(err);
+                    if (callback) callback(err);
+                }
+            );
+        }
+    );
 };
 
-const addRow = (db, row, callback) => {
-    const query = `INSERT INTO calendars VALUES (NULL, ?, ?);`;
-    db.run(query, [row.name, row.desc], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
-};
+// const listRows = (db, updateList) => {
+//     const query = `SELECT * FROM calendars;`;
+//     db.all(query, (err, rows) => {
+//         handleSqlError(err);
+//         if (!rows) return;
+//         if (updateList) updateList(rows);
+//     });
+// };
 
-const deleteRow = (db, id, callback) => {
-    const query = `DELETE FROM calendars WHERE id=?;`;
-    db.run(query, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
-};
+// const addRow = (db, row, callback) => {
+//     const query = `INSERT INTO calendars VALUES (NULL, ?, ?);`;
+//     db.run(query, [row.name, row.desc], (err) => {
+//         handleSqlError(err);
+//         if (callback) callback(err);
+//     });
+// };
 
-const editRow = (db, row, callback) => {
-    const query = `UPDATE calendars SET name=?, desc=? WHERE id=?;`;
-    db.run(query, [row.name, row.desc, row.id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
-};
+// const deleteRow = (db, id, callback) => {
+//     const query = `DELETE FROM calendars WHERE id=?;`;
+//     db.run(query, [id], (err) => {
+//         handleSqlError(err);
+//         if (callback) callback(err);
+//     });
+// };
 
-const CalendarDB = { create, listRows, addRow, deleteRow, editRow };
+// const editRow = (db, row, callback) => {
+//     const query = `UPDATE calendars SET name=?, desc=? WHERE id=?;`;
+//     db.run(query, [row.name, row.desc, row.id], (err) => {
+//         handleSqlError(err);
+//         if (callback) callback(err);
+//     });
+// };
+
+const CalendarDB = { create, saveEvent };
 export default CalendarDB;
