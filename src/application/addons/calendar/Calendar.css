@@ -92,18 +92,19 @@
 }
 
 .new-event-grid {
-    max-height: 74%;
     margin: 0.2rem 2.5rem;
+    margin-right: 3rem;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     /* grid-template-rows: repeat(4, 1fr); */
     justify-items: center;
     align-items: center;
+    overflow-y: auto;
 }
 
 .new-event-grid > div {
     text-align: center;
-    padding: 0.3rem;
+    padding: 0.2rem;
     user-select: none;
     font-size: 1.1rem;
 }

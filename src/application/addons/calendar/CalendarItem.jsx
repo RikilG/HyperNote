@@ -1,11 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useContext, useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 
-import CalendarPage from "./CalendarPage";
 import Textbox from "../../ui/Textbox";
 import ContextMenu from "../../ui/ContextMenu";
-import WindowContext from "../../WindowContext";
 
 const style = {
     container: {
@@ -33,10 +31,9 @@ function useHookWithRefCallback() {
     return [setRef, bounds];
 }
 
-const CalendarItem = (props) => {
+const CalendarItem = ({ handleDelete, handleEdit, event }) => {
     let [textbox, setTextbox] = useState(false);
     let [setContextMenuRef, bounds] = useHookWithRefCallback();
-    const { openWindow } = useContext(WindowContext);
 
     const contextMenuOptions = [
         {
@@ -51,13 +48,8 @@ const CalendarItem = (props) => {
         },
     ];
 
-    const handleDelete = (e) => {
-        if (e) e.stopPropagation();
-        props.handleDelete(props.taskItem);
-    };
-
     const handleConfirm = (newName) => {
-        props.handleEdit(props.taskItem, newName);
+        handleEdit(event, newName);
         setTextbox(false);
     };
 
@@ -66,23 +58,11 @@ const CalendarItem = (props) => {
             handleConfirm(newName);
             return "";
         }
-        return props.taskItem.name;
+        return event.title;
     };
 
-    const handleTaskOpen = () => {
+    const handleEventClick = () => {
         if (textbox) return; // rename textbox is open
-        const taskItem = props.taskItem;
-        let id = `calendar/${taskItem.name}-${taskItem.id}`;
-        let task = {
-            addon: "calendar",
-            id: id,
-            page: undefined,
-            taskItem: taskItem,
-            running: false,
-        };
-        task.page = <CalendarPage winObj={task} />;
-        openWindow(task, true);
-        props.setOpenTask(task);
     };
 
     return (
@@ -90,19 +70,19 @@ const CalendarItem = (props) => {
             <div
                 style={style.container}
                 className="hover-item"
-                onClick={handleTaskOpen}
+                onClick={handleEventClick}
                 ref={setContextMenuRef}
             >
                 {textbox ? (
                     <Textbox
-                        initialValue={props.taskItem.name}
+                        initialValue={event.title}
                         visible={textbox}
                         setVisible={setTextbox}
                         handleConfirm={handleConfirm}
                         handleCancel={handleCancel}
                     />
                 ) : (
-                    <div style={style.title}>{props.taskItem.name}</div>
+                    <div style={style.title}>{event.title}</div>
                 )}
                 {!textbox && (
                     <div className="hover-item-toolbar">
@@ -115,7 +95,13 @@ const CalendarItem = (props) => {
                         >
                             <FontAwesomeIcon icon={faPen} />
                         </div>
-                        <div className="hover-item-tool" onClick={handleDelete}>
+                        <div
+                            className="hover-item-tool"
+                            onClick={(e) => {
+                                if (e) e.stopPropagation();
+                                handleDelete(event);
+                            }}
+                        >
                             <FontAwesomeIcon icon={faTrash} />
                         </div>
                     </div>

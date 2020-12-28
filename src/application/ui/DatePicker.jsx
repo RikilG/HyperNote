@@ -13,7 +13,7 @@ const style = {
         cursor: "pointer",
     },
     picker: {
-        position: "absolute",
+        position: "fixed",
         // left: "-15%",
         zIndex: "8",
     },
@@ -44,9 +44,13 @@ const DatePicker = (props) => {
 
     return (
         <div style={style.container}>
-            <div onClick={() => setVisible((prev) => !prev)}>
+            <div onClick={() => setVisible((prev) => !props.disabled && !prev)}>
                 <Textbox
-                    style={style.textbox}
+                    style={
+                        props.disabled
+                            ? { color: "var(--dividerColor)", ...style.textbox }
+                            : style.textbox
+                    }
                     initialValue={props.value.toDateString()}
                     disabled={true}
                 />

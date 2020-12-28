@@ -9,7 +9,8 @@ import { useContext, useState, useEffect } from "react";
 import "./Calendar.css";
 import Tooltip from "../../ui/Tooltip";
 import CalendarPage from "./CalendarPage";
-import CalendarEvent from "./CalendarEvent";
+import CalendarItem from "./CalendarItem";
+import ModalNewEvent from "./ModalNewEvent";
 import WindowContext from "../../WindowContext";
 import CalendarDB from "./CalendarDB";
 import { openDatabase } from "../../Database";
@@ -67,11 +68,19 @@ const style = {
         textAlign: "center",
         paddingRight: "0.3rem",
     },
+    comment: {
+        fontStyle: "italic",
+        textAlign: "center",
+        padding: "1rem",
+        color: "var(--dividerColor)",
+        userSelect: "none",
+    },
 };
 
 const CalendarNav = () => {
     let [curDate, setCurDate] = useState(Date());
     let [showModal, setShowModal] = useState(false);
+    let [events, setEvents] = useState([]);
     const { openWindow } = useContext(WindowContext);
     let [winObj, setWinObj] = useState({
         addon: "calendar",
@@ -82,16 +91,23 @@ const CalendarNav = () => {
     });
 
     const handleRefresh = () => {
-        // listRows(db, setCalendarList);
+        changeSelection(curDate);
     };
 
     const toggleCalendar = () => {
         openWindow(winObj, true);
     };
 
-    const changeSelection = (curDate) => {
+    const changeSelection = (newDate) => {
         // called via CalendarPage when user selects a date
-        setCurDate(curDate);
+        setCurDate(newDate);
+        CalendarDB.getEventsOn(newDate, (newEvents) => {
+            setEvents(newEvents);
+        });
+    };
+
+    const handleDelete = (event) => {
+        CalendarDB.deleteEvent(event, () => handleRefresh());
     };
 
     useEffect(() => {
@@ -114,8 +130,6 @@ const CalendarNav = () => {
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    // TODO: show calendar button
 
     return (
         <div style={style.container}>
@@ -145,13 +159,28 @@ const CalendarNav = () => {
                     </Tooltip>
                 </div>
             </div>
-            <div style={style.calendarItems}></div>
+            <div style={style.calendarItems}>
+                {events && events.length > 0 ? (
+                    events.map((event) => (
+                        <div key={event.id}>
+                            <CalendarItem
+                                event={event}
+                                handleDelete={handleDelete}
+                            />
+                            <div className="divider" />
+                        </div>
+                    ))
+                ) : (
+                    <div style={style.comment}>No events today!</div>
+                )}
+            </div>
             {showModal && (
-                <CalendarEvent
+                <ModalNewEvent
                     onExit={() => setShowModal((prev) => !prev)}
                     selectedDate={curDate}
                     saveEvent={(event, callback) =>
-                        CalendarDB.saveEvent(winObj.db, event, (err) => {
+                        CalendarDB.saveEvent(event, (err) => {
+                            handleRefresh();
                             if (callback) callback(err);
                         })
                     }
