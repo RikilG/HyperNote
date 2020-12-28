@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 // max no of tables sqlite allows is 64
 // schema from: https://www.vertabelo.com/blog/again-and-again-managing-recurring-events-in-a-data-model/
 
-let recurID = {
+const recurID = {
     daily: 1,
     weekly: 2,
     monthly: 3,
@@ -118,6 +118,7 @@ const saveEvent = (event, callback) => {
                 return;
             }
 
+            // event_id recurring_type_id separation_count max_occurrences day_of_week week_of_month day_of_month month_of_year
             const eventID = this.lastID;
             const recQuery = `INSERT INTO recurring_pattern VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
             db.run(
@@ -238,13 +239,82 @@ const deleteEvent = (event, callback) => {
     });
 };
 
-// const editRow = (db, row, callback) => {
-//     const query = `UPDATE calendars SET name=?, desc=? WHERE id=?;`;
-//     db.run(query, [row.name, row.desc, row.id], (err) => {
-//         handleSqlError(err);
-//         if (callback) callback(err);
-//     });
-// };
+const editEvent = (event, callback) => {
+    // id title description start_date end_date start_time end_time
+    // created_date is_all_day is_recurring
+    const now = new Date();
+    const query = `UPDATE events SET 
+        title=?,
+        description=?,
+        start_date=?,
+        end_date=?,
+        start_time=?,
+        end_time=?,
+        created_date=?,
+        is_all_day=?,
+        is_recurring=?
+        WHERE id=?;`;
+    db.run(
+        query,
+        [
+            event.eventName,
+            event.description,
+            toDateStr(event.startDate),
+            toDateStr(event.endDate),
+            event.startTime,
+            event.endTime,
+            toDateStr(now),
+            event.allDay,
+            event.recurrence !== "norepeat",
+            event.id,
+        ],
+        function (err) {
+            handleSqlError(err);
+            if (err) {
+                if (callback) callback(err);
+                return;
+            }
 
-const CalendarDB = { create, saveEvent, getEventsOn, deleteEvent };
+            if (event.recurrence === "norepeat") {
+                // no recurrence
+                const delQuery = `DELETE FROM recurring_pattern WHERE event_id=?;`;
+                db.run(delQuery, [event.id], (err) => {
+                    handleSqlError(err);
+                    if (callback) callback(err);
+                });
+                return;
+            }
+
+            const recQuery = `UPDATE recurring_pattern SET
+                recurring_type_id=?,
+                separation_count=?,
+                max_occurrences=?,
+                day_of_week=?,
+                week_of_month=?,
+                day_of_month=?,
+                month_of_year=?
+                WHERE event_id=?;`;
+            db.run(
+                recQuery,
+                [
+                    recurID[event.recurrence],
+                    event.separation,
+                    null,
+                    // TODO: make these fields useful
+                    event.startDate.getDay(),
+                    null, // TODO: week of month
+                    event.startDate.getDate(),
+                    event.startDate.getMonth() + 1,
+                    event.id,
+                ],
+                function (err) {
+                    handleSqlError(err);
+                    if (callback) callback(err);
+                }
+            );
+        }
+    );
+};
+
+const CalendarDB = { create, saveEvent, getEventsOn, deleteEvent, editEvent };
 export default CalendarDB;

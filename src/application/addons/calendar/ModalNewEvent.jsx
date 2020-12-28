@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 import Modal from "../../ui/Modal";
@@ -49,13 +49,21 @@ const style = {
     },
 };
 
+const recurName = ["", "daily", "weekly", "monthly", "yearly"];
+
+const getTimeStruct = (timeStr) => {
+    const [time, fmt] = timeStr.split(" ");
+    const [hrs, mins] = time.split(":");
+    return { hrs: parseInt(hrs), mins: parseInt(mins), fmt: fmt };
+};
+
 const invalidTime = (st, et) => {
     if (et.hrs > st.hrs) return true;
     if (et.hrs === st.hrs && et.mins > st.mins) return true;
     return false;
 };
 
-const ModalNewEvent = ({ onExit, selectedDate, saveEvent }) => {
+const ModalNewEvent = ({ onExit, selectedDate, saveEvent, event }) => {
     let [eventName, setEventName] = useState("");
     let [startDate, setStartDate] = useState(selectedDate);
     let [endDate, setEndDate] = useState(selectedDate);
@@ -67,6 +75,7 @@ const ModalNewEvent = ({ onExit, selectedDate, saveEvent }) => {
     let [separation, setSeparation] = useState(0);
     let [advanced, setAdvanced] = useState(false);
     let [nextOcc, setNextOcc] = useState("To be calculated");
+    const selectRef = useRef(null);
 
     const onSave = () => {
         if (eventName === "")
@@ -74,16 +83,18 @@ const ModalNewEvent = ({ onExit, selectedDate, saveEvent }) => {
 
         if (advanced) {
             if (
-                endDate < startDate ||
-                (endDate === startDate && invalidTime(startTime, endTime))
+                !infinite &&
+                (endDate < startDate ||
+                    (endDate === startDate && invalidTime(startTime, endTime)))
             )
                 return toast.error("Event cannot end before it starts!");
         } else {
-            setEndDate(startDate);
+            if (!event) setEndDate(startDate);
         }
 
         saveEvent(
             {
+                id: event ? event.id : null,
                 eventName: eventName,
                 description: "desc",
                 startDate: startDate,
@@ -94,9 +105,12 @@ const ModalNewEvent = ({ onExit, selectedDate, saveEvent }) => {
                 endTime: `${endTime.hrs}:${endTime.mins} ${endTime.fmt}`,
                 separation: separation,
             },
+            event ? true : false,
             (err) => {
                 if (!err) {
-                    toast.success("Event created!");
+                    event
+                        ? toast.success("Event created!")
+                        : toast.success("Event modified!");
                     onExit();
                 }
             }
@@ -119,21 +133,41 @@ const ModalNewEvent = ({ onExit, selectedDate, saveEvent }) => {
     }, [startDate, endDate, recurrence, separation]);
 
     useEffect(() => {
-        const now = new Date();
-        const initTime = {
-            hrs: now.getHours(),
-            mins: now.getMinutes(),
-            fmt: "hrs",
-        };
-        setStartTime(initTime);
-        setEndTime(initTime);
-    }, []);
+        if (event) {
+            setEventName(event.title);
+            setStartDate(new Date(event.start_date));
+            setEndDate(new Date(event.end_date));
+            setInfinite(event.end_date ? false : true);
+            setRecurrence(() => {
+                const val = event.is_recurring
+                    ? recurName[event.recurring_type_id]
+                    : "norepeat";
+                selectRef.current.value = val;
+                return val;
+            });
+            setAllDay(event.is_all_day);
+            setStartTime(getTimeStruct(event.start_time));
+            setEndTime(getTimeStruct(event.end_time));
+            setSeparation(event.is_recurring ? event.separation_count : 0);
+            setAdvanced(true);
+        } else {
+            const now = new Date();
+            const initTime = {
+                hrs: now.getHours(),
+                mins: now.getMinutes(),
+                fmt: "hrs",
+            };
+            setStartTime(initTime);
+            setEndTime(initTime);
+        }
+    }, [event]);
 
     return (
         <Modal onExit={onExit}>
             <div style={style.container}>
-                <div style={style.header}>New Event</div>
+                <div style={style.header}>{event ? "Edit" : "New"} Event</div>
                 <Textbox
+                    initialValue={eventName}
                     style={style.eventBox}
                     containerStyle={style.textboxContainer}
                     placeholder="Add event for ..."
@@ -171,7 +205,10 @@ const ModalNewEvent = ({ onExit, selectedDate, saveEvent }) => {
 
                     <div>Recurrence</div>
                     <div>
-                        <select onChange={(e) => setRecurrence(e.target.value)}>
+                        <select
+                            ref={selectRef}
+                            onChange={(e) => setRecurrence(e.target.value)}
+                        >
                             <option value="norepeat">Does Not Repeat</option>
                             <option value="daily">Daily</option>
                             <option value="weekly">Weekly</option>
@@ -184,7 +221,8 @@ const ModalNewEvent = ({ onExit, selectedDate, saveEvent }) => {
                     <div>
                         <input
                             type="checkbox"
-                            onClick={(e) => setAllDay(e.target.checked)}
+                            checked={allDay}
+                            onChange={(e) => setAllDay(e.target.checked)}
                         />
                         {allDay ? " (Selected)" : " (Not Selected)"}
                     </div>
@@ -233,7 +271,8 @@ const ModalNewEvent = ({ onExit, selectedDate, saveEvent }) => {
                     <div style={style.rowFlex}>
                         <input
                             type="checkbox"
-                            onClick={(e) => setAdvanced(e.target.checked)}
+                            checked={advanced}
+                            onChange={(e) => setAdvanced(e.target.checked)}
                         />
                         Advanced Options
                     </div>

@@ -80,6 +80,7 @@ const style = {
 const CalendarNav = () => {
     let [curDate, setCurDate] = useState(Date());
     let [showModal, setShowModal] = useState(false);
+    let [editEvent, setEditEvent] = useState(null);
     let [events, setEvents] = useState([]);
     const { openWindow } = useContext(WindowContext);
     let [winObj, setWinObj] = useState({
@@ -147,7 +148,10 @@ const CalendarNav = () => {
             <div style={style.controls}>
                 <div
                     style={style.controlItem}
-                    onClick={() => setShowModal(true)}
+                    onClick={() => {
+                        setEditEvent(null);
+                        setShowModal(true);
+                    }}
                 >
                     <Tooltip value="Add" position="bottom">
                         <FontAwesomeIcon icon={faPlus} />
@@ -166,6 +170,10 @@ const CalendarNav = () => {
                             <CalendarItem
                                 event={event}
                                 handleDelete={handleDelete}
+                                handleEdit={(event) => {
+                                    setEditEvent(event);
+                                    setShowModal(true);
+                                }}
                             />
                             <div className="divider" />
                         </div>
@@ -176,14 +184,25 @@ const CalendarNav = () => {
             </div>
             {showModal && (
                 <ModalNewEvent
-                    onExit={() => setShowModal((prev) => !prev)}
+                    onExit={() => {
+                        setShowModal((prev) => !prev);
+                        setEditEvent(null);
+                    }}
                     selectedDate={curDate}
-                    saveEvent={(event, callback) =>
-                        CalendarDB.saveEvent(event, (err) => {
-                            handleRefresh();
-                            if (callback) callback(err);
-                        })
-                    }
+                    saveEvent={(event, editMode, callback) => {
+                        if (editMode) {
+                            CalendarDB.editEvent(event, (err) => {
+                                handleRefresh();
+                                if (callback) callback(err);
+                            });
+                        } else {
+                            CalendarDB.saveEvent(event, (err) => {
+                                handleRefresh();
+                                if (callback) callback(err);
+                            });
+                        }
+                    }}
+                    event={editEvent}
                 />
             )}
         </div>
