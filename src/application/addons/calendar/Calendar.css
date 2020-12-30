@@ -4,14 +4,17 @@
     grid-template-rows: repeat(4, 1fr);
     background: var(--dividerColor);
     justify-items: stretch;
+    flex: 1;
 }
 
 .month-grid > div {
+    display: flex;
     background: var(--backgroundColor);
     border-radius: 0.4rem;
     margin: 2px;
     text-align: center;
-    padding: 3rem 0;
+    justify-content: center;
+    align-items: center;
 }
 
 .year-grid {
@@ -19,15 +22,16 @@
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(5, 1fr);
     background: var(--dividerColor);
-    height: 90%;
+    flex: 1;
 }
 
 .year-grid > div {
+    display: flex;
     background: var(--backgroundColor);
-    border-radius: 0.4rem;
-    margin: 2px;
-    text-align: center;
-    padding: 2rem 0;
+    border-radius: 0.2rem;
+    margin: 1px;
+    justify-content: center;
+    align-items: center;
 }
 
 .calendar-bar {
@@ -41,20 +45,27 @@
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: 25px repeat(5, 1fr);
+    grid-template-rows: 25px;
     background: var(--dividerColor);
-    height: 100%;
+    flex: 1;
 }
 
 .calendar-grid > div:not(.weekday) {
     background: var(--backgroundColor);
-    border-radius: 0.4rem;
+    border-radius: 0.2rem;
     margin: 0.5px;
-    padding: 0.3rem;
+    overflow: auto;
+}
+
+.calendar-grid > div.empty {
+    background: var(--dividerColor);
+    border: 2px solid var(--secondaryTextColor);
+    /* box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.4); */
 }
 
 .calendar-grid > div:nth-child(7n + 1) {
     background: rgb(235, 133, 25);
+    border: 1px solid var(--dividerColor);
 }
 
 .calendar-grid > div:not(.empty):not(.weekday):hover,
@@ -63,8 +74,9 @@
     -webkit-backface-visibility: hidden;
     box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.4);
     cursor: pointer;
-    transform: scale(1.05);
-    transition: 0.2s ease;
+    transform: scale(1.03);
+    transition: 0.3s ease;
+    z-index: 1;
 }
 
 .weekday {
@@ -83,12 +95,11 @@
     background: rgb(219, 219, 23) !important;
     color: black;
     border-radius: 0.4rem;
-    margin: 0.5px;
-    padding: 0.3rem;
 }
 
 .today {
     background: var(--primaryColor) !important;
+    box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.2);
 }
 
 .new-event-grid {

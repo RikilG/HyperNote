@@ -1,5 +1,6 @@
-// database helper functions
 import { toast } from "react-toastify";
+
+import { monthToDays } from "./CalendarPage";
 // max no of tables sqlite allows is 64
 // schema from: https://www.vertabelo.com/blog/again-and-again-managing-recurring-events-in-a-data-model/
 
@@ -143,6 +144,74 @@ const saveEvent = (event, callback) => {
     );
 };
 
+const occursToday = (event, date) => {
+    const eventStart = resetTime(new Date(event.start_date));
+    // validation conditions according to recurring type
+    if (date < eventStart) return false;
+    if (event.recurring_type_id === 1) {
+        // daily
+        if (
+            ((date - eventStart) / (1000 * 60 * 60 * 24)) %
+                (1 + event.separation_count) !==
+            0
+        )
+            return false; // separation condition not satisfied
+    } else if (event.recurring_type_id === 2) {
+        // weekly
+        if (
+            ((date - eventStart) / (1000 * 60 * 60 * 24 * 7)) %
+                (1 + event.separation_count) !==
+            0
+        ) {
+            return false; // separation condition not satisfied
+        }
+    } else if (event.recurring_type_id === 3) {
+        // monthly
+        const diff =
+            date.getMonth() -
+            eventStart.getMonth() +
+            (date.getFullYear() - eventStart.getFullYear()) * 12;
+        if (
+            date.getDate() !== eventStart.getDate() ||
+            diff % (1 + event.separation_count) !== 0
+        )
+            return false;
+    } else if (event.recurring_type_id === 4) {
+        // yearly
+        // if eventEnd is really the end of event span, and not where the recurrence stops:
+        // if (eventStart.getFullYear() === eventEnd.getFullYear()) {
+        //     // event container in one year
+        //     if (
+        //         (date.getFullYear() - eventStart.getFullYear()) %
+        //             (1 + event.separation_count) !==
+        //         0
+        //     )
+        //         return false; // separation condition not satisfied
+        //     eventStart.setFullYear(date.getFullYear());
+        //     eventEnd.setFullYear(date.getFullYear());
+        // } else {
+        //     // TODO: make use of separation also!
+        //     // event spans across the start/end of year
+        //     if (date.getMonth() >= 0 && date.getDate() >= 1) {
+        //         eventStart.setFullYear(date.getFullYear() - 1);
+        //         eventEnd.setFullYear(date.getFullYear());
+        //     } else {
+        //         eventStart.setFullYear(date.getFullYear());
+        //         eventEnd.setFullYear(date.getFullYear() + 1);
+        //     }
+        // }
+        if (
+            (date.getFullYear() - eventStart.getFullYear()) %
+                (1 + event.separation_count) !==
+                0 ||
+            date.getDate() !== eventStart.getDate() ||
+            date.getMonth() !== eventStart.getMonth()
+        )
+            return false; // separation condition not satisfied
+    }
+    return true;
+};
+
 const getEventsOn = (date, callback) => {
     if (typeof date === "string") date = new Date(date);
     date = resetTime(date); // TODO: we don't care about time! for now. don't know if it requres changes
@@ -150,82 +219,107 @@ const getEventsOn = (date, callback) => {
     // non-recurring
     const query = `SELECT * FROM events WHERE ((date(?) BETWEEN start_date AND end_date) OR (start_date=date(?))) AND is_recurring=0;`;
     // recurring
-    const recQuery = `SELECT * FROM recurring_pattern join events on events.id=recurring_pattern.event_id where start_date<=date(?);`;
+    // TODO: after we differentiate end_date with event_end_date/span, replace
+    // end_date here with that new var
+    const recQuery = `SELECT * FROM recurring_pattern join events on events.id=recurring_pattern.event_id where start_date<=date(?) AND (end_date IS NULL OR end_date>=date(?));`;
 
     db.all(query, [strDate, strDate], (err, rows) => {
         handleSqlError(err);
         if (!rows || err) return;
-        db.all(recQuery, [strDate], (err, recRows) => {
+        // TODO: differentiate end_date with event_end_date/span
+        // by using no of occurences (infinite if no end to repeat)
+        db.all(recQuery, [strDate, strDate], (err, recRows) => {
             handleSqlError(err);
             if (!recRows || err) return;
             // process recurring events
             recRows = recRows.filter((event) => {
-                const eventStart = resetTime(new Date(event.start_date));
-                const eventEnd = event.end_date
-                    ? resetTime(new Date(event.end_date))
-                    : date;
-                // validation conditions according to recurring type
-                if (event.recurring_type_id === 1) {
-                    // daily
-                    if (
-                        ((date - eventStart) / (1000 * 60 * 60 * 24)) %
-                            (1 + event.separation_count) !==
-                        0
-                    )
-                        return false; // separation condition not satisfied
-                } else if (event.recurring_type_id === 2) {
-                    // weekly
-                    if (
-                        ((date - eventStart) / (1000 * 60 * 60 * 24 * 7)) %
-                            (1 + event.separation_count) !==
-                        0
-                    ) {
-                        return false; // separation condition not satisfied
-                    }
-                } else if (event.recurring_type_id === 3) {
-                    // monthly
-                    const diff =
-                        date.getMonth() -
-                        eventStart.getMonth() +
-                        (date.getFullYear() - eventStart.getFullYear()) * 12;
-                    if (
-                        date.getDate() !== eventStart.getDate() ||
-                        diff % (1 + event.separation_count) !== 0
-                    )
-                        return false;
-                } else if (event.recurring_type_id === 4) {
-                    // yearly
-                    if (eventStart.getFullYear() === eventEnd.getFullYear()) {
-                        // event container in one year
-                        if (
-                            (date.getFullYear() - eventStart.getFullYear()) %
-                                (1 + event.separation_count) !==
-                            0
-                        )
-                            return false; // separation condition not satisfied
-                        eventStart.setFullYear(date.getFullYear());
-                        eventEnd.setFullYear(date.getFullYear());
-                    } else {
-                        // TODO: make use of separation also!
-                        // event spans across the start/end of year
-                        if (date.getMonth() >= 0 && date.getDate() >= 1) {
-                            eventStart.setFullYear(date.getFullYear() - 1);
-                            eventEnd.setFullYear(date.getFullYear());
-                        } else {
-                            eventStart.setFullYear(date.getFullYear());
-                            eventEnd.setFullYear(date.getFullYear() + 1);
-                        }
-                    }
-                }
-                if (date >= eventStart && date <= eventEnd) {
-                    return true;
-                }
-                return false;
+                return occursToday(event, date);
             });
 
             if (callback) callback([...rows, ...recRows]);
         });
     });
+};
+
+const getMonthEvents = (date, callback) => {
+    const lastDate = monthToDays(date.getMonth());
+    if (typeof date === "string") date = new Date(date);
+    date.setDate(1);
+    date = resetTime(date); // TODO: we don't care about time! for now. don't know if it requres changes
+    const monthStartStr = toDateStr(date);
+    const monthEndStr = toDateStr(
+        new Date(date.getFullYear(), date.getMonth(), lastDate)
+    );
+    // non-recurring
+    const query = `SELECT * FROM events WHERE ((start_date BETWEEN date(?) AND date(?)) OR (end_date BETWEEN date(?) AND date(?))) AND is_recurring=0;`;
+    // recurring
+    // TODO: after we differentiate end_date with event_end_date/span, replace
+    // end_date here with that new var
+    const recQuery = `SELECT * FROM recurring_pattern join events on events.id=recurring_pattern.event_id where start_date<=date(?) AND (end_date IS NULL OR end_date>=date(?));`;
+
+    let monthEvents = {};
+    for (let i = 1; i <= lastDate; i++) {
+        monthEvents[i] = [];
+    }
+
+    db.all(
+        query,
+        [monthStartStr, monthEndStr, monthStartStr, monthEndStr],
+        (err, rows) => {
+            handleSqlError(err);
+            if (!rows || err) return;
+            // TODO: differentiate end_date with event_end_date/span
+            // by using no of occurences (infinite if no end to repeat)
+            db.all(recQuery, [monthEndStr, monthStartStr], (err, recRows) => {
+                handleSqlError(err);
+                if (!recRows || err) return;
+                // process non-recurring events
+                rows.forEach((event) => {
+                    const stDate = resetTime(new Date(event.start_date));
+                    const endDate =
+                        event.end_date && resetTime(new Date(event.end_date));
+                    if (stDate.getMonth() === date.getMonth()) {
+                        // start date in this month
+                        if (endDate) {
+                            // if endDate exists
+                            for (
+                                let i = stDate.getDate();
+                                i <= endDate.getDate();
+                                i++
+                            ) {
+                                monthEvents[i].push(event);
+                            }
+                        } else {
+                            monthEvents[stDate.getDate()].push(event);
+                        }
+                    } else {
+                        // endDate exists in this month
+                        for (let i = 1; i <= endDate.getDate(); i++) {
+                            monthEvents[i].push(event);
+                        }
+                    }
+                });
+                // process recurring events
+                recRows.forEach((event) => {
+                    let iterDate = resetTime(new Date(date));
+                    for (let i = 1; i <= lastDate; i++) {
+                        iterDate.setDate(i);
+                        if (occursToday(event, iterDate)) {
+                            // console.log(iterDate.getDate(), event);
+                            monthEvents[i].push(event);
+                            if (
+                                event.recurring_type_id === 4 ||
+                                event.recurring_type_id === 3
+                            )
+                                break; // these events come only once
+                        }
+                    }
+                });
+
+                if (callback) callback(monthEvents);
+            });
+        }
+    );
 };
 
 const deleteEvent = (event, callback) => {
@@ -316,5 +410,12 @@ const editEvent = (event, callback) => {
     );
 };
 
-const CalendarDB = { create, saveEvent, getEventsOn, deleteEvent, editEvent };
+const CalendarDB = {
+    create,
+    saveEvent,
+    getEventsOn,
+    deleteEvent,
+    editEvent,
+    getMonthEvents,
+};
 export default CalendarDB;

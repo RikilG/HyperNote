@@ -89,6 +89,7 @@ const CalendarNav = () => {
         page: undefined,
         changeSelection: () => {},
         db: null,
+        getMonthEvents: CalendarDB.getMonthEvents,
     });
 
     const handleRefresh = () => {
