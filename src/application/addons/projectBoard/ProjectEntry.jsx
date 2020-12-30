@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useContext, useState, useRef, useCallback } from "react";
-import { toast } from "react-toastify";
 
 import "./Project.css";
 import ProjectPage from "./ProjectPage";

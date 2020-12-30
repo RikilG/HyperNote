@@ -15,6 +15,7 @@
     "custom-electron-titlebar": "^3.2.5",
     "marked": "^1.2.2",
     "react": "^17.0.1",
+    "react-calendar": "^3.2.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.0",
     "react-split-pane": "^2.0.3",

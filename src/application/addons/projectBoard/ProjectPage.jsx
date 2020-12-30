@@ -1,7 +1,4 @@
-import { useEffect, useState } from "react";
-
 import WindowBar from "../../workspace/WindowBar";
-import Tooltip from "../../ui/Tooltip";
 
 const style = {
     container: {

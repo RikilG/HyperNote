@@ -5,11 +5,8 @@ import {
     faChevronCircleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
-import UserPreferences from "../../settings/UserPreferences";
 import WindowBar from "../../workspace/WindowBar";
-import { openDatabase } from "../../Database";
 import Tooltip from "../../ui/Tooltip";
-import CalendarDB from "./CalendarDB";
 
 const style = {
     container: {
@@ -18,18 +15,6 @@ const style = {
         padding: "0 0.5rem",
         display: "flex",
         flexFlow: "column nowrap",
-    },
-    description: {
-        display: "block",
-        margin: "auto",
-        height: "20%",
-        minHeight: "30px",
-        maxHeight: "35%",
-        width: "80%",
-        resize: "vertical",
-        fontSize: "1.1rem",
-        textAlign: "center",
-        background: "transparent",
     },
     calendar: {
         display: "flex",
@@ -49,6 +34,25 @@ const style = {
         textAlign: "center",
         userSelect: "none",
     },
+    eventItem: {
+        background: "var(--primaryColor)",
+        borderRadius: "0.3rem",
+        fontSize: "0.9rem",
+        margin: "0.2rem",
+        padding: "0.05rem 0.2rem",
+        height: "1rem",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        boxShadow: "4px 2px 4px rgba(0, 0, 0, 0.4)",
+    },
+    eventMore: {
+        fontSize: "0.8rem",
+        paddingLeft: "0.5rem",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+    },
 };
 
 const MONTHS = [
@@ -67,7 +71,7 @@ const MONTHS = [
 ];
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const monthToDays = (month, year) => {
+export const monthToDays = (month, year) => {
     if (month === 1) {
         if (year % 4 === 0) {
             if (year % 100 === 0 && year % 400 !== 0) return 28;
@@ -77,9 +81,143 @@ const monthToDays = (month, year) => {
     else return 31;
 };
 
+const CalendarGrid = ({
+    month,
+    year,
+    getMonthEvents,
+    getCalendarDates,
+    setCurDate,
+}) => {
+    let [monthEvents, setMonthEvents] = useState({});
+
+    const setDate = (dateItem) => {
+        if (dateItem.date !== 0)
+            setCurDate(
+                (prev) =>
+                    new Date(prev.getFullYear(), prev.getMonth(), dateItem.date)
+            );
+    };
+
+    useEffect(() => {
+        getMonthEvents(new Date(year, month, 1), (events) => {
+            setMonthEvents(events);
+        });
+    }, [getMonthEvents, month, year]);
+
+    return (
+        <div className="calendar-grid">
+            {WEEKDAYS.map((day, ind) => (
+                <div key={ind} className="weekday">
+                    {day}
+                </div>
+            ))}
+            {getCalendarDates().map((dateItem, ind) => (
+                <div
+                    key={ind}
+                    className={
+                        dateItem.date === 0
+                            ? "empty"
+                            : dateItem.isToday
+                            ? "today"
+                            : dateItem.isSelected
+                            ? "active-selection"
+                            : ""
+                    }
+                    onClick={() => setDate(dateItem)}
+                >
+                    <div style={{ margin: "0.3rem", marginBottom: "0" }}>
+                        {dateItem.date === 0 ? "" : dateItem.date}
+                    </div>
+                    <div style={{ overflowY: "auto" }}>
+                        {monthEvents[dateItem.date] &&
+                            (monthEvents[dateItem.date].length <= 2 ? (
+                                monthEvents[dateItem.date].map((event) => (
+                                    <div
+                                        style={style.eventItem}
+                                        key={`${event.id}-${dateItem.date}`}
+                                    >
+                                        {event.title}
+                                    </div>
+                                ))
+                            ) : (
+                                <div>
+                                    <div style={style.eventItem}>
+                                        {monthEvents[dateItem.date][0].title}
+                                    </div>
+                                    <div style={style.eventItem}>
+                                        {monthEvents[dateItem.date][1].title}
+                                    </div>
+                                    <div style={style.eventMore}>
+                                        {monthEvents[dateItem.date].length - 2}{" "}
+                                        more...
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const MonthGrid = ({ curDate, setCurDate, setSelectMonth, setSelectYear }) => {
+    return (
+        <div className="month-grid">
+            {MONTHS.map((month, ind) => (
+                <div
+                    key={month}
+                    onClick={() => {
+                        setCurDate(
+                            (prev) =>
+                                new Date(
+                                    prev.getFullYear(),
+                                    ind,
+                                    prev.getDate()
+                                )
+                        );
+                        setSelectMonth(false);
+                        setSelectYear(false);
+                    }}
+                    className={
+                        ind === curDate.getMonth() ? "active-selection" : ""
+                    }
+                >
+                    {month}
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const YearGrid = ({ getYears, setCurDate, setSelectMonth, setSelectYear }) => {
+    return (
+        <div className="year-grid">
+            {getYears().map((yearItem, ind) => (
+                <div
+                    key={ind}
+                    onClick={() => {
+                        setCurDate(
+                            (prev) =>
+                                new Date(
+                                    yearItem.year,
+                                    prev.getMonth(),
+                                    prev.getDate()
+                                )
+                        );
+                        setSelectYear(false);
+                        setSelectMonth(true);
+                    }}
+                    className={yearItem.isSelected ? "active-selection" : ""}
+                >
+                    {yearItem.year}
+                </div>
+            ))}
+        </div>
+    );
+};
+
 const CalendarPage = (props) => {
-    const { changeSelection } = props.winObj;
-    const db = openDatabase(UserPreferences.get("calendarStorage"));
+    const { changeSelection, getMonthEvents } = props.winObj;
     const today = new Date();
     let [curDate, setCurDate] = useState(today);
     let [selectMonth, setSelectMonth] = useState(false);
@@ -102,7 +240,8 @@ const CalendarPage = (props) => {
                 isSelected: i === curDate.getDate(),
             });
         }
-        for (; i <= 42 - initialDate.getDay(); i++) dates.push({ date: 0 });
+        for (let j = 0; j < (42 - initialDate.getDay() + 1 - i) % 7; j++)
+            dates.push({ date: 0 });
         return dates;
     };
 
@@ -143,13 +282,7 @@ const CalendarPage = (props) => {
     };
 
     useEffect(() => {
-        // on mount and unmount
-        CalendarDB.create(db);
         changeSelection(curDate);
-        // listRows(db, setCalendarList);
-        return () => {
-            db.close();
-        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -196,95 +329,29 @@ const CalendarPage = (props) => {
                     </div>
                 </div>
                 {selectMonth && (
-                    <div className="month-grid">
-                        {MONTHS.map((month, ind) => (
-                            <div
-                                key={month}
-                                onClick={() => {
-                                    setCurDate(
-                                        (prev) =>
-                                            new Date(
-                                                prev.getFullYear(),
-                                                ind,
-                                                prev.getDate()
-                                            )
-                                    );
-                                    setSelectMonth(false);
-                                    setSelectYear(false);
-                                }}
-                                className={
-                                    ind === curDate.getMonth()
-                                        ? "active-selection"
-                                        : ""
-                                }
-                            >
-                                {month}
-                            </div>
-                        ))}
-                    </div>
+                    <MonthGrid
+                        curDate={curDate}
+                        setCurDate={setCurDate}
+                        setSelectMonth={setSelectMonth}
+                        setSelectYear={setSelectYear}
+                    />
                 )}
                 {selectYear && (
-                    <div className="year-grid">
-                        {getYears().map((yearItem, ind) => (
-                            <div
-                                key={ind}
-                                onClick={() => {
-                                    setCurDate(
-                                        (prev) =>
-                                            new Date(
-                                                yearItem.year,
-                                                prev.getMonth(),
-                                                prev.getDate()
-                                            )
-                                    );
-                                    setSelectYear(false);
-                                    setSelectMonth(true);
-                                }}
-                                className={
-                                    yearItem.isSelected
-                                        ? "active-selection"
-                                        : ""
-                                }
-                            >
-                                {yearItem.year}
-                            </div>
-                        ))}
-                    </div>
+                    <YearGrid
+                        getYears={getYears}
+                        setCurDate={setCurDate}
+                        setSelectMonth={setSelectMonth}
+                        setSelectYear={setSelectYear}
+                    />
                 )}
                 {!selectMonth && !selectYear && (
-                    <div className="calendar-grid">
-                        {WEEKDAYS.map((day, ind) => (
-                            <div key={ind} className="weekday">
-                                {day}
-                            </div>
-                        ))}
-                        {getCalendarDates().map((dateItem, ind) => (
-                            <div
-                                key={ind}
-                                className={
-                                    dateItem.date === 0
-                                        ? "empty"
-                                        : dateItem.isToday
-                                        ? "today"
-                                        : dateItem.isSelected
-                                        ? "active-selection"
-                                        : ""
-                                }
-                                onClick={() =>
-                                    setCurDate(
-                                        (prev) =>
-                                            new Date(
-                                                prev.getFullYear(),
-                                                prev.getMonth(),
-                                                dateItem.date
-                                            )
-                                    )
-                                }
-                            >
-                                {dateItem.date === 0 ? "" : dateItem.date}
-                            </div>
-                        ))}
-                    </div>
+                    <CalendarGrid
+                        month={curDate.getMonth()}
+                        year={curDate.getFullYear()}
+                        getMonthEvents={getMonthEvents}
+                        getCalendarDates={getCalendarDates}
+                        setCurDate={setCurDate}
+                    />
                 )}
             </div>
         </div>

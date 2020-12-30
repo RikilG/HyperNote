@@ -15,6 +15,7 @@ export default class UserPreferences {
         pomoStorage: this.path.join(this.dataPath, "pomoStorage.db"),
         projectStorage: this.path.join(this.dataPath, "projectStorage.db"),
         calendarStorage: this.path.join(this.dataPath, "calendarStorage.db"),
+        preferredTimeFormat: "12H",
     };
 
     static __loadPreferences() {
