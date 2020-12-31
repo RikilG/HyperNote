@@ -182,7 +182,7 @@ const editBoardRow = (db, row, callback) => {
 };
 
 const editTileRow = (db, row, callback) => {
-    const query = `UPDATE tiles SET boardID=?, name=?, desc=?, dueDate=?, link=? WHERE id=?;`;
+    const query = `UPDATE tiles SET boardID=?, name=?, desc=?, dueDate=?, link=? WHERE id=?;`; // assume tiles can be moved between boards
     db.run(
         query,
         [row.boardID, row.name, row.desc, row.dueDate, row.link, row.id],
@@ -194,8 +194,8 @@ const editTileRow = (db, row, callback) => {
 };
 
 const editChecklistRow = (db, row, callback) => {
-    const query = `UPDATE checklists SET tileID=?, desc=? WHERE id=?;`;
-    db.run(query, [row.tileID, row.desc, row.id], (err) => {
+    const query = `UPDATE checklists SET tileID=?, desc=?, checked=? WHERE id=?;`; //add check
+    db.run(query, [row.tileID, row.desc, row.checked, row.id], (err) => {
         handleSqlError(err);
         if (callback) callback(err);
     });
