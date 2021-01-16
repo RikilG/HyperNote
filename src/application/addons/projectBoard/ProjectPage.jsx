@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import WindowBar from "../../workspace/WindowBar";
+import Tooltip from "../../ui/Tooltip";
+import Tile from "./Tile";
 
 const style = {
     container: {
@@ -23,10 +26,15 @@ const style = {
 
 const ProjectPage = (props) => {
     const projectItem = props.winObj.projectItem;
+    let [showModal, setShowModal] = useState(false);
     return (
         <div style={style.container}>
             <WindowBar winObj={props.winObj} title={"Project"} />
             <div style={style.title}>{projectItem.name}</div>
+            <button onClick={() => setShowModal(true)} />
+            {showModal && (
+                <Tile onExit={() => setShowModal((prev) => !prev)} tileID={2} />
+            )}
         </div>
     );
 };
