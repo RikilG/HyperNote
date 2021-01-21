@@ -1,13 +1,17 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faPen } from "@fortawesome/free-solid-svg-icons";
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "../../ui/Tooltip";
 import Modal from "../../ui/Modal";
 import CheckList from "./CheckList";
 import Textarea from "../../ui/Textarea";
 import Textbox from "../../ui/Textbox";
 import ContextMenu from "../../ui/ContextMenu";
-import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import DatePicker from "../../ui/DatePicker";
+import UserPreferences from "../../settings/UserPreferences";
+import { openDatabase } from "../../Database";
+import { listTileRows, editTileRow } from "./ProjectDB";
 
 const style = {
     container: {
@@ -16,12 +20,20 @@ const style = {
         flexFlow: "column nowrap",
         flexDirection: "column",
     },
+    titleGroup: {
+        display: "flex",
+        flexFlow: "row nowrap",
+    },
     title: {
-        fontSize: "1.7rem",
         padding: "0.5rem 0",
         textAlign: "left",
         fontSize: "20px",
         color: "var(--secondaryTextColor)",
+    },
+    renameIcon: {
+        padding: "5px 0px",
+        position: "relative",
+        right: "2rem",
     },
     textarea: {
         display: "block",
@@ -42,11 +54,17 @@ const style = {
     dateContainer: {
         background: "var(--backgroundColor)",
         border: "2px solid",
+        color: "var(--primaryTextColor)",
         padding: "15px 10px",
         textAlign: "left",
-        fontSize: "16px",
         marginBottom: "0.2rem",
-        marginRight: "-0.3rem",
+        marginLeft: "0.3rem",
+        cursor: "pointer",
+        fontSize: "16px",
+        borderRadius: "4px",
+        width: "auto",
+        display: "flex",
+        flexFlow: "row nowrap",
     },
     checklistButton: {
         background: "var(--backgroundColor)",
@@ -99,7 +117,28 @@ function useHookWithRefCallback() {
 const Tile = (props) => {
     let [showModal, setShowModal] = useState(false);
     let [setContextMenuRef, bounds] = useHookWithRefCallback();
+    let [tileItem, setTileItem] = useState({});
+    let [titleEdit, setTitleEdit] = useState(false);
     const childRef = useRef();
+    const db = openDatabase(UserPreferences.get("projectStorage"));
+    const handleNameChange = (name) => {
+        tileItem.name = name;
+        setTitleEdit(false);
+        editTileRow(db, tileItem);
+    };
+    const handleDescChange = (desc) => {
+        tileItem.desc = desc;
+        editTileRow(db, tileItem);
+    };
+    const handleDateChange = (date) => {
+        tileItem.dueDate = date.toString();
+        editTileRow(db, tileItem);
+        listTileRows(db, setTileItem, props.tileID);
+    };
+    const handleLinkChange = (link) => {
+        tileItem.link = link;
+        editTileRow(db, tileItem);
+    };
     const contextMenuOptions = [
         {
             name: "Follow Link",
@@ -107,25 +146,55 @@ const Tile = (props) => {
             action: () => {},
         },
     ];
+    useEffect(() => {
+        listTileRows(db, setTileItem, props.tileID);
+        return () => {
+            db.close();
+        };
+    }, [props.tileID]);
     return (
         <Modal onExit={props.onExit}>
             <div style={style.container}>
-                <Textbox
-                    initialValue={"Tile " + props.tileID}
-                    disabled={true}
-                    style={style.title}
-                />
+                <div style={style.titleGroup}>
+                    <Textbox
+                        placeholder={"Tile " + props.tileID}
+                        initialValue={tileItem.name}
+                        disabled={!titleEdit}
+                        style={style.title}
+                        handleConfirm={handleNameChange}
+                    />
+                    <div
+                        style={style.renameIcon}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setTitleEdit(true);
+                        }}
+                    >
+                        <Tooltip value="Rename Tile" position="mouse">
+                            <FontAwesomeIcon icon={faPen} />
+                        </Tooltip>
+                    </div>
+                </div>
                 <Textarea
                     placeholder={"Additional Information"}
-                    initialValue={props.initialValue}
+                    initialValue={tileItem.desc}
                     style={style.textarea}
+                    handleCancel={handleDescChange}
                 />
-                <Textbox style={style.dateContainer} placeholder={"Date"} />
+                {tileItem && (
+                    <div style={style.dateContainer}>
+                        Due Date:
+                        <DatePicker
+                            value={new Date(tileItem.dueDate)}
+                            onChange={handleDateChange}
+                        />
+                    </div>
+                )}
                 <div
                     onClick={() => setShowModal((prev) => !prev)}
                     style={style.checklistButton}
                 >
-                    Checkbox
+                    Checklist
                     <div
                         onClick={(e) => {
                             e.stopPropagation();
@@ -144,7 +213,7 @@ const Tile = (props) => {
                         <div style={{ border: "2px solid" }}>
                             <CheckList
                                 ref={childRef}
-                                tileID={2} //should not be hardcoded
+                                tileID={props.tileID}
                                 onExit={() => setShowModal((prev) => !prev)}
                             />
                         </div>
@@ -154,6 +223,8 @@ const Tile = (props) => {
                     <Textbox
                         style={style.linkContainer}
                         placeholder={"Link to Folder"}
+                        initialValue={tileItem.link}
+                        handleConfirm={handleLinkChange}
                     />
                     <ContextMenu bounds={bounds} menu={contextMenuOptions} />
                 </div>
