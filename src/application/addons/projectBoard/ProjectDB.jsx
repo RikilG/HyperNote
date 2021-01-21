@@ -64,27 +64,45 @@ const listProjectRows = (db, updateList) => {
     });
 };
 
-const listBoardRows = (db, updateList) => {
-    const query = `SELECT * FROM boards;`;
-    db.all(query, (err, rows) => {
+const listBoardNames = (db, updateList, projectID) => {
+    const query = `SELECT id,name FROM boards WHERE projectID=?;`;
+    db.all(query, [projectID], (err, rows) => {
         handleSqlError(err);
         if (!rows) return;
         if (updateList) updateList(rows);
     });
 };
 
-const listTileRows = (db, updateList) => {
-    const query = `SELECT * FROM tiles;`;
-    db.all(query, (err, rows) => {
+const listBoardRows = (db, updateList, id) => {
+    const query = `SELECT * FROM boards WHERE id=?;`;
+    db.each(query, [id], (err, rows) => {
         handleSqlError(err);
         if (!rows) return;
         if (updateList) updateList(rows);
     });
 };
 
-const listChecklistRows = (db, updateList) => {
-    const query = `SELECT * FROM checklists;`;
-    db.all(query, (err, rows) => {
+const listTileNames = (db, updateList, boardID) => {
+    const query = `SELECT id,name FROM tiles WHERE boardID=?;`;
+    db.all(query, [boardID], (err, rows) => {
+        handleSqlError(err);
+        if (!rows) return;
+        if (updateList) updateList(rows);
+    });
+};
+
+const listTileRows = (db, updateList, id) => {
+    const query = `SELECT * FROM tiles WHERE id=?;`;
+    db.each(query, [id], (err, rows) => {
+        handleSqlError(err);
+        if (!rows) return;
+        if (updateList) updateList(rows);
+    });
+};
+
+const listChecklistRows = (db, updateList, tileID) => {
+    const query = `SELECT * FROM checklists WHERE tileID=?;`;
+    db.all(query, [tileID], (err, rows) => {
         handleSqlError(err);
         if (!rows) return;
         if (updateList) updateList(rows);
@@ -182,10 +200,10 @@ const editBoardRow = (db, row, callback) => {
 };
 
 const editTileRow = (db, row, callback) => {
-    const query = `UPDATE tiles SET boardID=?, name=?, desc=?, dueDate=?, link=? WHERE id=?;`; // assume tiles can be moved between boards
+    const query = `UPDATE tiles SET name=?, desc=?, dueDate=?, link=? WHERE id=?;`; // assume tiles can be moved between boards
     db.run(
         query,
-        [row.boardID, row.name, row.desc, row.dueDate, row.link, row.id],
+        [row.name, row.desc, row.dueDate, row.link, row.id],
         (err) => {
             handleSqlError(err);
             if (callback) callback(err);
@@ -208,11 +226,13 @@ export {
     deleteProjectRow,
     editProjectRow,
     createBoardsDb,
+    listBoardNames,
     listBoardRows,
     addBoardRow,
     deleteBoardRow,
     editBoardRow,
     createTilesDb,
+    listTileNames,
     listTileRows,
     addTileRow,
     deleteTileRow,
