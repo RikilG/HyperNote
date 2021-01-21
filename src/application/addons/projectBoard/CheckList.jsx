@@ -1,13 +1,10 @@
-import {
-    useState,
-    useEffect,
-    forwardRef,
-    useRef,
-    useImperativeHandle,
-} from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import CheckBox from "../../ui/CheckBox";
 import UserPreferences from "../../settings/UserPreferences";
 import { openDatabase } from "../../Database";
+import Tooltip from "../../ui/Tooltip";
 import {
     createChecklistsDb,
     listChecklistRows,
@@ -22,13 +19,19 @@ const style = {
         display: "flex",
         flexFlow: "column nowrap",
     },
+    checkboxGroup: {
+        display: "flex",
+        flexFlow: "row nowrap",
+    },
+    deleteIcon: {
+        marginTop: "3px",
+    },
 };
 
 const CheckList = forwardRef((props, ref) => {
     let [checklist, setChecklist] = useState([]);
     const db = openDatabase(UserPreferences.get("projectStorage"));
-    createChecklistsDb(db, () => listChecklistRows(db));
-
+    createChecklistsDb(db);
     useImperativeHandle(ref, () => ({
         createNewCheckbox() {
             const checkboxItem = {
@@ -39,24 +42,24 @@ const CheckList = forwardRef((props, ref) => {
             };
             addChecklistRow(db, checkboxItem, (err) => {
                 if (err) return;
-                listChecklistRows(db, setChecklist);
+                listChecklistRows(db, setChecklist, props.tileID);
             });
         },
     }));
 
-    /*const handleDelete = (checkboxItem) => {
-        deleteChecklistRow(db, checkboxItem.id, (err) => {
+    const handleDelete = (id) => {
+        deleteChecklistRow(db, id, (err) => {
             if (err) return;
-            listChecklistRows(db, setChecklist);
+            listChecklistRows(db, setChecklist, props.tileID);
         });
-    };*/
+    };
 
     useEffect(() => {
-        listChecklistRows(db, setChecklist);
+        listChecklistRows(db, setChecklist, props.tileID);
         return () => {
             db.close();
         };
-    }, []);
+    }, [props.tileID]);
 
     const handleTextChange = (text, id) => {
         let checkboxItem;
@@ -69,7 +72,7 @@ const CheckList = forwardRef((props, ref) => {
         }
         editChecklistRow(db, checkboxItem, (err) => {
             if (err) return;
-            listChecklistRows(db, props.setChecklist);
+            listChecklistRows(db, props.setChecklist, props.tileID);
         });
     };
 
@@ -84,22 +87,40 @@ const CheckList = forwardRef((props, ref) => {
         }
         editChecklistRow(db, checkboxItem, (err) => {
             if (err) return;
-            listChecklistRows(db, props.setChecklist);
+            listChecklistRows(db, props.setChecklist, props.tileID);
         });
     };
 
     return (
         <div style={style.container}>
             {checklist.map((listobj) => (
-                <CheckBox
-                    initialText={listobj.desc}
-                    handleConfirm={(text) => handleTextChange(text, listobj.id)}
-                    defaultChecked={listobj.checked}
-                    onCheckboxToggle={(event) =>
-                        handleCheckboxToggle(event.target.checked, listobj.id)
-                    }
-                    textboxStyle={{ background: "var(--backgroundColor)" }}
-                />
+                <div key={listobj.id} style={style.checkboxGroup}>
+                    <CheckBox
+                        initialText={listobj.desc}
+                        handleConfirm={(text) =>
+                            handleTextChange(text, listobj.id)
+                        }
+                        defaultChecked={listobj.checked}
+                        onCheckboxToggle={(event) =>
+                            handleCheckboxToggle(
+                                event.target.checked,
+                                listobj.id
+                            )
+                        }
+                        textboxStyle={{ background: "var(--backgroundColor)" }}
+                    />
+                    <div
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(listobj.id);
+                        }}
+                        style={style.deleteIcon}
+                    >
+                        <Tooltip value="Delete" position="mouse">
+                            <FontAwesomeIcon icon={faTrash} />
+                        </Tooltip>
+                    </div>
+                </div>
             ))}
         </div>
     );
