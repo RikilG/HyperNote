@@ -58,6 +58,7 @@ const Project = () => {
 
     const createNewProject = (projectName) => {
         const projectItem = {
+            id: null,
             name: projectName,
         };
         addProjectRow(db, projectItem, (err) => {
@@ -70,7 +71,6 @@ const Project = () => {
 
     const handleRefresh = () => {
         listProjectRows(db, setProjectList);
-        console.log(projectList);
     };
 
     const handleDelete = (projectItem) => {
