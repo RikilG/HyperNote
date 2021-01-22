@@ -146,30 +146,54 @@ const addChecklistRow = (db, row, callback) => {
 };
 
 const deleteProjectRow = (db, id, callback) => {
-    const query = `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?));
-    DELETE FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?);
-    DELETE FROM boards WHERE projectID=?;
-    DELETE FROM projects WHERE id=?;`;
-    db.run(query, [id, id, id, id], (err) => {
+    const query1 = `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?));`;
+    db.run(query1, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query2 = `DELETE FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?);`;
+    db.run(query2, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query3 = `DELETE FROM boards WHERE projectID=?;`;
+    db.run(query3, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query4 = `DELETE FROM projects WHERE id=?;`;
+    db.run(query4, [id], (err) => {
         handleSqlError(err);
         if (callback) callback(err);
     });
 };
 
 const deleteBoardRow = (db, id, callback) => {
-    const query = `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID=?);
-    DELETE FROM tiles WHERE boardID=?;
-    DELETE FROM boards WHERE id=?;`;
-    db.run(query, [id, id, id], (err) => {
+    const query1 = `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID=?);`;
+    db.run(query1, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query2 = `DELETE FROM tiles WHERE boardID=?;`;
+    db.run(query2, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query3 = `DELETE FROM boards WHERE id=?;`;
+    db.run(query3, [id], (err) => {
         handleSqlError(err);
         if (callback) callback(err);
     });
 };
 
 const deleteTileRow = (db, id, callback) => {
-    const query = `DELETE FROM checklists WHERE tileID=?;
-    DELETE FROM tiles WHERE id=?;`;
-    db.run(query, [id, id], (err) => {
+    const query1 = `DELETE FROM checklists WHERE tileID=?;`;
+    db.run(query1, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query2 = `DELETE FROM tiles WHERE id=?;`;
+    db.run(query2, [id], (err) => {
         handleSqlError(err);
         if (callback) callback(err);
     });

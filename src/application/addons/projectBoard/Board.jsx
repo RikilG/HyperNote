@@ -10,7 +10,6 @@ import {
     createTilesDb,
     listTileNames,
     addTileRow,
-    //deleteTileRow,
     editBoardRow,
     listBoardRows,
 } from "./ProjectDB";
@@ -88,12 +87,6 @@ const Board = (props) => {
         setTitleEdit(false);
         editBoardRow(db, boardItem);
     };
-    /*const handleDelete = (tileItem) => {
-        deleteTileRow(db, tileItem.id, (err) => {
-            if (err) return;
-            listTileNames(db, setTiles, props.boardID);
-        });
-    };*/
 
     useEffect(() => {
         listTileNames(db, setTiles, props.boardID);
@@ -101,12 +94,19 @@ const Board = (props) => {
         return () => {
             db.close();
         };
-    }, [showModal, props.boardID]);
+    }, [showModal, props.boardID, props.tileDeleted]);
 
     return (
         <div style={style.container}>
             <div style={style.titlebar}>
-                <div style={style.boardTitleGroup}>
+                <div
+                    id={"Board-" + props.boardID}
+                    draggable={true}
+                    onDragStart={(e) => {
+                        e.dataTransfer.setData("text/plain", e.target.id);
+                    }}
+                    style={style.boardTitleGroup}
+                >
                     <Textbox
                         placeholder={"Board " + props.boardID}
                         initialValue={boardItem.name}
@@ -144,11 +144,16 @@ const Board = (props) => {
             </div>
             {tiles.map((listobj) => (
                 <div
+                    id={"Tile-" + listobj.id}
+                    draggable={true}
                     key={listobj.id}
                     style={style.boardTile}
                     onClick={() => {
                         setChoice(listobj.id);
                         setShowModal(true);
+                    }}
+                    onDragStart={(e) => {
+                        e.dataTransfer.setData("text/plain", e.target.id);
                     }}
                 >
                     <Textbox
