@@ -96,7 +96,7 @@ const ProjectPage = (props) => {
         if (type === "Tile") {
             deleteTileRow(db, id, (err) => {
                 if (err) return;
-                setDummy((x) => x + 1);
+                setDummy((x) => (x + 1) % 100003);
             });
         } else if (type === "Board") {
             deleteBoardRow(db, id, (err) => {
@@ -144,7 +144,11 @@ const ProjectPage = (props) => {
                             key={listobj.id}
                             style={style.boardParentContainer}
                         >
-                            <Board boardID={listobj.id} tileDeleted={dummy} />
+                            <Board
+                                boardID={listobj.id}
+                                tileDeleted={dummy}
+                                setTileDeleted={setDummy}
+                            />
                         </div>
                     ))}
                 </div>

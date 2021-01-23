@@ -224,7 +224,7 @@ const editBoardRow = (db, row, callback) => {
 };
 
 const editTileRow = (db, row, callback) => {
-    const query = `UPDATE tiles SET name=?, desc=?, dueDate=?, link=? WHERE id=?;`; // assume tiles can be moved between boards
+    const query = `UPDATE tiles SET name=?, desc=?, dueDate=?, link=? WHERE id=?;`;
     db.run(
         query,
         [row.name, row.desc, row.dueDate, row.link, row.id],
@@ -233,6 +233,14 @@ const editTileRow = (db, row, callback) => {
             if (callback) callback(err);
         }
     );
+};
+
+const editTileBoard = (db, row, callback) => {
+    const query = `UPDATE tiles SET boardID=? WHERE id=?;`; // assume tiles can be moved between boards
+    db.run(query, [row.boardID, row.id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
 };
 
 const editChecklistRow = (db, row, callback) => {
@@ -261,6 +269,7 @@ export {
     addTileRow,
     deleteTileRow,
     editTileRow,
+    editTileBoard,
     createChecklistsDb,
     listChecklistRows,
     addChecklistRow,

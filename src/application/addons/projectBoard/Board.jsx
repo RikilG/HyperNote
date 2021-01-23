@@ -11,6 +11,7 @@ import {
     listTileNames,
     addTileRow,
     editBoardRow,
+    editTileBoard,
     listBoardRows,
 } from "./ProjectDB";
 
@@ -82,6 +83,17 @@ const Board = (props) => {
             listTileNames(db, setTiles, props.boardID);
         });
     };
+    const onDrop = (e) => {
+        let data = e.dataTransfer.getData("text");
+        e.dataTransfer.clearData();
+        let [type, id] = data.split("-");
+        if (type === "Tile") {
+            editTileBoard(db, { boardID: props.boardID, id: id }, (err) => {
+                if (err) return;
+                props.setTileDeleted((x) => (x + 1) % 100003); //Need to find better way to make parent refresh
+            });
+        }
+    };
     const handleNameChange = (name) => {
         boardItem.name = name;
         setTitleEdit(false);
@@ -97,7 +109,13 @@ const Board = (props) => {
     }, [showModal, props.boardID, props.tileDeleted]);
 
     return (
-        <div style={style.container}>
+        <div
+            onDrop={onDrop}
+            onDragOver={(e) => {
+                e.preventDefault();
+            }}
+            style={style.container}
+        >
             <div style={style.titlebar}>
                 <div
                     id={"Board-" + props.boardID}
