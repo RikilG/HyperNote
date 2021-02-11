@@ -64,27 +64,45 @@ const listProjectRows = (db, updateList) => {
     });
 };
 
-const listBoardRows = (db, updateList) => {
-    const query = `SELECT * FROM boards;`;
-    db.all(query, (err, rows) => {
+const listBoardNames = (db, updateList, projectID) => {
+    const query = `SELECT id,name FROM boards WHERE projectID=?;`;
+    db.all(query, [projectID], (err, rows) => {
         handleSqlError(err);
         if (!rows) return;
         if (updateList) updateList(rows);
     });
 };
 
-const listTileRows = (db, updateList) => {
-    const query = `SELECT * FROM tiles;`;
-    db.all(query, (err, rows) => {
+const listBoardRows = (db, updateList, id) => {
+    const query = `SELECT * FROM boards WHERE id=?;`;
+    db.each(query, [id], (err, rows) => {
         handleSqlError(err);
         if (!rows) return;
         if (updateList) updateList(rows);
     });
 };
 
-const listChecklistRows = (db, updateList) => {
-    const query = `SELECT * FROM checklists;`;
-    db.all(query, (err, rows) => {
+const listTileNames = (db, updateList, boardID) => {
+    const query = `SELECT id,name FROM tiles WHERE boardID=?;`;
+    db.all(query, [boardID], (err, rows) => {
+        handleSqlError(err);
+        if (!rows) return;
+        if (updateList) updateList(rows);
+    });
+};
+
+const listTileRows = (db, updateList, id) => {
+    const query = `SELECT * FROM tiles WHERE id=?;`;
+    db.each(query, [id], (err, rows) => {
+        handleSqlError(err);
+        if (!rows) return;
+        if (updateList) updateList(rows);
+    });
+};
+
+const listChecklistRows = (db, updateList, tileID) => {
+    const query = `SELECT * FROM checklists WHERE tileID=?;`;
+    db.all(query, [tileID], (err, rows) => {
         handleSqlError(err);
         if (!rows) return;
         if (updateList) updateList(rows);
@@ -128,30 +146,54 @@ const addChecklistRow = (db, row, callback) => {
 };
 
 const deleteProjectRow = (db, id, callback) => {
-    const query = `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?));
-    DELETE FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?);
-    DELETE FROM boards WHERE projectID=?;
-    DELETE FROM projects WHERE id=?;`;
-    db.run(query, [id, id, id, id], (err) => {
+    const query1 = `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?));`;
+    db.run(query1, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query2 = `DELETE FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?);`;
+    db.run(query2, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query3 = `DELETE FROM boards WHERE projectID=?;`;
+    db.run(query3, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query4 = `DELETE FROM projects WHERE id=?;`;
+    db.run(query4, [id], (err) => {
         handleSqlError(err);
         if (callback) callback(err);
     });
 };
 
 const deleteBoardRow = (db, id, callback) => {
-    const query = `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID=?);
-    DELETE FROM tiles WHERE boardID=?;
-    DELETE FROM boards WHERE id=?;`;
-    db.run(query, [id, id, id], (err) => {
+    const query1 = `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID=?);`;
+    db.run(query1, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query2 = `DELETE FROM tiles WHERE boardID=?;`;
+    db.run(query2, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query3 = `DELETE FROM boards WHERE id=?;`;
+    db.run(query3, [id], (err) => {
         handleSqlError(err);
         if (callback) callback(err);
     });
 };
 
 const deleteTileRow = (db, id, callback) => {
-    const query = `DELETE FROM checklists WHERE tileID=?;
-    DELETE FROM tiles WHERE id=?;`;
-    db.run(query, [id, id], (err) => {
+    const query1 = `DELETE FROM checklists WHERE tileID=?;`;
+    db.run(query1, [id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+    const query2 = `DELETE FROM tiles WHERE id=?;`;
+    db.run(query2, [id], (err) => {
         handleSqlError(err);
         if (callback) callback(err);
     });
@@ -182,10 +224,10 @@ const editBoardRow = (db, row, callback) => {
 };
 
 const editTileRow = (db, row, callback) => {
-    const query = `UPDATE tiles SET boardID=?, name=?, desc=?, dueDate=?, link=? WHERE id=?;`;
+    const query = `UPDATE tiles SET name=?, desc=?, dueDate=?, link=? WHERE id=?;`;
     db.run(
         query,
-        [row.boardID, row.name, row.desc, row.dueDate, row.link, row.id],
+        [row.name, row.desc, row.dueDate, row.link, row.id],
         (err) => {
             handleSqlError(err);
             if (callback) callback(err);
@@ -193,9 +235,17 @@ const editTileRow = (db, row, callback) => {
     );
 };
 
+const editTileBoard = (db, row, callback) => {
+    const query = `UPDATE tiles SET boardID=? WHERE id=?;`; // assume tiles can be moved between boards
+    db.run(query, [row.boardID, row.id], (err) => {
+        handleSqlError(err);
+        if (callback) callback(err);
+    });
+};
+
 const editChecklistRow = (db, row, callback) => {
-    const query = `UPDATE checklists SET tileID=?, desc=? WHERE id=?;`;
-    db.run(query, [row.tileID, row.desc, row.id], (err) => {
+    const query = `UPDATE checklists SET tileID=?, desc=?, checked=? WHERE id=?;`; //add check
+    db.run(query, [row.tileID, row.desc, row.checked, row.id], (err) => {
         handleSqlError(err);
         if (callback) callback(err);
     });
@@ -208,15 +258,18 @@ export {
     deleteProjectRow,
     editProjectRow,
     createBoardsDb,
+    listBoardNames,
     listBoardRows,
     addBoardRow,
     deleteBoardRow,
     editBoardRow,
     createTilesDb,
+    listTileNames,
     listTileRows,
     addTileRow,
     deleteTileRow,
     editTileRow,
+    editTileBoard,
     createChecklistsDb,
     listChecklistRows,
     addChecklistRow,

@@ -53,7 +53,7 @@ const ProjectEntry = (props) => {
     ];
 
     const handleDelete = (e) => {
-        e.stopPropagation();
+        if (e) e.stopPropagation();
         props.handleDelete(props.projectItem);
     };
 
@@ -81,7 +81,9 @@ const ProjectEntry = (props) => {
             projectItem: projectItem,
             running: false,
         };
-        project.page = <ProjectPage winObj={project} />;
+        project.page = (
+            <ProjectPage winObj={project} projectID={projectItem.id} />
+        );
         openWindow(project, true, async (winObj) => {
             if (winObj.id !== id) {
                 if (winObj.running === true) {

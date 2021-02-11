@@ -1,8 +1,21 @@
+import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import WindowBar from "../../workspace/WindowBar";
+import Board from "./Board";
+import UserPreferences from "../../settings/UserPreferences";
+import { openDatabase } from "../../Database";
+import {
+    createBoardsDb,
+    addBoardRow,
+    listBoardNames,
+    deleteTileRow,
+    deleteBoardRow,
+} from "./ProjectDB";
+import Tooltip from "../../ui/Tooltip";
 
 const style = {
     container: {
-        // background: "#FF4030",
         background: "var(--backgroundColor)",
         height: "100%",
         padding: "0 0.5rem",
@@ -19,14 +32,127 @@ const style = {
         fontSize: "1.1rem",
         textAlign: "center",
     },
+    actionSpace: {
+        display: "flex",
+        flexFlow: "column nowrap",
+    },
+    topSpace: {
+        display: "flex",
+        flexFlow: "row nowrap",
+    },
+    deleteBox: {
+        width: "10rem",
+        height: "1.5rem",
+        background: "#f05673",
+        margin: "auto",
+        border: "3px solid",
+        borderRadius: "0.5rem",
+        textAlign: "center",
+        fontSize: "17px",
+        paddingTop: "3px",
+    },
+    addIcon: {
+        padding: "0.2rem 0.5rem",
+        paddingRight: "1.2rem",
+        height: "1rem",
+        width: "0.1rem",
+        background: "var(--primaryColor)",
+        border: "2px solid",
+    },
+    boardArea: {
+        display: "flex",
+        flexFlow: "row nowrap",
+        overflow: "auto",
+        height: "29rem",
+    },
+    boardParentContainer: {
+        width: "11rem",
+        padding: "0.2rem 0.5rem",
+    },
 };
 
 const ProjectPage = (props) => {
-    const projectItem = props.winObj.projectItem;
+    let winObj = props.winObj;
+    let [boards, setBoards] = useState([]);
+    const [dummy, setDummy] = useState(0);
+    const projectItem = winObj.projectItem;
+    const db = openDatabase(UserPreferences.get("projectStorage"));
+    createBoardsDb(db);
+    const createNewBoard = () => {
+        const boardItem = {
+            id: null,
+            projectID: props.projectID,
+            name: "",
+        };
+        addBoardRow(db, boardItem, (err) => {
+            if (err) return;
+            listBoardNames(db, setBoards, props.projectID);
+        });
+    };
+    const onDrop = (e) => {
+        let data = e.dataTransfer.getData("text");
+        e.dataTransfer.clearData();
+        let [type, id] = data.split("-");
+        if (type === "Tile") {
+            deleteTileRow(db, id, (err) => {
+                if (err) return;
+                setDummy((x) => (x + 1) % 100003);
+            });
+        } else if (type === "Board") {
+            deleteBoardRow(db, id, (err) => {
+                if (err) return;
+                listBoardNames(db, setBoards, props.projectID);
+            });
+        }
+    };
+    useEffect(() => {
+        listBoardNames(db, setBoards, props.projectID);
+        return () => {
+            db.close();
+        };
+    }, [props.projectID]);
     return (
         <div style={style.container}>
-            <WindowBar winObj={props.winObj} title={"Project"} />
-            <div style={style.title}>{projectItem.name}</div>
+            <WindowBar winObj={winObj} title={"Project"} />
+            <div style={style.actionSpace}>
+                <div style={style.topSpace}>
+                    <div
+                        onDrop={onDrop}
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                        }}
+                        style={style.deleteBox}
+                    >
+                        Delete Box
+                    </div>
+                    <div
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            createNewBoard();
+                        }}
+                        style={style.addIcon}
+                    >
+                        <Tooltip value="Add Board" position="mouse">
+                            <FontAwesomeIcon icon={faPlus} />
+                        </Tooltip>
+                    </div>
+                </div>
+                <div style={style.title}>{projectItem.name}</div>
+                <div style={style.boardArea}>
+                    {boards.map((listobj) => (
+                        <div
+                            key={listobj.id}
+                            style={style.boardParentContainer}
+                        >
+                            <Board
+                                boardID={listobj.id}
+                                tileDeleted={dummy}
+                                setTileDeleted={setDummy}
+                            />
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };
