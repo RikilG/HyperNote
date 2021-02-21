@@ -100,14 +100,14 @@ const CheckList = forwardRef((props, ref) => {
                         handleConfirm={(text) =>
                             handleTextChange(text, listobj.id)
                         }
-                        defaultChecked={listobj.checked}
-                        onCheckboxToggle={(event) =>
+                        value={listobj.checked}
+                        onChange={(event) =>
                             handleCheckboxToggle(
                                 event.target.checked,
                                 listobj.id
                             )
                         }
-                        textboxStyle={{ background: "var(--backgroundColor)" }}
+                        editable={true}
                     />
                     <div
                         onClick={(e) => {

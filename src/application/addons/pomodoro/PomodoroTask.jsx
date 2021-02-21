@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faStopwatch, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useContext, useState, useRef, useCallback } from "react";
 import { toast } from "react-toastify";
 
@@ -11,11 +11,15 @@ import WindowContext from "../../WindowContext";
 
 const style = {
     container: {
+        display: "flex",
         position: "relative",
         margin: "0.15rem",
         padding: "0.25rem",
         borderRadius: "0.3rem",
         cursor: "pointer",
+    },
+    taskIcon: {
+        marginRight: "6px",
     },
 };
 
@@ -107,6 +111,9 @@ const PomodoroTask = (props) => {
                 onClick={handleTaskOpen}
                 ref={setContextMenuRef}
             >
+                <div style={style.taskIcon}>
+                    <FontAwesomeIcon icon={faStopwatch} />
+                </div>
                 {textbox ? (
                     <Textbox
                         initialValue={props.taskItem.name}

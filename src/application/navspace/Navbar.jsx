@@ -89,7 +89,7 @@ const Navbar = (props) => {
                         onClick={() => props.changeSelection("pomodoro")}
                     />
                 </Tooltip>
-                <Tooltip value="Project" position="right">
+                <Tooltip value="Projects" position="right">
                     <FontAwesomeIcon
                         style={style.icon}
                         icon={faWindowRestore}

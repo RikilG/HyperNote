@@ -10,6 +10,9 @@ const style = {
         flexFlow: "row nowrap",
         flex: "1",
     },
+    textbox: {
+        background: "var(--backgroundColor)",
+    },
 };
 
 /*
@@ -18,11 +21,12 @@ Passable props:
 - textboxStyle
 - placeholder
 - defaultChecked
-- onCheckboxToggle
+- onChange
 - handleCancel
 - handleConfirm
 - handleChange
 - handleKeyPress
+- editable (default: false)
 */
 
 const CheckBox = (props) => {
@@ -32,16 +36,18 @@ const CheckBox = (props) => {
                 type="checkbox"
                 className="checkbox"
                 defaultChecked={props.defaultChecked}
-                onChange={props.onCheckboxToggle}
+                checked={props.value}
+                onChange={props.onChange}
             />
             <Textbox
                 initialValue={props.initialText}
-                style={props.textboxStyle}
+                style={props.textboxStyle || style.textbox}
                 placeholder={props.placeholder}
                 handleCancel={props.handleCancel}
                 handleConfirm={props.handleConfirm}
                 handleChange={props.handleChange}
                 handleKeyPress={props.handleKeyPress}
+                disabled={!props.editable}
             />
         </div>
     );

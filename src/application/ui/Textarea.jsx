@@ -12,6 +12,7 @@ const style = {
         display: "flex",
         flexFlow: "row nowrap",
         flex: "1",
+        outline: "none",
     },
 };
 

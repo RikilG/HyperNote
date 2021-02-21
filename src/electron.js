@@ -1,7 +1,5 @@
 const path = require("path");
-const electron = require("electron");
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
+const { app, BrowserWindow, protocol } = require("electron");
 
 let mainWindow;
 
@@ -33,7 +31,15 @@ function createWindow() {
     });
 }
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+    // register a custom protol similar to file:// to get local
+    // media like audio and images
+    protocol.registerFileProtocol("hypernote", (request, callback) => {
+        const url = request.url.substr(12); // all urls start with 'file://'
+        callback({ path: path.normalize(`${__dirname}/${url}`) });
+    });
+    createWindow();
+});
 
 app.on("window-all-closed", function () {
     if (process.platform !== "darwin") {

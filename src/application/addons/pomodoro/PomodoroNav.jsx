@@ -54,6 +54,9 @@ const PomodoroNav = () => {
         const taskItem = {
             name: taskName,
             desc: "",
+            duration: 25,
+            tickingSound: true,
+            ringingSound: true,
         };
         addRow(db, taskItem, (err) => {
             if (err) return;

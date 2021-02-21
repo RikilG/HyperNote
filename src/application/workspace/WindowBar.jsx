@@ -35,7 +35,11 @@ const WindowBar = (props) => {
             <Tooltip value="close" position="left">
                 <div
                     style={style.closeButton}
-                    onClick={() => closeWindow(props.winObj)}
+                    onClick={() => {
+                        if (props.onExit) props.onExit();
+                        // complete onExit tasks
+                        setTimeout(() => closeWindow(props.winObj), 100);
+                    }}
                 >
                     <FontAwesomeIcon icon={faTimes} />
                 </div>
