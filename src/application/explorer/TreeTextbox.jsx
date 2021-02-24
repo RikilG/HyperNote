@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import FileSystem from "./FileSystem";
+import FileSystem from "../FileSystem";
 import Textbox from "../ui/Textbox";
 import { ExplorerContext } from "../explorer/Explorer";
 

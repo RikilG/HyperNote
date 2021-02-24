@@ -1,4 +1,4 @@
-import FileSystem from "./explorer/FileSystem";
+import FileSystem from "./FileSystem";
 import { toast } from "react-toastify";
 const sqlite3 = window.require("sqlite3");
 

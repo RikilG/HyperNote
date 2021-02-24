@@ -22,7 +22,7 @@ import {
 import "../css/Explorer.css";
 import Tooltip from "../ui/Tooltip";
 import Textbox from "../ui/Textbox";
-import FileSystem from "./FileSystem";
+import FileSystem from "../FileSystem";
 import TreeTextbox from "./TreeTextbox";
 import ContextMenu from "../ui/ContextMenu";
 import { ExplorerContext } from "./Explorer";
