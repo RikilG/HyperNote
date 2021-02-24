@@ -11,7 +11,7 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: false,
+            nodeIntegration: true,
             enableRemoteModule: true, // for accessing userData
             preload: path.join(__dirname, "preload.js"),
         },
@@ -59,3 +59,5 @@ app.on("activate", function () {
 //     slashes: true
 // });
 // mainWindow.loadURL(startUrl);
+
+require("./requestHandler"); // handle incomming requests

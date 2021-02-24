@@ -2,7 +2,7 @@
   "name": "hypernote",
   "version": "0.1.0",
   "private": true,
-  "main": "src/electron.js",
+  "main": "src/backend/electron.js",
   "homepage": "./",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
@@ -30,7 +30,7 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "rebuild": "electron-rebuild -f -w sqlite3",
-    "electron-start": "node src/wait-for-react",
+    "electron-start": "node src/backend/wait-for-react",
     "react-start": "react-scripts start"
   },
   "eslintConfig": {

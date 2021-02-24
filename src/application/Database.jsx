@@ -1,8 +1,10 @@
 import FileSystem from "./FileSystem";
 import { toast } from "react-toastify";
 const sqlite3 = window.require("sqlite3");
+const { ipcRenderer } = window.require("electron");
 
 function openDatabase(dbpath) {
+    send("ping").then((res) => console.log(res));
     if (!FileSystem.exists(dbpath)) {
         toast("Creating new databse");
     }
@@ -15,4 +17,13 @@ function openDatabase(dbpath) {
     return db;
 }
 
-export { openDatabase };
+function send(message) {
+    return new Promise((resolve) => {
+        ipcRenderer.once("asynchronous-reply", (_, arg) => {
+            resolve(arg);
+        });
+        ipcRenderer.send("asynchronous-message", message);
+    });
+}
+
+export { openDatabase, send };
