@@ -36,12 +36,15 @@ app.on("ready", () => {
     // media like audio and images
     protocol.registerFileProtocol("hypernote", (request, callback) => {
         const url = request.url.substr(12); // all urls start with 'file://'
-        callback({ path: path.normalize(`${__dirname}/${url}`) });
+        callback({ path: path.normalize(`${path.dirname(__dirname)}/${url}`) });
     });
     createWindow();
 });
 
+const requestHandler = require("./requestHandler");
+
 app.on("window-all-closed", function () {
+    requestHandler.close();
     if (process.platform !== "darwin") {
         app.quit();
     }
@@ -59,5 +62,3 @@ app.on("activate", function () {
 //     slashes: true
 // });
 // mainWindow.loadURL(startUrl);
-
-require("./requestHandler"); // handle incomming requests

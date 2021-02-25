@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 
-import UserPreferences from "../../settings/UserPreferences";
 import WindowBar from "../../workspace/WindowBar";
 import Progressbar from "../../ui/Progressbar";
 import CheckBox from "../../ui/CheckBox";
 import { useAudio } from "../../ui/AudioPlayer";
-import { openDatabase } from "../../Database";
 import Textarea from "../../ui/Textarea";
 import { editRow } from "./PomodoroDB";
 import Tooltip from "../../ui/Tooltip";
@@ -70,7 +68,6 @@ const style = {
 
 const PomodoroPage = (props) => {
     const taskItem = props.winObj.taskItem;
-    const db = openDatabase(UserPreferences.get("pomoStorage"));
 
     let [duration, setDuration] = useState(taskItem.duration);
     let [customInput, setCustomInput] = useState(
@@ -146,7 +143,7 @@ const PomodoroPage = (props) => {
 
     const handleTaskEdit = (key, value) => {
         taskItem[key] = value;
-        editRow(db, taskItem);
+        editRow(taskItem);
     };
 
     return (
