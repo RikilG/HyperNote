@@ -19,7 +19,7 @@ function openDatabase(dbpath) {
     return db;
 }
 
-function send(message) {
+function sendBackend(message) {
     return new Promise((resolve) => {
         ipcRenderer.once("asynchronous-reply", (_, arg) => {
             resolve(arg);
@@ -29,7 +29,7 @@ function send(message) {
 }
 
 const runDBQuery = (props, callback) => {
-    send(props).then((res) => {
+    sendBackend(props).then((res) => {
         if (res.error) {
             toast.error(res.error);
             console.log(res.error);
@@ -38,7 +38,7 @@ const runDBQuery = (props, callback) => {
     });
 };
 
-export { openDatabase, send, runDBQuery, POMO_DB, CALENDAR_DB };
+export { openDatabase, sendBackend, runDBQuery, POMO_DB, CALENDAR_DB };
 
 // const createQuery = (db, query, callback) => {
 //     db.run(query, (err) => {

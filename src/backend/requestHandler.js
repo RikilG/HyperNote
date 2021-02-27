@@ -3,7 +3,7 @@ const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 const basePath = require("electron").app.getPath("userData");
 const dataPath = path.join(basePath, "userStorage");
-const configPath = path.join(dataPath, "config.json");
+// const configPath = path.join(dataPath, "config.json");
 
 const IN_STREAM = "asynchronous-message";
 const OUT_STREAM = "asynchronous-reply";
@@ -39,7 +39,7 @@ ipcMain.on(IN_STREAM, (event, arg) => {
                 } else event.reply(OUT_STREAM, { data: "SUCCESS" });
             });
         } else if (arg.operation === "READ") {
-            DBList[arg.target].all(arg.query, (err, rows) => {
+            DBList[arg.target].all(arg.query, arg.changeList, (err, rows) => {
                 if (err) {
                     console.log(err);
                     event.reply(OUT_STREAM, { error: err });
@@ -48,11 +48,12 @@ ipcMain.on(IN_STREAM, (event, arg) => {
             });
         } else {
             // arg.operation is "UPDATE" or "DELETE"
-            DBList[arg.target].run(arg.query, arg.changeList, (err) => {
+            DBList[arg.target].run(arg.query, arg.changeList, function (err) {
+                // function will give you "this" context. not arrow function
                 if (err) {
                     console.log(err);
                     event.reply(OUT_STREAM, { error: err });
-                } else event.reply(OUT_STREAM, { data: "SUCCESS" });
+                } else event.reply(OUT_STREAM, { data: "SUCCESS", lastID: this.lastID });
             });
         }
     } else event.reply(OUT_STREAM, { error: "Invalid access parameter" });

@@ -13,8 +13,6 @@ import CalendarItem from "./CalendarItem";
 import ModalNewEvent from "./ModalNewEvent";
 import WindowContext from "../../WindowContext";
 import CalendarDB from "./CalendarDB";
-import { openDatabase } from "../../Database";
-import UserPreferences from "../../settings/UserPreferences";
 
 const style = {
     container: {
@@ -88,7 +86,6 @@ const CalendarNav = () => {
         id: "calendar/default-0",
         page: undefined,
         changeSelection: () => {},
-        db: null,
         getMonthEvents: CalendarDB.getMonthEvents,
     });
 
@@ -100,11 +97,12 @@ const CalendarNav = () => {
         openWindow(winObj, true);
     };
 
-    const changeSelection = (newDate) => {
+    const changeSelection = (newDate, callback) => {
         // called via CalendarPage when user selects a date
         setCurDate(newDate);
         CalendarDB.getEventsOn(newDate, (newEvents) => {
             setEvents(newEvents);
+            if (callback) callback();
         });
     };
 
@@ -114,23 +112,17 @@ const CalendarNav = () => {
 
     useEffect(() => {
         // on mount and unmount
-        const dbRef = openDatabase(UserPreferences.get("calendarStorage"));
-        setWinObj((winObj) => {
-            let newObj = { ...winObj };
-            newObj.page = <CalendarPage winObj={newObj} />;
-            newObj.db = dbRef;
-            newObj.changeSelection = changeSelection;
-            openWindow(newObj, true);
-            return newObj;
+        CalendarDB.create(() => {
+            // changeSelection(curDate);
+            setWinObj((winObj) => {
+                let newObj = { ...winObj };
+                newObj.page = <CalendarPage winObj={newObj} />;
+                newObj.changeSelection = changeSelection;
+                openWindow(newObj, true);
+                return newObj;
+            });
         });
-
-        CalendarDB.create(dbRef);
-        changeSelection(curDate);
         // listRows(db, setCalendarList);
-        return () => {
-            dbRef.close();
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
