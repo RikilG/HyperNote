@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 
+import { sendBackendAsync, CALENDAR_DB } from "../../Database";
 import { monthToDays } from "./CalendarPage";
 // max no of tables sqlite allows is 64
 // schema from: https://www.vertabelo.com/blog/again-and-again-managing-recurring-events-in-a-data-model/
@@ -10,7 +11,6 @@ const recurID = {
     monthly: 3,
     yearly: 4,
 };
-let db = null;
 
 const resetTime = (date) => {
     date.setHours(0, 0, 0, 0);
@@ -30,19 +30,25 @@ const toDateStr = (dateObj) => {
     return dateUTC.toISOString().slice(0, 10);
 };
 
-const handleSqlError = (err) => {
+const handleError = (err) => {
     if (err) {
         toast.error(err);
         console.log(err);
     }
 };
 
-const runQuery = (query) => {
-    db.run(query, (err) => handleSqlError(err));
+const __runQuery = async (args) => {
+    const props = {
+        access: "db",
+        target: CALENDAR_DB,
+        query: args.query,
+        operation: args.operation,
+        changeList: args.changeList,
+    };
+    return await sendBackendAsync(props); // A Promise
 };
 
-const create = (dbObj, callback) => {
-    db = dbObj;
+const create = async (callback) => {
     const queries = [
         // `CREATE TABLE IF NOT EXISTS calendars(
         //     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,69 +85,71 @@ const create = (dbObj, callback) => {
     ];
     for (let i in queries) {
         // run each query
-        runQuery(queries[i]);
+        const res = await __runQuery({
+            operation: "CREATE",
+            query: queries[i],
+        });
+        handleError(res.error);
     }
-    setTimeout(() => {
-        runQuery(
-            `INSERT OR IGNORE INTO recurring_type VALUES
-                (1, "daily"), (2, "weekly"), (3, "monthly"), (4, "yearly");
-            `
-        );
-    }, 500);
+    const res = await __runQuery({
+        operation: "UPDATE",
+        query: `INSERT OR IGNORE INTO recurring_type VALUES
+            (1, "daily"), (2, "weekly"), (3, "monthly"), (4, "yearly");
+        `,
+    });
+    handleError(res.error);
     if (callback) callback();
 };
 
-const saveEvent = (event, callback) => {
+const saveEvent = async (event, callback) => {
     // id title description start_date end_date start_time end_time
     // created_date is_all_day is_recurring
     const now = new Date();
     const query = `INSERT INTO events VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
-    db.run(
-        query,
-        [
-            event.eventName,
-            event.description,
-            toDateStr(event.startDate),
-            toDateStr(event.endDate),
-            event.startTime,
-            event.endTime,
-            toDateStr(now),
-            event.allDay,
-            event.recurrence !== "norepeat",
-        ],
-        function (err) {
-            // arrow function will not give you "this" to get id
-            if (err) handleSqlError(err);
+    const changeList = [
+        event.eventName,
+        event.description,
+        toDateStr(event.startDate),
+        toDateStr(event.endDate),
+        event.startTime,
+        event.endTime,
+        toDateStr(now),
+        event.allDay,
+        event.recurrence !== "norepeat",
+    ];
+    const res = await __runQuery({
+        operation: "UPDATE",
+        query: query,
+        changeList: changeList,
+    });
+    handleError(res.error);
 
-            if (event.recurrence === "norepeat" || err) {
-                // no recurrence
-                if (callback) callback(err);
-                return;
-            }
+    if (event.recurrence === "norepeat" || res.error) {
+        // no recurrence
+        if (callback) callback(res.err);
+        return;
+    }
 
-            // event_id recurring_type_id separation_count max_occurrences day_of_week week_of_month day_of_month month_of_year
-            const eventID = this.lastID;
-            const recQuery = `INSERT INTO recurring_pattern VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
-            db.run(
-                recQuery,
-                [
-                    eventID,
-                    recurID[event.recurrence],
-                    event.separation,
-                    null,
-                    // TODO: make these fields useful
-                    event.startDate.getDay(),
-                    null, // TODO: week of month
-                    event.startDate.getDate(),
-                    event.startDate.getMonth() + 1,
-                ],
-                function (err) {
-                    handleSqlError(err);
-                    if (callback) callback(err);
-                }
-            );
-        }
-    );
+    // event_id recurring_type_id separation_count max_occurrences day_of_week week_of_month day_of_month month_of_year
+    const recQuery = `INSERT INTO recurring_pattern VALUES (?, ?, ?, ?, ?, ?, ?, ?);`;
+    const recChangeList = [
+        res.lastID,
+        recurID[event.recurrence],
+        event.separation,
+        null,
+        // TODO: make these fields useful
+        event.startDate.getDay(),
+        null, // TODO: week of month
+        event.startDate.getDate(),
+        event.startDate.getMonth() + 1,
+    ];
+    const recRes = await __runQuery({
+        operation: "UPDATE",
+        query: recQuery,
+        changeList: recChangeList,
+    });
+    handleError(recRes.error);
+    if (callback) callback(recRes.error);
 };
 
 const occursToday = (event, date) => {
@@ -212,7 +220,7 @@ const occursToday = (event, date) => {
     return true;
 };
 
-const getEventsOn = (date, callback) => {
+const getEventsOn = async (date, callback) => {
     if (typeof date === "string") date = new Date(date);
     date = resetTime(date); // TODO: we don't care about time! for now. don't know if it requres changes
     const strDate = toDateStr(date);
@@ -223,25 +231,29 @@ const getEventsOn = (date, callback) => {
     // end_date here with that new var
     const recQuery = `SELECT * FROM recurring_pattern join events on events.id=recurring_pattern.event_id where start_date<=date(?) AND (end_date IS NULL OR end_date>=date(?));`;
 
-    db.all(query, [strDate, strDate], (err, rows) => {
-        handleSqlError(err);
-        if (!rows || err) return;
-        // TODO: differentiate end_date with event_end_date/span
-        // by using no of occurences (infinite if no end to repeat)
-        db.all(recQuery, [strDate, strDate], (err, recRows) => {
-            handleSqlError(err);
-            if (!recRows || err) return;
-            // process recurring events
-            recRows = recRows.filter((event) => {
-                return occursToday(event, date);
-            });
-
-            if (callback) callback([...rows, ...recRows]);
-        });
+    const res = await __runQuery({
+        operation: "READ",
+        query: query,
+        changeList: [strDate, strDate],
     });
+    handleError(res.error);
+    if (!res.data || res.error) return;
+    // TODO: differentiate end_date with event_end_date/span
+    // by using no of occurences (infinite if no end to repeat)
+    const recRes = await __runQuery({
+        operation: "READ",
+        query: recQuery,
+        changeList: [strDate, strDate],
+    });
+    handleError(recRes.error);
+    if (!recRes.data || recRes.error || typeof recRes.data === "string") return;
+    const recEvents = recRes.data.filter((event) => {
+        return occursToday(event, date);
+    });
+    if (callback) callback([...res.data, ...recEvents]);
 };
 
-const getMonthEvents = (date, callback) => {
+const getMonthEvents = async (date, callback) => {
     const lastDate = monthToDays(date.getMonth());
     if (typeof date === "string") date = new Date(date);
     date.setDate(1);
@@ -262,78 +274,90 @@ const getMonthEvents = (date, callback) => {
         monthEvents[i] = [];
     }
 
-    db.all(
-        query,
-        [monthStartStr, monthEndStr, monthStartStr, monthEndStr],
-        (err, rows) => {
-            handleSqlError(err);
-            if (!rows || err) return;
-            // TODO: differentiate end_date with event_end_date/span
-            // by using no of occurences (infinite if no end to repeat)
-            db.all(recQuery, [monthEndStr, monthStartStr], (err, recRows) => {
-                handleSqlError(err);
-                if (!recRows || err) return;
-                // process non-recurring events
-                rows.forEach((event) => {
-                    const stDate = resetTime(new Date(event.start_date));
-                    const endDate =
-                        event.end_date && resetTime(new Date(event.end_date));
-                    if (stDate.getMonth() === date.getMonth()) {
-                        // start date in this month
-                        if (endDate) {
-                            // if endDate exists
-                            for (
-                                let i = stDate.getDate();
-                                i <= endDate.getDate();
-                                i++
-                            ) {
-                                monthEvents[i].push(event);
-                            }
-                        } else {
-                            monthEvents[stDate.getDate()].push(event);
-                        }
-                    } else {
-                        // endDate exists in this month
-                        for (let i = 1; i <= endDate.getDate(); i++) {
-                            monthEvents[i].push(event);
-                        }
-                    }
-                });
-                // process recurring events
-                recRows.forEach((event) => {
-                    let iterDate = resetTime(new Date(date));
-                    for (let i = 1; i <= lastDate; i++) {
-                        iterDate.setDate(i);
-                        if (occursToday(event, iterDate)) {
-                            // console.log(iterDate.getDate(), event);
-                            monthEvents[i].push(event);
-                            if (
-                                event.recurring_type_id === 4 ||
-                                event.recurring_type_id === 3
-                            )
-                                break; // these events come only once
-                        }
-                    }
-                });
-
-                if (callback) callback(monthEvents);
-            });
+    const res = await __runQuery({
+        operation: "READ",
+        query: query,
+        changeList: [monthStartStr, monthEndStr, monthStartStr, monthEndStr],
+    });
+    handleError(res.error);
+    if (!res.data || res.error) return;
+    // TODO: differentiate end_date with event_end_date/span
+    // by using no of occurences (infinite if no end to repeat)
+    const recRes = await __runQuery({
+        operation: "READ",
+        query: recQuery,
+        changeList: [monthEndStr, monthStartStr],
+    });
+    handleError(recRes.error);
+    if (!recRes.data || recRes.error) return;
+    // process non-recurring events
+    if (typeof res.data === "string") {
+        toast.warn("Invalid response detected");
+        return;
+    }
+    res.data.forEach((event) => {
+        const stDate = resetTime(new Date(event.start_date));
+        const endDate = event.end_date && resetTime(new Date(event.end_date));
+        if (stDate.getMonth() === date.getMonth()) {
+            // start date in this month
+            if (endDate) {
+                // if endDate exists
+                for (let i = stDate.getDate(); i <= endDate.getDate(); i++) {
+                    monthEvents[i].push(event);
+                }
+            } else {
+                monthEvents[stDate.getDate()].push(event);
+            }
+        } else {
+            // endDate exists in this month
+            for (let i = 1; i <= endDate.getDate(); i++) {
+                monthEvents[i].push(event);
+            }
         }
-    );
+    });
+    // process recurring events
+    if (typeof recRes.data === "string") {
+        toast.warn("Got Invalid data");
+        return;
+    }
+    recRes.data.forEach((event) => {
+        let iterDate = resetTime(new Date(date));
+        for (let i = 1; i <= lastDate; i++) {
+            iterDate.setDate(i);
+            if (occursToday(event, iterDate)) {
+                // console.log(iterDate.getDate(), event);
+                monthEvents[i].push(event);
+                if (
+                    event.recurring_type_id === 4 ||
+                    event.recurring_type_id === 3
+                )
+                    break; // these events come only once
+            }
+        }
+    });
+
+    if (callback) callback(monthEvents);
 };
 
-const deleteEvent = (event, callback) => {
+const deleteEvent = async (event, callback) => {
     const query = `DELETE FROM events WHERE id=?;`;
     const query2 = `DELETE FROM recurring_pattern WHERE event_id=?;`;
-    db.run(query, [event.id], (err) => {
-        handleSqlError(err);
-    }).run(query2, [event.id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
+    const res = await __runQuery({
+        operation: "DELETE",
+        query: query,
+        changeList: [event.id],
     });
+    handleError(res.error);
+    const res2 = await __runQuery({
+        operation: "DELETE",
+        query: query2,
+        changeList: [event.id],
+    });
+    handleError(res2.error);
+    if (callback) callback(res2.err);
 };
 
-const editEvent = (event, callback) => {
+const editEvent = async (event, callback) => {
     // id title description start_date end_date start_time end_time
     // created_date is_all_day is_recurring
     const now = new Date();
@@ -348,66 +372,68 @@ const editEvent = (event, callback) => {
         is_all_day=?,
         is_recurring=?
         WHERE id=?;`;
-    db.run(
-        query,
-        [
-            event.eventName,
-            event.description,
-            toDateStr(event.startDate),
-            toDateStr(event.endDate),
-            event.startTime,
-            event.endTime,
-            toDateStr(now),
-            event.allDay,
-            event.recurrence !== "norepeat",
-            event.id,
-        ],
-        function (err) {
-            handleSqlError(err);
-            if (err) {
-                if (callback) callback(err);
-                return;
-            }
+    const changeList = [
+        event.eventName,
+        event.description,
+        toDateStr(event.startDate),
+        toDateStr(event.endDate),
+        event.startTime,
+        event.endTime,
+        toDateStr(now),
+        event.allDay,
+        event.recurrence !== "norepeat",
+        event.id,
+    ];
+    const res = await __runQuery({
+        operation: "UPDATE",
+        query: query,
+        changeList: changeList,
+    });
+    handleError(res.error);
+    if (res.err) {
+        if (callback) callback(res.err);
+        return;
+    }
+    if (event.recurrence === "norepeat") {
+        // no recurrence
+        const delQuery = `DELETE FROM recurring_pattern WHERE event_id=?;`;
+        const delRes = await __runQuery({
+            operation: "DELETE",
+            query: delQuery,
+            changeList: [event.id],
+        });
+        handleError(delRes.error);
+        if (callback) callback(delRes.error);
+        return;
+    }
 
-            if (event.recurrence === "norepeat") {
-                // no recurrence
-                const delQuery = `DELETE FROM recurring_pattern WHERE event_id=?;`;
-                db.run(delQuery, [event.id], (err) => {
-                    handleSqlError(err);
-                    if (callback) callback(err);
-                });
-                return;
-            }
-
-            const recQuery = `UPDATE recurring_pattern SET
-                recurring_type_id=?,
-                separation_count=?,
-                max_occurrences=?,
-                day_of_week=?,
-                week_of_month=?,
-                day_of_month=?,
-                month_of_year=?
-                WHERE event_id=?;`;
-            db.run(
-                recQuery,
-                [
-                    recurID[event.recurrence],
-                    event.separation,
-                    null,
-                    // TODO: make these fields useful
-                    event.startDate.getDay(),
-                    null, // TODO: week of month
-                    event.startDate.getDate(),
-                    event.startDate.getMonth() + 1,
-                    event.id,
-                ],
-                function (err) {
-                    handleSqlError(err);
-                    if (callback) callback(err);
-                }
-            );
-        }
-    );
+    const recQuery = `UPDATE recurring_pattern SET
+        recurring_type_id=?,
+        separation_count=?,
+        max_occurrences=?,
+        day_of_week=?,
+        week_of_month=?,
+        day_of_month=?,
+        month_of_year=?
+        WHERE event_id=?;`;
+    const recChangeList = [
+        recurID[event.recurrence],
+        event.separation,
+        null,
+        // TODO: make these fields useful
+        event.startDate.getDay(),
+        null, // TODO: week of month
+        event.startDate.getDate(),
+        event.startDate.getMonth() + 1,
+        event.id,
+    ];
+    const recRes = await __runQuery({
+        operation: "UPDATE",
+        query: recQuery,
+        changeList: recChangeList,
+    });
+    handleError(recRes.error);
+    if (callback) callback(recRes.error);
 };
 
 const CalendarDB = {

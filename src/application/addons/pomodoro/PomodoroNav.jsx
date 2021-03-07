@@ -6,8 +6,6 @@ import Tooltip from "../../ui/Tooltip";
 import Textbox from "../../ui/Textbox";
 import PomodoroTask from "./PomodoroTask";
 import WindowContext from "../../WindowContext";
-import { openDatabase } from "../../Database";
-import UserPreferences from "../../settings/UserPreferences";
 import { createDb, listRows, addRow, deleteRow, editRow } from "./PomodoroDB";
 
 const style = {
@@ -46,9 +44,6 @@ const PomodoroNav = () => {
     let [textbox, setTextbox] = useState(false);
     let [openTask, setOpenTask] = useState(null); // currently open pomo task
     const { closeWindow } = useContext(WindowContext);
-    const db = openDatabase(UserPreferences.get("pomoStorage"));
-
-    createDb(db, () => listRows(db));
 
     const createNewTask = (taskName) => {
         const taskItem = {
@@ -58,20 +53,20 @@ const PomodoroNav = () => {
             tickingSound: true,
             ringingSound: true,
         };
-        addRow(db, taskItem, (err) => {
+        addRow(taskItem, (err) => {
             if (err) return;
-            listRows(db, setTaskList);
+            listRows((_, data) => setTaskList(data));
             setTextbox(false);
         });
         return ""; // make the textbox empty
     };
 
     const handleRefresh = () => {
-        listRows(db, setTaskList);
+        listRows((_, data) => setTaskList(data));
     };
 
     const handleDelete = (taskItem) => {
-        deleteRow(db, taskItem.id, (err) => {
+        deleteRow(taskItem.id, (err) => {
             if (err) return;
             // close the window if open
             if (openTask && openTask.taskItem.id === taskItem.id) {
@@ -80,28 +75,23 @@ const PomodoroNav = () => {
             }
             // TODO: re-fetching complete list is heavy. instead remove one from taskList directly
             // look at closeWindow function for info on how to get index
-            listRows(db, setTaskList);
+            listRows((_, data) => setTaskList(data));
         });
     };
 
     const handleEdit = (taskItem, newName) => {
         taskItem.name = newName;
-        editRow(db, taskItem, (err) => {
+        editRow(taskItem, (err) => {
             if (err) return;
             // TODO: re-fetching complete list is heavy. instead edit one from taskList directly
             // look at closeWindow function for info on how to get index
-            listRows(db, setTaskList);
+            listRows((_, data) => setTaskList(data));
         });
     };
 
     useEffect(() => {
-        // on mount and unmount
-        listRows(db, setTaskList);
-        return () => {
-            db.close();
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        createDb(() => listRows((_, data) => setTaskList(data)));
+    }, []); // on mount and unmount only
 
     return (
         <div style={style.container}>

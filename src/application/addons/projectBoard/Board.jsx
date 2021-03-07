@@ -1,19 +1,10 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faPlus } from "@fortawesome/free-solid-svg-icons";
-import UserPreferences from "../../settings/UserPreferences";
 import Textbox from "../../ui/Textbox";
 import Tooltip from "../../ui/Tooltip";
 import Tile from "./Tile";
-import { openDatabase } from "../../Database";
-import {
-    createTilesDb,
-    listTileNames,
-    addTileRow,
-    editBoardRow,
-    editTileBoard,
-    listBoardRows,
-} from "./ProjectDB";
+import { listTiles, addTileRow, editBoard, editTileBoard } from "./ProjectDB";
 
 const style = {
     container: {
@@ -59,28 +50,25 @@ const style = {
     boardTile: {},
 };
 
-const Board = (props) => {
+const Board = ({ boardObj, tileDeleted, setTileDeleted }) => {
     let [showModal, setShowModal] = useState(false);
     let [newTile, setNewTile] = useState(false);
     let [choice, setChoice] = useState(null);
     let [tiles, setTiles] = useState([]);
     let [titleEdit, setTitleEdit] = useState(false);
-    let [boardItem, setBoardItem] = useState({});
-    const db = openDatabase(UserPreferences.get("projectStorage"));
-    createTilesDb(db);
     const createNewTile = (tilename) => {
         let d = new Date();
         const tileItem = {
             id: null,
-            boardID: props.boardID,
+            boardID: boardObj.id,
             name: tilename,
             desc: "",
             dueDate: d.toString(),
             link: "",
         };
-        addTileRow(db, tileItem, (err) => {
+        addTileRow(tileItem, (err) => {
             if (err) return;
-            listTileNames(db, setTiles, props.boardID);
+            listTiles(setTiles, boardObj.id);
         });
     };
     const onDrop = (e) => {
@@ -88,25 +76,21 @@ const Board = (props) => {
         e.dataTransfer.clearData();
         let [type, id] = data.split("-");
         if (type === "Tile") {
-            editTileBoard(db, { boardID: props.boardID, id: id }, (err) => {
+            editTileBoard({ boardID: boardObj.id, id: id }, (err) => {
                 if (err) return;
-                props.setTileDeleted((x) => (x + 1) % 100003); //Need to find better way to make parent refresh
+                setTileDeleted((x) => (x + 1) % 100003); //Need to find better way to make parent refresh
             });
         }
     };
     const handleNameChange = (name) => {
-        boardItem.name = name;
+        boardObj.name = name;
         setTitleEdit(false);
-        editBoardRow(db, boardItem);
+        editBoard(boardObj);
     };
 
     useEffect(() => {
-        listTileNames(db, setTiles, props.boardID);
-        listBoardRows(db, setBoardItem, props.boardID);
-        return () => {
-            db.close();
-        };
-    }, [showModal, props.boardID, props.tileDeleted]);
+        listTiles(setTiles, boardObj.id);
+    }, [showModal, boardObj.id, tileDeleted]);
 
     return (
         <div
@@ -118,7 +102,7 @@ const Board = (props) => {
         >
             <div style={style.titlebar}>
                 <div
-                    id={"Board-" + props.boardID}
+                    id={"Board-" + boardObj.id}
                     draggable={true}
                     onDragStart={(e) => {
                         e.dataTransfer.setData("text/plain", e.target.id);
@@ -126,8 +110,8 @@ const Board = (props) => {
                     style={style.boardTitleGroup}
                 >
                     <Textbox
-                        placeholder={"Board " + props.boardID}
-                        initialValue={boardItem.name}
+                        placeholder={"Board " + boardObj.id}
+                        initialValue={boardObj.name}
                         disabled={!titleEdit}
                         containerStyle={style.boardTitle}
                         style={{
@@ -160,14 +144,14 @@ const Board = (props) => {
                     </Tooltip>
                 </div>
             </div>
-            {tiles.map((listobj) => (
+            {tiles.map((tileObj) => (
                 <div
-                    id={"Tile-" + listobj.id}
+                    id={"Tile-" + tileObj.id}
                     draggable={true}
-                    key={listobj.id}
+                    key={tileObj.id}
                     style={style.boardTile}
                     onClick={() => {
-                        setChoice(listobj.id);
+                        setChoice(tileObj);
                         setShowModal(true);
                     }}
                     onDragStart={(e) => {
@@ -175,7 +159,7 @@ const Board = (props) => {
                     }}
                 >
                     <Textbox
-                        initialValue={listobj.name}
+                        initialValue={tileObj.name}
                         disabled={true}
                         containerStyle={style.title}
                     />
@@ -193,7 +177,7 @@ const Board = (props) => {
             {showModal && (
                 <Tile
                     onExit={() => setShowModal((prev) => !prev)}
-                    tileID={choice}
+                    tileObj={choice}
                 />
             )}
         </div>

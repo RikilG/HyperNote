@@ -1,15 +1,15 @@
 import { toast } from "react-toastify";
 
 export default class FileSystem {
+    // set in preload.js
+    static fs = window.isElectron && window.require("fs");
+    static path = window.isElectron && window.require("path");
+
     static generateTree(root) {
         if (window.isElectron) {
-            // set in preload.js
-            const fs = window.require("fs");
-            const path = window.require("path");
-
             let stats;
             try {
-                stats = fs.lstatSync(root);
+                stats = this.fs.lstatSync(root);
             } catch (err) {
                 console.log(err);
                 toast.error("FAILED TO RETRIVE FILE TREE", {
@@ -23,13 +23,13 @@ export default class FileSystem {
             }
             let tree = {
                 path: root,
-                name: path.basename(root),
+                name: this.path.basename(root),
             };
 
             if (stats.isDirectory()) {
                 tree.type = "directory";
                 try {
-                    tree.subtree = fs
+                    tree.subtree = this.fs
                         .readdirSync(root)
                         .map((child) => FileSystem.getTree(root + "/" + child));
                 } catch (err) {
@@ -53,7 +53,7 @@ export default class FileSystem {
     }
 
     static getTree(root) {
-        let tree = FileSystem.generateTree(root);
+        let tree = this.generateTree(root);
         let obj = [tree];
 
         var iterator = 0; // this is going to be your identifier
@@ -77,9 +77,7 @@ export default class FileSystem {
     static readFile(filepath) {
         if (window.isElectron) {
             try {
-                return window
-                    .require("fs")
-                    .readFileSync(filepath, { encoding: "utf-8" });
+                return this.fs.readFileSync(filepath, { encoding: "utf-8" });
             } catch (err) {
                 console.log(err);
                 toast.error("COULDN'T READ FILE", { autoClose: false });
@@ -92,7 +90,7 @@ export default class FileSystem {
     static writeFile(filepath, content) {
         if (window.isElectron) {
             try {
-                return window.require("fs").writeFileSync(filepath, content);
+                return this.fs.writeFileSync(filepath, content);
             } catch (err) {
                 console.log(err);
                 toast.error("COULDN'T WRITE FILE", { autoClose: false });
@@ -102,9 +100,7 @@ export default class FileSystem {
 
     static exists(filepath) {
         try {
-            return (
-                window.isElectron && window.require("fs").existsSync(filepath)
-            );
+            return window.isElectron && this.fs.existsSync(filepath);
         } catch (err) {
             console.log(err);
             toast.error(err, { autoClose: false });
@@ -114,7 +110,7 @@ export default class FileSystem {
     static newDirectory(folderpath) {
         if (window.isElectron && !this.exists(folderpath)) {
             try {
-                window.require("fs").mkdirSync(folderpath);
+                this.fs.mkdirSync(folderpath);
             } catch (err) {
                 console.log(err);
                 toast.error("COULDN'T CREATE DIRECTORY", { autoClose: false });
@@ -152,14 +148,14 @@ export default class FileSystem {
 
     static join(basename, filename) {
         if (window.isElectron) {
-            return window.require("path").join(basename, filename);
+            return this.path.join(basename, filename);
         }
     }
 
     static rename(oldpath, newpath) {
         if (window.isElectron) {
             try {
-                window.require("fs").renameSync(oldpath, newpath);
+                this.fs.renameSync(oldpath, newpath);
             } catch (err) {
                 console.log(err);
                 toast.error("ERROR WHILE RENAMING FILE", { autoClose: false });
@@ -169,19 +165,18 @@ export default class FileSystem {
 
     static dirname(filepath) {
         if (window.isElectron) {
-            return window.require("path").dirname(filepath);
+            return this.path.dirname(filepath);
         }
     }
 
     static delete(filepath) {
         if (window.isElectron) {
-            const fs = window.require("fs");
             try {
-                const stats = fs.lstatSync(filepath);
+                const stats = this.fs.lstatSync(filepath);
                 if (stats.isDirectory()) {
-                    fs.rmdirSync(filepath, { recursive: true });
+                    this.fs.rmdirSync(filepath, { recursive: true });
                 } else {
-                    fs.unlinkSync(filepath);
+                    this.fs.unlinkSync(filepath);
                 }
             } catch (err) {
                 console.log(err);

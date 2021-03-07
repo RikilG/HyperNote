@@ -1,18 +1,7 @@
 // database helper functions
-import { toast } from "react-toastify";
+import { sendBackendCallback, POMO_DB } from "../../Database";
 
-const handleSqlError = (err) => {
-    if (err) {
-        toast.error(err);
-        console.log(err);
-    }
-};
-
-const runQuery = (query, db) => {
-    db.run(query, (err) => handleSqlError(err));
-};
-
-const createDb = (db, callback) => {
+const createDb = (callback) => {
     const query = `CREATE TABLE IF NOT EXISTS tasks(
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
         name TEXT,
@@ -21,56 +10,77 @@ const createDb = (db, callback) => {
         tickingSound BOOLEAN,
         ringingSound BOOLEAN
     );`;
-    runQuery(query, db);
-    if (callback) callback();
+    const props = {
+        access: "db",
+        target: POMO_DB,
+        operation: "CREATE",
+        query: query,
+    };
+    sendBackendCallback(props, callback);
 };
 
-const listRows = (db, updateList) => {
+const listRows = (callback) => {
     const query = `SELECT * FROM tasks;`;
-    db.all(query, (err, rows) => {
-        handleSqlError(err);
-        if (!rows) return;
-        if (updateList) updateList(rows);
-    });
+    const props = {
+        access: "db",
+        target: POMO_DB,
+        operation: "READ",
+        query: query,
+    };
+    sendBackendCallback(props, callback);
 };
 
-const addRow = (db, row, callback) => {
+const addRow = (row, callback) => {
     const query = `INSERT INTO tasks VALUES (NULL, ?, ?, ?, ?, ?);`;
-    db.run(
-        query,
-        [row.name, row.desc, row.duration, row.tickingSound, row.ringingSound],
-        (err) => {
-            handleSqlError(err);
-            if (callback) callback(err);
-        }
-    );
+    const changeList = [
+        row.name,
+        row.desc,
+        row.duration,
+        row.tickingSound,
+        row.ringingSound,
+    ];
+    const props = {
+        access: "db",
+        target: POMO_DB,
+        operation: "UPDATE",
+        query: query,
+        changeList: changeList,
+    };
+    sendBackendCallback(props, callback);
 };
 
-const deleteRow = (db, id, callback) => {
+const deleteRow = (id, callback) => {
     const query = `DELETE FROM tasks WHERE id=?;`;
-    db.run(query, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+    const changeList = [id];
+    const props = {
+        access: "db",
+        target: POMO_DB,
+        operation: "DELETE",
+        query: query,
+        changeList: changeList,
+    };
+    sendBackendCallback(props, callback);
 };
 
-const editRow = (db, row, callback) => {
+const editRow = (row, callback) => {
     const query = `UPDATE tasks SET name=?, desc=?, duration=?, tickingSound=?, ringingSound=? WHERE id=?;`;
-    db.run(
-        query,
-        [
-            row.name,
-            row.desc,
-            row.duration,
-            row.tickingSound,
-            row.ringingSound,
-            row.id,
-        ],
-        (err) => {
-            handleSqlError(err);
-            if (callback) callback(err);
-        }
-    );
+    const changeList = [
+        row.name,
+        row.desc,
+        row.duration,
+        row.tickingSound,
+        row.ringingSound,
+        row.id,
+    ];
+    console.log(row);
+    const props = {
+        access: "db",
+        target: POMO_DB,
+        operation: "UPDATE",
+        query: query,
+        changeList: changeList,
+    };
+    sendBackendCallback(props, callback);
 };
 
 export { createDb, listRows, addRow, deleteRow, editRow };

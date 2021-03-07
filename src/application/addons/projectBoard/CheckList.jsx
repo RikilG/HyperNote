@@ -2,11 +2,8 @@ import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import CheckBox from "../../ui/CheckBox";
-import UserPreferences from "../../settings/UserPreferences";
-import { openDatabase } from "../../Database";
 import Tooltip from "../../ui/Tooltip";
 import {
-    createChecklistsDb,
     listChecklistRows,
     addChecklistRow,
     deleteChecklistRow,
@@ -30,8 +27,6 @@ const style = {
 
 const CheckList = forwardRef((props, ref) => {
     let [checklist, setChecklist] = useState([]);
-    const db = openDatabase(UserPreferences.get("projectStorage"));
-    createChecklistsDb(db);
     useImperativeHandle(ref, () => ({
         createNewCheckbox() {
             const checkboxItem = {
@@ -40,25 +35,22 @@ const CheckList = forwardRef((props, ref) => {
                 desc: "",
                 checked: false,
             };
-            addChecklistRow(db, checkboxItem, (err) => {
+            addChecklistRow(checkboxItem, (err) => {
                 if (err) return;
-                listChecklistRows(db, setChecklist, props.tileID);
+                listChecklistRows(setChecklist, props.tileID);
             });
         },
     }));
 
     const handleDelete = (id) => {
-        deleteChecklistRow(db, id, (err) => {
+        deleteChecklistRow(id, (err) => {
             if (err) return;
-            listChecklistRows(db, setChecklist, props.tileID);
+            listChecklistRows(setChecklist, props.tileID);
         });
     };
 
     useEffect(() => {
-        listChecklistRows(db, setChecklist, props.tileID);
-        return () => {
-            db.close();
-        };
+        listChecklistRows(setChecklist, props.tileID);
     }, [props.tileID]);
 
     const handleTextChange = (text, id) => {
@@ -70,9 +62,9 @@ const CheckList = forwardRef((props, ref) => {
                 break;
             }
         }
-        editChecklistRow(db, checkboxItem, (err) => {
+        editChecklistRow(checkboxItem, (err) => {
             if (err) return;
-            listChecklistRows(db, props.setChecklist, props.tileID);
+            listChecklistRows(setChecklist, props.tileID);
         });
     };
 
@@ -85,9 +77,9 @@ const CheckList = forwardRef((props, ref) => {
                 break;
             }
         }
-        editChecklistRow(db, checkboxItem, (err) => {
+        editChecklistRow(checkboxItem, (err) => {
             if (err) return;
-            listChecklistRows(db, props.setChecklist, props.tileID);
+            listChecklistRows(setChecklist, props.tileID);
         });
     };
 

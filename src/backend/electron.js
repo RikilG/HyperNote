@@ -11,7 +11,7 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: false,
+            nodeIntegration: true,
             enableRemoteModule: true, // for accessing userData
             preload: path.join(__dirname, "preload.js"),
         },
@@ -36,12 +36,15 @@ app.on("ready", () => {
     // media like audio and images
     protocol.registerFileProtocol("hypernote", (request, callback) => {
         const url = request.url.substr(12); // all urls start with 'file://'
-        callback({ path: path.normalize(`${__dirname}/${url}`) });
+        callback({ path: path.normalize(`${path.dirname(__dirname)}/${url}`) });
     });
     createWindow();
 });
 
+const requestHandler = require("./requestHandler");
+
 app.on("window-all-closed", function () {
+    requestHandler.close();
     if (process.platform !== "darwin") {
         app.quit();
     }

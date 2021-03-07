@@ -4,7 +4,7 @@ import React from "react";
 import Explorer from "../explorer/Explorer";
 import Searchbar from "../addons/search/Searchbar";
 import Pomodoro from "../addons/pomodoro/PomodoroNav";
-import Project from "../addons/projectBoard/Project";
+import Project from "../addons/projectBoard/ProjectNav";
 import Calendar from "../addons/calendar/CalendarNav";
 
 const style = {

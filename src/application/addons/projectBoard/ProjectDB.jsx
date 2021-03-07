@@ -1,278 +1,195 @@
 // database helper functions
 import { toast } from "react-toastify";
+import { PROJECT_DB, sendBackendAsync, OPERATIONS } from "../../Database";
 
-const handleSqlError = (err) => {
+const handleError = (err) => {
     if (err) {
         toast.error(err);
         console.log(err);
     }
 };
 
-const runQuery = (query, db) => {
-    db.run(query, (err) => handleSqlError(err));
+const runQuery = async (query, operation, changeList) => {
+    const props = {
+        access: "db",
+        target: PROJECT_DB,
+        query: query,
+        operation: operation,
+        changeList: changeList,
+    };
+    const { error, data } = await sendBackendAsync(props); // A Promise
+    handleError(error);
+    return { error, data };
 };
 
-const createProjectsDb = (db, callback) => {
-    const query = `CREATE TABLE IF NOT EXISTS projects(
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        name TEXT
-    );`;
-    runQuery(query, db);
-    if (callback) callback();
+export const createDb = async (callback) => {
+    const queries = [
+        `CREATE TABLE IF NOT EXISTS projects(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            name TEXT
+        );`,
+        `CREATE TABLE IF NOT EXISTS boards(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            projectID INTEGER,
+            name TEXT
+        );`,
+        `CREATE TABLE IF NOT EXISTS tiles(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            boardID INTEGER,
+            name TEXT,
+            desc TEXT,
+            dueDate TEXT,
+            link TEXT
+        );`,
+        `CREATE TABLE IF NOT EXISTS checklists(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            tileID INTEGER,
+            desc TEXT,
+            checked INTEGER
+        );`,
+    ];
+    for (let i = 0; i < queries.length; i++) {
+        const { err } = await runQuery(queries[i], OPERATIONS.CREATE);
+        if (err && callback) callback(err); // exec only on err
+    }
+    if (callback) callback(); // exec once when no error
 };
 
-const createBoardsDb = (db, callback) => {
-    const query = `CREATE TABLE IF NOT EXISTS boards(
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        projectID INTEGER,
-        name TEXT
-    );`;
-    runQuery(query, db);
-    if (callback) callback();
-};
-
-const createTilesDb = (db, callback) => {
-    const query = `CREATE TABLE IF NOT EXISTS tiles(
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        boardID INTEGER,
-        name TEXT,
-        desc TEXT,
-        dueDate TEXT,
-        link TEXT
-    );`;
-    runQuery(query, db);
-    if (callback) callback();
-};
-
-const createChecklistsDb = (db, callback) => {
-    const query = `CREATE TABLE IF NOT EXISTS checklists(
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        tileID INTEGER,
-        desc TEXT,
-        checked INTEGER
-    );`;
-    runQuery(query, db);
-    if (callback) callback();
-};
-
-const listProjectRows = (db, updateList) => {
+export const listProjectRows = async (updateList) => {
     const query = `SELECT * FROM projects;`;
-    db.all(query, (err, rows) => {
-        handleSqlError(err);
-        if (!rows) return;
-        if (updateList) updateList(rows);
-    });
+    const { data } = await runQuery(query, OPERATIONS.READ);
+    if (updateList) updateList(data);
 };
 
-const listBoardNames = (db, updateList, projectID) => {
-    const query = `SELECT id,name FROM boards WHERE projectID=?;`;
-    db.all(query, [projectID], (err, rows) => {
-        handleSqlError(err);
-        if (!rows) return;
-        if (updateList) updateList(rows);
-    });
+export const listBoards = async (updateList, projectID) => {
+    const query = `SELECT * FROM boards WHERE projectID=?;`;
+    const { data } = await runQuery(query, OPERATIONS.READ, [projectID]);
+    if (updateList) updateList(data);
 };
 
-const listBoardRows = (db, updateList, id) => {
-    const query = `SELECT * FROM boards WHERE id=?;`;
-    db.each(query, [id], (err, rows) => {
-        handleSqlError(err);
-        if (!rows) return;
-        if (updateList) updateList(rows);
-    });
+export const listTiles = async (updateList, boardID) => {
+    const query = `SELECT * FROM tiles WHERE boardID=?;`;
+    const { data } = await runQuery(query, OPERATIONS.READ, [boardID]);
+    if (updateList) updateList(data);
 };
 
-const listTileNames = (db, updateList, boardID) => {
-    const query = `SELECT id,name FROM tiles WHERE boardID=?;`;
-    db.all(query, [boardID], (err, rows) => {
-        handleSqlError(err);
-        if (!rows) return;
-        if (updateList) updateList(rows);
-    });
-};
-
-const listTileRows = (db, updateList, id) => {
-    const query = `SELECT * FROM tiles WHERE id=?;`;
-    db.each(query, [id], (err, rows) => {
-        handleSqlError(err);
-        if (!rows) return;
-        if (updateList) updateList(rows);
-    });
-};
-
-const listChecklistRows = (db, updateList, tileID) => {
+export const listChecklistRows = async (updateList, tileID) => {
     const query = `SELECT * FROM checklists WHERE tileID=?;`;
-    db.all(query, [tileID], (err, rows) => {
-        handleSqlError(err);
-        if (!rows) return;
-        if (updateList) updateList(rows);
-    });
+    const { data } = await runQuery(query, OPERATIONS.READ, [tileID]);
+    if (updateList) updateList(data);
 };
 
-const addProjectRow = (db, row, callback) => {
+export const addProjectRow = async (row, callback) => {
     const query = `INSERT INTO projects VALUES (NULL, ?);`;
-    db.run(query, [row.name], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+    const { err } = await runQuery(query, OPERATIONS.UPDATE, [row.name]);
+    if (callback) callback(err);
 };
 
-const addBoardRow = (db, row, callback) => {
+export const addBoard = async (row, callback) => {
     const query = `INSERT INTO boards VALUES (NULL, ?, ?);`;
-    db.run(query, [row.projectID, row.name], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+    const { err } = await runQuery(query, OPERATIONS.UPDATE, [
+        row.projectID,
+        row.name,
+    ]);
+    if (callback) callback(err);
 };
 
-const addTileRow = (db, row, callback) => {
+export const addTileRow = async (row, callback) => {
     const query = `INSERT INTO tiles VALUES (NULL, ?, ?, ?, ?, ?);`;
-    db.run(
-        query,
-        [row.boardID, row.name, row.desc, row.dueDate, row.link],
-        (err) => {
-            handleSqlError(err);
-            if (callback) callback(err);
-        }
-    );
+    const changeList = [row.boardID, row.name, row.desc, row.dueDate, row.link];
+    const { err } = await runQuery(query, OPERATIONS.UPDATE, changeList);
+    if (callback) callback(err);
 };
 
-const addChecklistRow = (db, row, callback) => {
+export const addChecklistRow = async (row, callback) => {
     const query = `INSERT INTO checklists VALUES (NULL, ?, ?, ?);`;
-    db.run(query, [row.tileID, row.desc, row.checked], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+    const changeList = [row.tileID, row.desc, row.checked];
+    const { err } = await runQuery(query, OPERATIONS.UPDATE, changeList);
+    if (callback) callback(err);
 };
 
-const deleteProjectRow = (db, id, callback) => {
-    const query1 = `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?));`;
-    db.run(query1, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
-    const query2 = `DELETE FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?);`;
-    db.run(query2, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
-    const query3 = `DELETE FROM boards WHERE projectID=?;`;
-    db.run(query3, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
-    const query4 = `DELETE FROM projects WHERE id=?;`;
-    db.run(query4, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+export const deleteProjectRow = async (id, callback) => {
+    const queries = [
+        `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?));`,
+        `DELETE FROM tiles WHERE boardID IN (SELECT id FROM boards WHERE projectID=?);`,
+        `DELETE FROM boards WHERE projectID=?;`,
+        `DELETE FROM projects WHERE id=?;`,
+    ];
+    for (let i = 0; i < queries.length; i++) {
+        const { err } = await runQuery(queries[i], OPERATIONS.DELETE, [id]);
+        if (err && callback) callback(err); // exec only on err
+    }
+    if (callback) callback(); // exec once when no error
 };
 
-const deleteBoardRow = (db, id, callback) => {
-    const query1 = `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID=?);`;
-    db.run(query1, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
-    const query2 = `DELETE FROM tiles WHERE boardID=?;`;
-    db.run(query2, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
-    const query3 = `DELETE FROM boards WHERE id=?;`;
-    db.run(query3, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+export const deleteBoard = async (id, callback) => {
+    const queries = [
+        `DELETE FROM checklists WHERE tileID IN (SELECT id FROM tiles WHERE boardID=?);`,
+        `DELETE FROM tiles WHERE boardID=?;`,
+        `DELETE FROM boards WHERE id=?;`,
+    ];
+    for (let i = 0; i < queries.length; i++) {
+        const { err } = await runQuery(queries[i], OPERATIONS.DELETE, [id]);
+        if (err && callback) callback(err); // exec only on err
+    }
+    if (callback) callback(); // exec once when no error
 };
 
-const deleteTileRow = (db, id, callback) => {
-    const query1 = `DELETE FROM checklists WHERE tileID=?;`;
-    db.run(query1, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
-    const query2 = `DELETE FROM tiles WHERE id=?;`;
-    db.run(query2, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+export const deleteTileRow = async (id, callback) => {
+    const queries = [
+        `DELETE FROM checklists WHERE tileID=?;`,
+        `DELETE FROM tiles WHERE id=?;`,
+    ];
+    for (let i = 0; i < queries.length; i++) {
+        const { err } = await runQuery(queries[i], OPERATIONS.DELETE, [id]);
+        if (err && callback) callback(err); // exec only on err
+    }
+    if (callback) callback(); // exec once when no error
 };
 
-const deleteChecklistRow = (db, id, callback) => {
+export const deleteChecklistRow = async (id, callback) => {
     const query = `DELETE FROM checklists WHERE id=?;`;
-    db.run(query, [id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+    const { err } = await runQuery(query, OPERATIONS.DELETE, [id]);
+    if (callback) callback(err);
 };
 
-const editProjectRow = (db, row, callback) => {
+export const editProjectRow = async (row, callback) => {
     const query = `UPDATE projects SET name=? WHERE id=?;`;
-    db.run(query, [row.name, row.id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+    const { err } = await runQuery(query, OPERATIONS.UPDATE, [
+        row.name,
+        row.id,
+    ]);
+    if (callback) callback(err);
 };
 
-const editBoardRow = (db, row, callback) => {
+export const editBoard = async (row, callback) => {
     const query = `UPDATE boards SET name=? WHERE id=?;`;
-    db.run(query, [row.name, row.id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+    const { err } = await runQuery(query, OPERATIONS.UPDATE, [
+        row.name,
+        row.id,
+    ]);
+    if (callback) callback(err);
 };
 
-const editTileRow = (db, row, callback) => {
+export const editTileRow = async (row, callback) => {
     const query = `UPDATE tiles SET name=?, desc=?, dueDate=?, link=? WHERE id=?;`;
-    db.run(
-        query,
-        [row.name, row.desc, row.dueDate, row.link, row.id],
-        (err) => {
-            handleSqlError(err);
-            if (callback) callback(err);
-        }
-    );
+    const changeList = [row.name, row.desc, row.dueDate, row.link, row.id];
+    const { err } = await runQuery(query, OPERATIONS.UPDATE, changeList);
+    if (callback) callback(err);
 };
 
-const editTileBoard = (db, row, callback) => {
+export const editTileBoard = async (row, callback) => {
     const query = `UPDATE tiles SET boardID=? WHERE id=?;`; // assume tiles can be moved between boards
-    db.run(query, [row.boardID, row.id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
+    const { err } = await runQuery(query, OPERATIONS.UPDATE, [
+        row.boardID,
+        row.id,
+    ]);
+    if (callback) callback(err);
 };
 
-const editChecklistRow = (db, row, callback) => {
+export const editChecklistRow = async (row, callback) => {
     const query = `UPDATE checklists SET tileID=?, desc=?, checked=? WHERE id=?;`; //add check
-    db.run(query, [row.tileID, row.desc, row.checked, row.id], (err) => {
-        handleSqlError(err);
-        if (callback) callback(err);
-    });
-};
-
-export {
-    createProjectsDb,
-    listProjectRows,
-    addProjectRow,
-    deleteProjectRow,
-    editProjectRow,
-    createBoardsDb,
-    listBoardNames,
-    listBoardRows,
-    addBoardRow,
-    deleteBoardRow,
-    editBoardRow,
-    createTilesDb,
-    listTileNames,
-    listTileRows,
-    addTileRow,
-    deleteTileRow,
-    editTileRow,
-    editTileBoard,
-    createChecklistsDb,
-    listChecklistRows,
-    addChecklistRow,
-    deleteChecklistRow,
-    editChecklistRow,
+    const changeList = [row.tileID, row.desc, row.checked, row.id];
+    const { err } = await runQuery(query, OPERATIONS.UPDATE, changeList);
+    if (callback) callback(err);
 };

@@ -2,7 +2,7 @@
   "name": "hypernote",
   "version": "0.1.0",
   "private": true,
-  "main": "src/electron.js",
+  "main": "src/backend/electron.js",
   "homepage": "./",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
@@ -12,6 +12,7 @@
     "@testing-library/jest-dom": "^5.11.5",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "async-mutex": "^0.3.1",
     "custom-electron-titlebar": "^3.2.5",
     "marked": "^1.2.2",
     "react": "^17.0.1",
@@ -30,7 +31,7 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "rebuild": "electron-rebuild -f -w sqlite3",
-    "electron-start": "node src/wait-for-react",
+    "electron-start": "node src/backend/wait-for-react",
     "react-start": "react-scripts start"
   },
   "eslintConfig": {
@@ -52,7 +53,7 @@
     ]
   },
   "devDependencies": {
-    "electron": "^10.1.5",
+    "electron": "^10.4.0",
     "foreman": "^3.0.1"
   }
 }

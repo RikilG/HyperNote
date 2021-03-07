@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faChevronCircleLeft,
@@ -71,6 +71,14 @@ const MONTHS = [
 ];
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+const usePrevious = (value) => {
+    const ref = useRef();
+    useEffect(() => {
+        ref.current = value;
+    });
+    return ref.current;
+};
+
 export const monthToDays = (month, year) => {
     if (month === 1) {
         if (year % 4 === 0) {
@@ -81,15 +89,7 @@ export const monthToDays = (month, year) => {
     else return 31;
 };
 
-const CalendarGrid = ({
-    month,
-    year,
-    getMonthEvents,
-    getCalendarDates,
-    setCurDate,
-}) => {
-    let [monthEvents, setMonthEvents] = useState({});
-
+const CalendarGrid = ({ getCalendarDates, setCurDate, monthEvents }) => {
     const setDate = (dateItem) => {
         if (dateItem.date !== 0)
             setCurDate(
@@ -97,12 +97,6 @@ const CalendarGrid = ({
                     new Date(prev.getFullYear(), prev.getMonth(), dateItem.date)
             );
     };
-
-    useEffect(() => {
-        getMonthEvents(new Date(year, month, 1), (events) => {
-            setMonthEvents(events);
-        });
-    }, [getMonthEvents, month, year]);
 
     return (
         <div className="calendar-grid">
@@ -222,6 +216,8 @@ const CalendarPage = (props) => {
     let [curDate, setCurDate] = useState(today);
     let [selectMonth, setSelectMonth] = useState(false);
     let [selectYear, setSelectYear] = useState(false);
+    let [monthEvents, setMonthEvents] = useState({});
+    const prevDate = usePrevious(curDate);
 
     const getCalendarDates = () => {
         let dates = [];
@@ -282,13 +278,23 @@ const CalendarPage = (props) => {
     };
 
     useEffect(() => {
-        changeSelection(curDate);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-        changeSelection(curDate);
-    }, [curDate, changeSelection]);
+        if (
+            prevDate === undefined ||
+            prevDate.getMonth() !== curDate.getMonth() ||
+            prevDate.getFullYear() !== curDate.getFullYear()
+        ) {
+            // there is a change in month or year
+            setMonthEvents({});
+            changeSelection(curDate, () => {
+                getMonthEvents(
+                    new Date(curDate.getFullYear(), curDate.getMonth(), 1),
+                    (events) => {
+                        setMonthEvents(events);
+                    }
+                );
+            });
+        } else changeSelection(curDate);
+    }, [getMonthEvents, curDate, changeSelection]);
 
     return (
         <div style={style.container}>
@@ -346,9 +352,7 @@ const CalendarPage = (props) => {
                 )}
                 {!selectMonth && !selectYear && (
                     <CalendarGrid
-                        month={curDate.getMonth()}
-                        year={curDate.getFullYear()}
-                        getMonthEvents={getMonthEvents}
+                        monthEvents={monthEvents}
                         getCalendarDates={getCalendarDates}
                         setCurDate={setCurDate}
                     />

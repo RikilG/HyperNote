@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faPen } from "@fortawesome/free-solid-svg-icons";
 import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
@@ -9,9 +9,7 @@ import Textarea from "../../ui/Textarea";
 import Textbox from "../../ui/Textbox";
 import ContextMenu from "../../ui/ContextMenu";
 import DatePicker from "../../ui/DatePicker";
-import UserPreferences from "../../settings/UserPreferences";
-import { openDatabase } from "../../Database";
-import { listTileRows, editTileRow } from "./ProjectDB";
+import { editTileRow } from "./ProjectDB";
 
 const style = {
     container: {
@@ -114,30 +112,28 @@ function useHookWithRefCallback() {
     return [setRef, bounds];
 }
 
-const Tile = (props) => {
+const Tile = ({ tileObj, onExit }) => {
     let [showModal, setShowModal] = useState(false);
     let [setContextMenuRef, bounds] = useHookWithRefCallback();
-    let [tileItem, setTileItem] = useState({});
     let [titleEdit, setTitleEdit] = useState(false);
     const childRef = useRef();
-    const db = openDatabase(UserPreferences.get("projectStorage"));
+    // TODO: code reduction with one handleChange(key, value) type function
     const handleNameChange = (name) => {
-        tileItem.name = name;
+        tileObj.name = name;
         setTitleEdit(false);
-        editTileRow(db, tileItem);
+        editTileRow(tileObj);
     };
     const handleDescChange = (desc) => {
-        tileItem.desc = desc;
-        editTileRow(db, tileItem);
+        tileObj.desc = desc;
+        editTileRow(tileObj);
     };
     const handleDateChange = (date) => {
-        tileItem.dueDate = date.toString();
-        editTileRow(db, tileItem);
-        listTileRows(db, setTileItem, props.tileID);
+        tileObj.dueDate = date.toString();
+        editTileRow(tileObj);
     };
     const handleLinkChange = (link) => {
-        tileItem.link = link;
-        editTileRow(db, tileItem);
+        tileObj.link = link;
+        editTileRow(tileObj);
     };
     const contextMenuOptions = [
         {
@@ -146,19 +142,14 @@ const Tile = (props) => {
             action: () => {},
         },
     ];
-    useEffect(() => {
-        listTileRows(db, setTileItem, props.tileID);
-        return () => {
-            db.close();
-        };
-    }, [props.tileID]);
+
     return (
-        <Modal onExit={props.onExit}>
+        <Modal onExit={onExit}>
             <div style={style.container}>
                 <div style={style.titleGroup}>
                     <Textbox
-                        placeholder={"Tile " + props.tileID}
-                        initialValue={tileItem.name}
+                        placeholder={"Tile " + tileObj.id}
+                        initialValue={tileObj.name}
                         disabled={!titleEdit}
                         style={style.title}
                         handleConfirm={handleNameChange}
@@ -177,15 +168,15 @@ const Tile = (props) => {
                 </div>
                 <Textarea
                     placeholder={"Additional Information"}
-                    initialValue={tileItem.desc}
+                    initialValue={tileObj.desc}
                     style={style.textarea}
                     handleCancel={handleDescChange}
                 />
-                {tileItem && (
+                {tileObj && (
                     <div style={style.dateContainer}>
                         Due Date:
                         <DatePicker
-                            value={new Date(tileItem.dueDate)}
+                            value={new Date(tileObj.dueDate)}
                             onChange={handleDateChange}
                         />
                     </div>
@@ -213,7 +204,7 @@ const Tile = (props) => {
                         <div style={{ border: "2px solid" }}>
                             <CheckList
                                 ref={childRef}
-                                tileID={props.tileID}
+                                tileID={tileObj.id}
                                 onExit={() => setShowModal((prev) => !prev)}
                             />
                         </div>
@@ -223,7 +214,7 @@ const Tile = (props) => {
                     <Textbox
                         style={style.linkContainer}
                         placeholder={"Link to Folder"}
-                        initialValue={tileItem.link}
+                        initialValue={tileObj.link}
                         handleConfirm={handleLinkChange}
                     />
                     <ContextMenu bounds={bounds} menu={contextMenuOptions} />

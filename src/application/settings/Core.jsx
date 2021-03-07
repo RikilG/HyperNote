@@ -4,7 +4,7 @@ import { useState } from "react";
 import Button from "../ui/Button";
 import Textbox from "../ui/Textbox";
 import UserPreferences from "../settings/UserPreferences";
-import FileSystem from "../explorer/FileSystem";
+import FileSystem from "../FileSystem";
 
 const style = {
     container: {

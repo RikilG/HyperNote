@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Tree from "./Tree";
 import TreeToolbar from "./TreeToolbar";
 import WindowContext from "../WindowContext";
-import FileSystem from "../explorer/FileSystem";
+import FileSystem from "../FileSystem";
 import UserPreferences from "../settings/UserPreferences";
 
 const style = {

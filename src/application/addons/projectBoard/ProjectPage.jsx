@@ -3,15 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import WindowBar from "../../workspace/WindowBar";
 import Board from "./Board";
-import UserPreferences from "../../settings/UserPreferences";
-import { openDatabase } from "../../Database";
-import {
-    createBoardsDb,
-    addBoardRow,
-    listBoardNames,
-    deleteTileRow,
-    deleteBoardRow,
-} from "./ProjectDB";
+import { addBoard, listBoards, deleteTileRow, deleteBoard } from "./ProjectDB";
 import Tooltip from "../../ui/Tooltip";
 
 const style = {
@@ -76,41 +68,39 @@ const ProjectPage = (props) => {
     let [boards, setBoards] = useState([]);
     const [dummy, setDummy] = useState(0);
     const projectItem = winObj.projectItem;
-    const db = openDatabase(UserPreferences.get("projectStorage"));
-    createBoardsDb(db);
     const createNewBoard = () => {
         const boardItem = {
             id: null,
             projectID: props.projectID,
             name: "",
         };
-        addBoardRow(db, boardItem, (err) => {
+        addBoard(boardItem, (err) => {
             if (err) return;
-            listBoardNames(db, setBoards, props.projectID);
+            listBoards(setBoards, props.projectID);
         });
     };
+
     const onDrop = (e) => {
         let data = e.dataTransfer.getData("text");
         e.dataTransfer.clearData();
         let [type, id] = data.split("-");
         if (type === "Tile") {
-            deleteTileRow(db, id, (err) => {
+            deleteTileRow(id, (err) => {
                 if (err) return;
                 setDummy((x) => (x + 1) % 100003);
             });
         } else if (type === "Board") {
-            deleteBoardRow(db, id, (err) => {
+            deleteBoard(id, (err) => {
                 if (err) return;
-                listBoardNames(db, setBoards, props.projectID);
+                listBoards(setBoards, props.projectID);
             });
         }
     };
+
     useEffect(() => {
-        listBoardNames(db, setBoards, props.projectID);
-        return () => {
-            db.close();
-        };
+        listBoards(setBoards, props.projectID);
     }, [props.projectID]);
+
     return (
         <div style={style.container}>
             <WindowBar winObj={winObj} title={"Project"} />
@@ -139,13 +129,13 @@ const ProjectPage = (props) => {
                 </div>
                 <div style={style.title}>{projectItem.name}</div>
                 <div style={style.boardArea}>
-                    {boards.map((listobj) => (
+                    {boards.map((boardObj) => (
                         <div
-                            key={listobj.id}
+                            key={boardObj.id}
                             style={style.boardParentContainer}
                         >
                             <Board
-                                boardID={listobj.id}
+                                boardObj={boardObj}
                                 tileDeleted={dummy}
                                 setTileDeleted={setDummy}
                             />
