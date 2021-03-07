@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 
-import { sendBackend, CALENDAR_DB } from "../../Database";
+import { sendBackendAsync, CALENDAR_DB } from "../../Database";
 import { monthToDays } from "./CalendarPage";
 // max no of tables sqlite allows is 64
 // schema from: https://www.vertabelo.com/blog/again-and-again-managing-recurring-events-in-a-data-model/
@@ -37,15 +37,15 @@ const handleError = (err) => {
     }
 };
 
-const __runQueryAsync = (args) => {
+const __runQuery = async (args) => {
     const props = {
         access: "db",
         target: CALENDAR_DB,
-        operation: args.operation,
         query: args.query,
+        operation: args.operation,
         changeList: args.changeList,
     };
-    return sendBackend(props); // A Promise
+    return await sendBackendAsync(props); // A Promise
 };
 
 const create = async (callback) => {
@@ -85,13 +85,13 @@ const create = async (callback) => {
     ];
     for (let i in queries) {
         // run each query
-        const res = await __runQueryAsync({
+        const res = await __runQuery({
             operation: "CREATE",
             query: queries[i],
         });
         handleError(res.error);
     }
-    const res = await __runQueryAsync({
+    const res = await __runQuery({
         operation: "UPDATE",
         query: `INSERT OR IGNORE INTO recurring_type VALUES
             (1, "daily"), (2, "weekly"), (3, "monthly"), (4, "yearly");
@@ -117,7 +117,7 @@ const saveEvent = async (event, callback) => {
         event.allDay,
         event.recurrence !== "norepeat",
     ];
-    const res = await __runQueryAsync({
+    const res = await __runQuery({
         operation: "UPDATE",
         query: query,
         changeList: changeList,
@@ -143,7 +143,7 @@ const saveEvent = async (event, callback) => {
         event.startDate.getDate(),
         event.startDate.getMonth() + 1,
     ];
-    const recRes = await __runQueryAsync({
+    const recRes = await __runQuery({
         operation: "UPDATE",
         query: recQuery,
         changeList: recChangeList,
@@ -231,7 +231,7 @@ const getEventsOn = async (date, callback) => {
     // end_date here with that new var
     const recQuery = `SELECT * FROM recurring_pattern join events on events.id=recurring_pattern.event_id where start_date<=date(?) AND (end_date IS NULL OR end_date>=date(?));`;
 
-    const res = await __runQueryAsync({
+    const res = await __runQuery({
         operation: "READ",
         query: query,
         changeList: [strDate, strDate],
@@ -240,7 +240,7 @@ const getEventsOn = async (date, callback) => {
     if (!res.data || res.error) return;
     // TODO: differentiate end_date with event_end_date/span
     // by using no of occurences (infinite if no end to repeat)
-    const recRes = await __runQueryAsync({
+    const recRes = await __runQuery({
         operation: "READ",
         query: recQuery,
         changeList: [strDate, strDate],
@@ -274,7 +274,7 @@ const getMonthEvents = async (date, callback) => {
         monthEvents[i] = [];
     }
 
-    const res = await __runQueryAsync({
+    const res = await __runQuery({
         operation: "READ",
         query: query,
         changeList: [monthStartStr, monthEndStr, monthStartStr, monthEndStr],
@@ -283,7 +283,7 @@ const getMonthEvents = async (date, callback) => {
     if (!res.data || res.error) return;
     // TODO: differentiate end_date with event_end_date/span
     // by using no of occurences (infinite if no end to repeat)
-    const recRes = await __runQueryAsync({
+    const recRes = await __runQuery({
         operation: "READ",
         query: recQuery,
         changeList: [monthEndStr, monthStartStr],
@@ -342,13 +342,13 @@ const getMonthEvents = async (date, callback) => {
 const deleteEvent = async (event, callback) => {
     const query = `DELETE FROM events WHERE id=?;`;
     const query2 = `DELETE FROM recurring_pattern WHERE event_id=?;`;
-    const res = await __runQueryAsync({
+    const res = await __runQuery({
         operation: "DELETE",
         query: query,
         changeList: [event.id],
     });
     handleError(res.error);
-    const res2 = await __runQueryAsync({
+    const res2 = await __runQuery({
         operation: "DELETE",
         query: query2,
         changeList: [event.id],
@@ -384,7 +384,7 @@ const editEvent = async (event, callback) => {
         event.recurrence !== "norepeat",
         event.id,
     ];
-    const res = await __runQueryAsync({
+    const res = await __runQuery({
         operation: "UPDATE",
         query: query,
         changeList: changeList,
@@ -397,7 +397,7 @@ const editEvent = async (event, callback) => {
     if (event.recurrence === "norepeat") {
         // no recurrence
         const delQuery = `DELETE FROM recurring_pattern WHERE event_id=?;`;
-        const delRes = await __runQueryAsync({
+        const delRes = await __runQuery({
             operation: "DELETE",
             query: delQuery,
             changeList: [event.id],
@@ -427,7 +427,7 @@ const editEvent = async (event, callback) => {
         event.startDate.getMonth() + 1,
         event.id,
     ];
-    const recRes = await __runQueryAsync({
+    const recRes = await __runQuery({
         operation: "UPDATE",
         query: recQuery,
         changeList: recChangeList,

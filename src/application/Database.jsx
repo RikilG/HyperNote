@@ -1,44 +1,40 @@
-import FileSystem from "./FileSystem";
 import { toast } from "react-toastify";
-const sqlite3 = window.require("sqlite3");
+import { Mutex } from "async-mutex";
 const { ipcRenderer } = window.require("electron");
 
-const POMO_DB = "pomodoroDB";
-const CALENDAR_DB = "calendarDB";
+export const POMO_DB = "pomodoroDB";
+export const PROJECT_DB = "projectDB";
+export const CALENDAR_DB = "calendarDB";
 
-function openDatabase(dbpath) {
-    if (!FileSystem.exists(dbpath)) {
-        toast("Creating new databse");
-    }
-    let db = new sqlite3.Database(dbpath, (err) => {
-        if (err) {
-            toast(err);
-            return;
-        }
-    });
-    return db;
-}
+export const OPERATIONS = {
+    CREATE: "CREATE",
+    READ: "READ",
+    UPDATE: "UPDATE",
+    DELETE: "DELETE",
+};
 
-function sendBackend(message) {
-    return new Promise((resolve) => {
-        ipcRenderer.once("asynchronous-reply", (_, arg) => {
-            resolve(arg);
+const mutexLock = new Mutex();
+
+export const sendBackendAsync = async (props) => {
+    return mutexLock.runExclusive(async () => {
+        return new Promise((resolve) => {
+            ipcRenderer.once("asynchronous-reply", (_, arg) => {
+                resolve(arg);
+            });
+            ipcRenderer.send("asynchronous-message", props);
         });
-        ipcRenderer.send("asynchronous-message", message);
     });
-}
+};
 
-const runDBQuery = (props, callback) => {
-    sendBackend(props).then((res) => {
+export const sendBackendCallback = (props, callback) => {
+    sendBackendAsync(props).then((res) => {
         if (res.error) {
             toast.error(res.error);
             console.log(res.error);
         }
-        if (callback) callback(res.data);
+        if (callback) callback(res.error, res.data);
     });
 };
-
-export { openDatabase, sendBackend, runDBQuery, POMO_DB, CALENDAR_DB };
 
 // const createQuery = (db, query, callback) => {
 //     db.run(query, (err) => {

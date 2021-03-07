@@ -55,14 +55,14 @@ const PomodoroNav = () => {
         };
         addRow(taskItem, (err) => {
             if (err) return;
-            listRows(setTaskList);
+            listRows((_, data) => setTaskList(data));
             setTextbox(false);
         });
         return ""; // make the textbox empty
     };
 
     const handleRefresh = () => {
-        listRows(setTaskList);
+        listRows((_, data) => setTaskList(data));
     };
 
     const handleDelete = (taskItem) => {
@@ -75,7 +75,7 @@ const PomodoroNav = () => {
             }
             // TODO: re-fetching complete list is heavy. instead remove one from taskList directly
             // look at closeWindow function for info on how to get index
-            listRows(setTaskList);
+            listRows((_, data) => setTaskList(data));
         });
     };
 
@@ -85,12 +85,12 @@ const PomodoroNav = () => {
             if (err) return;
             // TODO: re-fetching complete list is heavy. instead edit one from taskList directly
             // look at closeWindow function for info on how to get index
-            listRows(setTaskList);
+            listRows((_, data) => setTaskList(data));
         });
     };
 
     useEffect(() => {
-        createDb(() => listRows(setTaskList));
+        createDb(() => listRows((_, data) => setTaskList(data)));
     }, []); // on mount and unmount only
 
     return (

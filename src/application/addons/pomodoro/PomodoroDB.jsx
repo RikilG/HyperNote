@@ -1,5 +1,5 @@
 // database helper functions
-import { runDBQuery, POMO_DB } from "../../Database";
+import { sendBackendCallback, POMO_DB } from "../../Database";
 
 const createDb = (callback) => {
     const query = `CREATE TABLE IF NOT EXISTS tasks(
@@ -16,7 +16,7 @@ const createDb = (callback) => {
         operation: "CREATE",
         query: query,
     };
-    runDBQuery(props, callback);
+    sendBackendCallback(props, callback);
 };
 
 const listRows = (callback) => {
@@ -27,7 +27,7 @@ const listRows = (callback) => {
         operation: "READ",
         query: query,
     };
-    runDBQuery(props, callback);
+    sendBackendCallback(props, callback);
 };
 
 const addRow = (row, callback) => {
@@ -46,7 +46,7 @@ const addRow = (row, callback) => {
         query: query,
         changeList: changeList,
     };
-    runDBQuery(props, callback);
+    sendBackendCallback(props, callback);
 };
 
 const deleteRow = (id, callback) => {
@@ -59,7 +59,7 @@ const deleteRow = (id, callback) => {
         query: query,
         changeList: changeList,
     };
-    runDBQuery(props, callback);
+    sendBackendCallback(props, callback);
 };
 
 const editRow = (row, callback) => {
@@ -80,7 +80,7 @@ const editRow = (row, callback) => {
         query: query,
         changeList: changeList,
     };
-    runDBQuery(props, callback);
+    sendBackendCallback(props, callback);
 };
 
 export { createDb, listRows, addRow, deleteRow, editRow };

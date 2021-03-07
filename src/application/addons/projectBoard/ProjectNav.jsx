@@ -6,10 +6,8 @@ import Tooltip from "../../ui/Tooltip";
 import Textbox from "../../ui/Textbox";
 import ProjectEntry from "./ProjectEntry";
 import WindowContext from "../../WindowContext";
-import { openDatabase } from "../../Database";
-import UserPreferences from "../../settings/UserPreferences";
 import {
-    createProjectsDb,
+    createDb,
     listProjectRows,
     addProjectRow,
     deleteProjectRow,
@@ -52,52 +50,45 @@ const Project = () => {
     let [textbox, setTextbox] = useState(false);
     let [openProject, setOpenProject] = useState(null);
     const { closeWindow } = useContext(WindowContext);
-    const db = openDatabase(UserPreferences.get("projectStorage"));
-
-    createProjectsDb(db, () => listProjectRows(db));
 
     const createNewProject = (projectName) => {
         const projectItem = {
             id: null,
             name: projectName,
         };
-        addProjectRow(db, projectItem, (err) => {
+        addProjectRow(projectItem, (err) => {
             if (err) return;
-            listProjectRows(db, setProjectList);
+            listProjectRows(setProjectList);
             setTextbox(false);
         });
         return "";
     };
 
     const handleRefresh = () => {
-        listProjectRows(db, setProjectList);
+        listProjectRows(setProjectList);
     };
 
     const handleDelete = (projectItem) => {
-        deleteProjectRow(db, projectItem.id, (err) => {
+        deleteProjectRow(projectItem.id, (err) => {
             if (err) return;
             if (openProject && openProject.projectItem.id === projectItem.id) {
                 closeWindow(openProject);
                 setOpenProject(null);
             }
-            listProjectRows(db, setProjectList);
+            listProjectRows(setProjectList);
         });
     };
 
     const handleEdit = (projectItem, newName) => {
         projectItem.name = newName;
-        editProjectRow(db, projectItem, (err) => {
+        editProjectRow(projectItem, (err) => {
             if (err) return;
-            listProjectRows(db, setProjectList);
+            listProjectRows(setProjectList);
         });
     };
 
     useEffect(() => {
-        listProjectRows(db, setProjectList);
-        return () => {
-            db.close();
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        createDb(() => listProjectRows(setProjectList));
     }, []);
 
     return (
