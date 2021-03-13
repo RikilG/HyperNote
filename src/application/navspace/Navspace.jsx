@@ -1,6 +1,5 @@
 import React from "react";
 
-// import Navbar from "./Navbar";
 import Explorer from "../explorer/Explorer";
 import Searchbar from "../addons/search/Searchbar";
 import Pomodoro from "../addons/pomodoro/PomodoroNav";
@@ -12,9 +11,7 @@ const style = {
         display: "flex",
         flexFlow: "row nowrap",
         height: "100%",
-        // width: "calc(100% - 35px)",
         width: "100%",
-        // overflowX: "hidden",
     },
 };
 

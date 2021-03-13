@@ -14,11 +14,13 @@ import {
 import Settings from "../settings/Settings";
 import Tooltip from "../ui/Tooltip";
 
+export const navbarWidth = 32; // in px
+
 const style = {
     container: {
-        flex: "0 0 35px",
+        flex: `0 0 ${navbarWidth}px`,
         height: "100%",
-        background: "var(--backgroundAccent)",
+        background: "var(--windowFrame)",
         display: "flex",
         flexFlow: "column nowrap",
     },
@@ -33,6 +35,7 @@ const style = {
         paddingBottom: "1rem",
     },
     icon: {
+        color: "var(--primaryTextColor)",
         width: "90%",
         padding: "25% 5%",
         cursor: "pointer",

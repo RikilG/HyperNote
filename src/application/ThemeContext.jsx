@@ -1,38 +1,38 @@
 import React, { useState, useEffect } from "react";
 import UserPreferences from "./settings/UserPreferences";
 
-import themes from "./css/themes";
+import themes from "./themes/themes";
 const { Color } = window.require("custom-electron-titlebar");
+
+const setCSSAttribute = (attribute, value) => {
+    document.documentElement.style.setProperty(`--${attribute}`, value);
+};
+
+const getCSSAttribute = (attribute) => {
+    return document.documentElement.style.getPropertyValue(`--${attribute}`);
+};
 
 const setCSSVariables = (theme) => {
     for (const value in theme) {
-        document.documentElement.style.setProperty(`--${value}`, theme[value]);
+        setCSSAttribute(value, theme[value]);
     }
     const docWidth = document.documentElement.clientWidth;
     const docHeight = document.documentElement.clientHeight;
-    document.documentElement.style.setProperty(
-        `--windowWidth`,
-        `${docWidth}px`
-    );
-    document.documentElement.style.setProperty(
-        `--windowHeight`,
-        `${docHeight}px`
-    );
+    setCSSAttribute("windowWidth", `${docWidth}px`);
+    setCSSAttribute("windowHeight", `${docHeight}px`);
 };
 
 export const ThemeContext = React.createContext({
+    theme: {},
     themeName: "dark",
     changeTheme: () => {},
+    getCSSAttribute: () => {},
+    setCSSAttribute: () => {},
 });
 
 const ThemeContextWrapper = ({ children, titlebar }) => {
     const [themeName, setThemeName] = useState(UserPreferences.get("theme"));
     const [theme, setTheme] = useState(themes[themeName]);
-
-    // works only the first time to remove the default black titlebar
-    titlebar.updateBackground(
-        Color.fromHex(themes[themeName].backgroundAccent)
-    );
 
     const changeTheme = (newTheme) => {
         if (themes[newTheme]) {
@@ -47,11 +47,21 @@ const ThemeContextWrapper = ({ children, titlebar }) => {
 
     useEffect(() => {
         // similar to componentDidMount and componentDidUpdate
+        // works only the first time to remove the default black titlebar
+        titlebar.updateBackground(Color.fromHex(theme.windowFrame));
         setCSSVariables(theme);
-    }, [theme]);
+    }, [theme, titlebar]);
 
     return (
-        <ThemeContext.Provider value={{ themeName, changeTheme }}>
+        <ThemeContext.Provider
+            value={{
+                theme,
+                themeName,
+                changeTheme,
+                getCSSAttribute,
+                setCSSAttribute,
+            }}
+        >
             {children}
         </ThemeContext.Provider>
     );

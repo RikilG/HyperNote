@@ -35,7 +35,7 @@ const style = {
         userSelect: "none",
     },
     eventItem: {
-        background: "var(--primaryColor)",
+        background: "var(--green)",
         borderRadius: "0.3rem",
         fontSize: "0.9rem",
         margin: "0.2rem",

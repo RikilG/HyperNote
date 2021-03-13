@@ -1,9 +1,7 @@
 import React, { useContext } from "react";
 import { toast } from "react-toastify";
 import { ThemeContext } from "../ThemeContext";
-import themes from "../css/themes";
-
-import Button from "../ui/Button";
+import themes from "../themes/themes";
 
 const style = {
     container: {
@@ -24,37 +22,26 @@ const style = {
     },
 };
 
-const Appearance = (props) => {
-    const { /*themeName,*/ changeTheme } = useContext(ThemeContext);
+const Appearance = () => {
+    const { themeName, changeTheme } = useContext(ThemeContext);
 
     const handleThemeChange = (event) => {
-        let newTheme = event.target.getAttribute("value");
+        let newTheme = event.target.value;
         changeTheme(newTheme);
         toast("Applied theme: " + newTheme);
-    };
-
-    const getThemeButtons = () => {
-        let output = [];
-        for (var theme in themes) {
-            output.push(
-                <Button
-                    key={theme}
-                    onClick={handleThemeChange}
-                    value={theme}
-                    style={style.button}
-                >
-                    {theme.charAt(0).toUpperCase() + theme.slice(1)} Theme
-                </Button>
-            );
-        }
-        return output;
     };
 
     return (
         <div style={style.container}>
             <div style={style.header}>Appearance</div>
             <div style={style.subheader}>Theme</div>
-            {getThemeButtons()}
+            <select onChange={handleThemeChange} value={themeName}>
+                {Object.keys(themes).map((theme) => (
+                    <option value={theme} key={theme}>
+                        {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                    </option>
+                ))}
+            </select>
         </div>
     );
 };

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import SplitPane from "react-split-pane";
 import Pane from "react-split-pane/lib/Pane";
 
-import Navbar from "./navspace/Navbar";
+import Navbar, { navbarWidth } from "./navspace/Navbar";
 import Navspace from "./navspace/Navspace";
 import Workspace from "./workspace/Workspace";
 
@@ -31,7 +31,7 @@ const Main = () => {
                     height: "100%",
                 }}
             >
-                <div style={{ width: "35px" }}>
+                <div style={{ width: `${navbarWidth}px` }}>
                     <Navbar
                         navbarActive={navbarActive}
                         setNavbarActive={setNavbarActive}
