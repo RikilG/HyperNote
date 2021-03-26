@@ -10,7 +10,7 @@ const Tooltip = (props) => {
         const tooltipRect = tooltip.current.getBoundingClientRect();
         let x = 0,
             y = 0,
-            titlebarHeight = 30;
+            titlebarHeight = window.isElectron ? 30 : 0;
         let align = props.position;
 
         function setBottom() {

@@ -12,7 +12,7 @@ import "./css/SplitPane.css";
 import { WindowContextWrapper } from "./WindowContext";
 
 const Main = () => {
-    let [activeAddon, setActiveAddon] = useState("explorer");
+    let [activeAddon, setActiveAddon] = useState("search");
     let [navbarActive, setNavbarActive] = useState(true);
 
     const handleAddonChange = (addon) => {

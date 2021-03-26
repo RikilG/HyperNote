@@ -5,11 +5,13 @@ import { ToastContainer } from "react-toastify";
 import Main from "./application/Main";
 import ThemeContextWrapper from "./application/ThemeContext";
 
-const customTitlebar = window.require("custom-electron-titlebar");
-
-const titlebar = new customTitlebar.Titlebar({
-    backgroundColor: customTitlebar.Color.fromHex("#444"),
-});
+const isElectron = window.isElectron;
+const customTitlebar = isElectron && window.require("custom-electron-titlebar");
+const titlebar =
+    isElectron &&
+    new customTitlebar.Titlebar({
+        backgroundColor: customTitlebar.Color.fromHex("#444"),
+    });
 
 ReactDOM.render(
     <React.StrictMode>

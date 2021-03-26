@@ -1,29 +1,25 @@
 import FileSystem from "../FileSystem";
 // import { toast } from 'react-toastify';
 
+const isElectron = window.isElectron;
+const path = isElectron && window.require("path");
+const basePath =
+    isElectron && window.require("electron").remote.app.getPath("userData");
+const dataPath = isElectron && path.join(basePath, "userStorage");
+const configPath = isElectron && path.join(dataPath, "config.json");
 export default class UserPreferences {
-    static path = window.require("path");
-    static basePath = window.require("electron").remote.app.getPath("userData");
-    static dataPath = this.path.join(this.basePath, "userStorage");
-    static configPath = this.path.join(this.dataPath, "config.json");
     static preferences = {};
     static defaults = {
         theme: "material",
-        userStorage: this.dataPath,
-        noteStorage: this.path.join(this.dataPath, "noteStorage"),
-        pomoStorage: this.path.join(this.dataPath, "pomoStorage.db"),
-        projectStorage: this.path.join(this.dataPath, "projectStorage.db"),
-        calendarStorage: this.path.join(this.dataPath, "calendarStorage.db"),
+        noteStorage: isElectron && path.join(dataPath, "noteStorage"),
         preferredTimeFormat: "12H",
     };
 
     static __loadPreferences() {
         const defaultData = { error: true };
         try {
-            if (FileSystem.exists(this.configPath))
-                this.preferences = JSON.parse(
-                    FileSystem.readFile(this.configPath)
-                );
+            if (FileSystem.exists(configPath))
+                this.preferences = JSON.parse(FileSystem.readFile(configPath));
             else {
                 this.preferences = this.defaults;
                 this.setPreferences();
@@ -65,7 +61,7 @@ export default class UserPreferences {
     }
 
     static setPreferences() {
-        FileSystem.writeFile(this.configPath, JSON.stringify(this.preferences));
+        FileSystem.writeFile(configPath, JSON.stringify(this.preferences));
     }
 
     static resetDefaults() {

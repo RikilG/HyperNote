@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { Mutex } from "async-mutex";
-const { ipcRenderer } = window.require("electron");
+const ipcRenderer = window.isElectron && window.require("electron").ipcRenderer;
 
 export const POMO_DB = "pomodoroDB";
 export const PROJECT_DB = "projectDB";
