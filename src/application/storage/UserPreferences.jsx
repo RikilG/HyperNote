@@ -1,6 +1,7 @@
 import FileSystem from "../storage/FileSystem";
 // import { toast } from 'react-toastify';
 
+const fileSystem = FileSystem.getInstance();
 const isElectron = window.isElectron;
 const path = isElectron && window.require("path");
 const basePath =
@@ -18,18 +19,18 @@ export default class UserPreferences {
     static __loadPreferences() {
         const defaultData = { error: true };
         try {
-            if (FileSystem.exists(configPath))
-                this.preferences = JSON.parse(FileSystem.readFile(configPath));
+            if (fileSystem.exists(configPath))
+                this.preferences = JSON.parse(fileSystem.readFile(configPath));
             else {
                 this.preferences = this.defaults;
                 this.setPreferences();
             }
 
-            if (!FileSystem.exists(this.preferences.userStorage)) {
-                FileSystem.newDirectory(this.preferences.userStorage);
+            if (!fileSystem.exists(this.preferences.userStorage)) {
+                fileSystem.newDirectory(this.preferences.userStorage);
             }
-            if (!FileSystem.exists(this.preferences.noteStorage)) {
-                FileSystem.newDirectory(this.preferences.noteStorage);
+            if (!fileSystem.exists(this.preferences.noteStorage)) {
+                fileSystem.newDirectory(this.preferences.noteStorage);
             }
 
             return this.preferences;
@@ -61,7 +62,7 @@ export default class UserPreferences {
     }
 
     static setPreferences() {
-        FileSystem.writeFile(configPath, JSON.stringify(this.preferences));
+        fileSystem.writeFile(configPath, JSON.stringify(this.preferences));
     }
 
     static resetDefaults() {

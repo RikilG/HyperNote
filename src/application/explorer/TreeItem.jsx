@@ -22,9 +22,9 @@ import {
 import "../css/Explorer.css";
 import Tooltip from "../ui/Tooltip";
 import Textbox from "../ui/Textbox";
-import FileSystem from "../storage/FileSystem";
 import TreeTextbox from "./TreeTextbox";
 import ContextMenu from "../ui/ContextMenu";
+import StorageContext from "../storage/StorageContext";
 import { ExplorerContext } from "./Explorer";
 
 const styles = {
@@ -86,7 +86,8 @@ const TreeItem = (props) => {
     let [clickEvent, setClickEvent] = useState("");
     let [caret, setCaret] = useState(null);
     let [setContextMenuRef, bounds] = useHookWithRefCallback();
-    let { refreshTree } = useContext(ExplorerContext);
+    const { refreshTree } = useContext(ExplorerContext);
+    const { fileSystem } = useContext(StorageContext);
 
     const contextMenuOptions = [
         {
@@ -98,7 +99,7 @@ const TreeItem = (props) => {
             name: "delete",
             icon: faTrash,
             action: () => {
-                FileSystem.delete(props.path);
+                fileSystem.delete(props.path);
                 refreshTree();
             },
         },
@@ -112,11 +113,11 @@ const TreeItem = (props) => {
 
     const handleRenameConfirm = (newName) => {
         if (newName !== "") {
-            const newPath = FileSystem.join(
-                FileSystem.dirname(props.path),
+            const newPath = fileSystem.join(
+                fileSystem.dirname(props.path),
                 newName
             );
-            FileSystem.rename(props.path, newPath);
+            fileSystem.rename(props.path, newPath);
             refreshTree();
         }
     };

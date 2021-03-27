@@ -1,10 +1,10 @@
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import Button from "../ui/Button";
 import Textbox from "../ui/Textbox";
 import UserPreferences from "../storage/UserPreferences";
-import FileSystem from "../storage/FileSystem";
+import StorageContext from "../storage/StorageContext";
 
 const style = {
     container: {
@@ -31,12 +31,14 @@ const style = {
 };
 
 const Core = (props) => {
+    const { fileSystem } = useContext(StorageContext);
     let [noteStorage, setNoteStorage] = useState(
         UserPreferences.get("noteStorage")
     );
 
     const handleStorageChange = () => {
-        FileSystem.browseFolder()
+        fileSystem
+            .browseFolder()
             .then((response) => {
                 if (response.cancelled) return noteStorage; // the old path
                 return response.filePaths[0];

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import SplitPane from "react-split-pane";
 import Pane from "react-split-pane/lib/Pane";
 import { toast } from "react-toastify";
@@ -7,7 +7,7 @@ import "../css/Editor.css";
 import Textarea from "../ui/Textarea";
 import Renderer from "./Renderer";
 import EditorGroupBar from "./EditorGroupBar";
-import FileSystem from "../storage/FileSystem";
+import StorageContext from "../storage/StorageContext";
 
 const style = {
     container: {
@@ -20,13 +20,14 @@ const style = {
 };
 
 const EditorGroup = (props) => {
+    const { fileSystem } = useContext(StorageContext);
     let [value, setValue] = useState("# Loading...");
     let [modified, setModified] = useState(false);
     let [currentChoice, setCurrentChoice] = useState(0);
 
     useEffect(() => {
         if (props.fileObj) {
-            setValue(FileSystem.readFile(props.fileObj.path));
+            setValue(fileSystem.readFile(props.fileObj.path));
         }
     }, [props.fileObj]); // runs ony once, componentDidMount or when props change
 
@@ -44,7 +45,7 @@ const EditorGroup = (props) => {
         if (!modified) {
             return;
         } else {
-            FileSystem.writeFile(props.fileObj.path, value);
+            fileSystem.writeFile(props.fileObj.path, value);
             toast("File saved successfully!");
         }
     };

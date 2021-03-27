@@ -1,7 +1,7 @@
 import { useContext } from "react";
 
-import FileSystem from "../storage/FileSystem";
 import Textbox from "../ui/Textbox";
+import StorageContext from "../storage/StorageContext";
 import { ExplorerContext } from "../explorer/Explorer";
 
 const style = {
@@ -21,14 +21,15 @@ Passable props:
 */
 
 const TreeTextbox = (props) => {
+    const { fileSystem } = useContext(StorageContext);
     const { refreshTree } = useContext(ExplorerContext);
     const path = props.path;
 
     const handleConfirm = (newName) => {
         if (newName && newName !== "") {
             if (props.clickEvent === "file")
-                FileSystem.newFile(FileSystem.join(path, newName));
-            else FileSystem.newDirectory(FileSystem.join(path, newName));
+                fileSystem.newFile(fileSystem.join(path, newName));
+            else fileSystem.newDirectory(fileSystem.join(path, newName));
             refreshTree();
         }
     };

@@ -3,7 +3,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { ToastContainer } from "react-toastify";
 import Main from "./application/Main";
-import ThemeContextWrapper from "./application/ThemeContext";
+import { ThemeContextWrapper } from "./application/ThemeContext";
+import { StorageContextWrapper } from "./application/storage/StorageContext";
 
 const isElectron = window.isElectron;
 const customTitlebar = isElectron && window.require("custom-electron-titlebar");
@@ -16,10 +17,12 @@ const titlebar =
 ReactDOM.render(
     <React.StrictMode>
         <div style={{ height: "100%" }}>
-            <ThemeContextWrapper titlebar={titlebar}>
-                <Main />
-                <ToastContainer position="bottom-right" />
-            </ThemeContextWrapper>
+            <StorageContextWrapper>
+                <ThemeContextWrapper titlebar={titlebar}>
+                    <Main />
+                    <ToastContainer position="bottom-right" />
+                </ThemeContextWrapper>
+            </StorageContextWrapper>
         </div>
     </React.StrictMode>,
     document.getElementById("root")

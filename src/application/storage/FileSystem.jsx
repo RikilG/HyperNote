@@ -1,11 +1,18 @@
 import { toast } from "react-toastify";
+import DropboxHelper from "./cloud/DropboxHelper";
 
 export default class FileSystem {
     // set in preload.js
-    static fs = window.isElectron && window.require("fs");
-    static path = window.isElectron && window.require("path");
+    fs = window.isElectron && window.require("fs");
+    path = window.isElectron && window.require("path");
+    static dropboxHelper = new DropboxHelper();
+    static instance = new FileSystem();
 
-    static generateTree(root) {
+    static getInstance() {
+        return this.instance;
+    }
+
+    generateTree(root) {
         if (window.isElectron) {
             let stats;
             try {
@@ -31,7 +38,7 @@ export default class FileSystem {
                 try {
                     tree.subtree = this.fs
                         .readdirSync(root)
-                        .map((child) => FileSystem.getTree(root + "/" + child));
+                        .map((child) => this.getTree(root + "/" + child));
                 } catch (err) {
                     console.log(err);
                     toast.error("FAILED TO RETRIVE SUB-TREE", {
@@ -52,7 +59,7 @@ export default class FileSystem {
         }
     }
 
-    static getTree(root) {
+    getTree(root) {
         let tree = this.generateTree(root);
         let obj = [tree];
 
@@ -74,7 +81,7 @@ export default class FileSystem {
         return obj[0];
     }
 
-    static readFile(filepath) {
+    readFile(filepath) {
         if (window.isElectron) {
             try {
                 return this.fs.readFileSync(filepath, { encoding: "utf-8" });
@@ -87,7 +94,7 @@ export default class FileSystem {
         return undefined;
     }
 
-    static writeFile(filepath, content) {
+    writeFile(filepath, content) {
         if (window.isElectron) {
             try {
                 return this.fs.writeFileSync(filepath, content);
@@ -98,7 +105,7 @@ export default class FileSystem {
         }
     }
 
-    static exists(filepath) {
+    exists(filepath) {
         try {
             return window.isElectron && this.fs.existsSync(filepath);
         } catch (err) {
@@ -107,7 +114,7 @@ export default class FileSystem {
         }
     }
 
-    static newDirectory(folderpath) {
+    newDirectory(folderpath) {
         if (window.isElectron && !this.exists(folderpath)) {
             try {
                 this.fs.mkdirSync(folderpath);
@@ -118,7 +125,7 @@ export default class FileSystem {
         }
     }
 
-    static newFile(filepath) {
+    newFile(filepath) {
         if (!this.exists(filepath)) {
             try {
                 this.writeFile(filepath, "");
@@ -129,7 +136,7 @@ export default class FileSystem {
         }
     }
 
-    static browseFolder() {
+    browseFolder() {
         // Async function, returns Promise. take care
         if (window.isElectron) {
             try {
@@ -146,13 +153,13 @@ export default class FileSystem {
         }
     }
 
-    static join(basename, filename) {
+    join(basename, filename) {
         if (window.isElectron) {
             return this.path.join(basename, filename);
         }
     }
 
-    static rename(oldpath, newpath) {
+    rename(oldpath, newpath) {
         if (window.isElectron) {
             try {
                 this.fs.renameSync(oldpath, newpath);
@@ -163,13 +170,13 @@ export default class FileSystem {
         }
     }
 
-    static dirname(filepath) {
+    dirname(filepath) {
         if (window.isElectron) {
             return this.path.dirname(filepath);
         }
     }
 
-    static delete(filepath) {
+    delete(filepath) {
         if (window.isElectron) {
             try {
                 const stats = this.fs.lstatSync(filepath);

@@ -12,7 +12,7 @@ import {
 
 import Textbox from "../ui/Textbox";
 import WindowContext from "../WindowContext";
-import FileSystem from "../storage/FileSystem";
+import StorageContext from "../storage/StorageContext";
 import Tooltip from "../ui/Tooltip";
 
 let styles = {
@@ -33,17 +33,18 @@ let styles = {
 
 const EditorGroupBar = (props) => {
     let [active, setActive] = useState(false);
+    const { fileSystem } = useContext(StorageContext);
     const { closeWindow } = useContext(WindowContext);
 
     const handleConfirm = (filename) => {
         // TODO: modify props.fileObj.name after renaming
         if (active && filename !== props.fileObj.name) {
             const oldpath = props.fileObj.path;
-            const newpath = FileSystem.join(
-                FileSystem.dirname(oldpath),
+            const newpath = fileSystem.join(
+                fileSystem.dirname(oldpath),
                 filename
             );
-            FileSystem.rename(oldpath, newpath);
+            fileSystem.rename(oldpath, newpath);
             // wait for it to write to disk
             setTimeout(props.fileObj.refresh, 400);
         }

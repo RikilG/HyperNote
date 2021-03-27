@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Tree from "./Tree";
 import TreeToolbar from "./TreeToolbar";
 import WindowContext from "../WindowContext";
-import FileSystem from "../storage/FileSystem";
+import StorageContext from "../storage/StorageContext";
 import UserPreferences from "../storage/UserPreferences";
 
 const style = {
@@ -31,6 +31,7 @@ const ExplorerContext = React.createContext({
 });
 
 const Explorer = (props) => {
+    const { fileSystem } = useContext(StorageContext);
     const { openWindow } = useContext(WindowContext);
     let [tree, setTree] = useState({});
 
@@ -38,7 +39,7 @@ const Explorer = (props) => {
         // TODO: make getTree() async to remove file system parsing from main thread
         // TODO: modify prevTree from setTree (using func syntax of setState) to reduce disk load
         // TODO: sort the resulting tree to show folders first and next files
-        setTree(FileSystem.getTree(UserPreferences.get("noteStorage")));
+        setTree(fileSystem.getTree(UserPreferences.get("noteStorage")));
     };
 
     useEffect(() => {

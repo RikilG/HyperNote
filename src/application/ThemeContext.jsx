@@ -31,7 +31,7 @@ export const ThemeContext = React.createContext({
     setCSSAttribute: () => {},
 });
 
-const ThemeContextWrapper = ({ children, titlebar }) => {
+export const ThemeContextWrapper = ({ children, titlebar }) => {
     const [themeName, setThemeName] = useState(UserPreferences.get("theme"));
     const [theme, setTheme] = useState(themes[themeName]);
 
@@ -71,5 +71,3 @@ const ThemeContextWrapper = ({ children, titlebar }) => {
         </ThemeContext.Provider>
     );
 };
-
-export default ThemeContextWrapper;
