@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 
-import { sendBackendAsync, CALENDAR_DB } from "../../Database";
+import { sendBackendAsync, CALENDAR_DB } from "../../storage/Database";
 import { monthToDays } from "./CalendarPage";
 // max no of tables sqlite allows is 64
 // schema from: https://www.vertabelo.com/blog/again-and-again-managing-recurring-events-in-a-data-model/

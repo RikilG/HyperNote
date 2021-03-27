@@ -12,7 +12,7 @@ import {
 
 import Textbox from "../ui/Textbox";
 import WindowContext from "../WindowContext";
-import FileSystem from "../FileSystem";
+import FileSystem from "../storage/FileSystem";
 import Tooltip from "../ui/Tooltip";
 
 let styles = {

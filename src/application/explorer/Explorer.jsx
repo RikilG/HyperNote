@@ -3,8 +3,8 @@ import React, { useContext, useEffect, useState } from "react";
 import Tree from "./Tree";
 import TreeToolbar from "./TreeToolbar";
 import WindowContext from "../WindowContext";
-import FileSystem from "../FileSystem";
-import UserPreferences from "../settings/UserPreferences";
+import FileSystem from "../storage/FileSystem";
+import UserPreferences from "../storage/UserPreferences";
 
 const style = {
     explorer: {

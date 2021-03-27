@@ -7,7 +7,7 @@ import "../css/Editor.css";
 import Textarea from "../ui/Textarea";
 import Renderer from "./Renderer";
 import EditorGroupBar from "./EditorGroupBar";
-import FileSystem from "../FileSystem";
+import FileSystem from "../storage/FileSystem";
 
 const style = {
     container: {

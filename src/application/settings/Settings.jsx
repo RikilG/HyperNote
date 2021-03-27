@@ -5,7 +5,7 @@ import Dialog, { showDialog, hideDialog } from "../ui/Dialog";
 import Appearance from "./Appearance";
 import Core from "./Core";
 import Modal from "../ui/Modal";
-import UserPreferences from "./UserPreferences";
+import UserPreferences from "../storage/UserPreferences";
 import "../css/Settings.css";
 
 const style = {

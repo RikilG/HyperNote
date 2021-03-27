@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import UserPreferences from "../settings/UserPreferences";
+import UserPreferences from "../storage/UserPreferences";
 
 const style = {
     container: {

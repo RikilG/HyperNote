@@ -1,5 +1,5 @@
 // database helper functions
-import { sendBackendCallback, POMO_DB } from "../../Database";
+import { sendBackendCallback, POMO_DB } from "../../storage/Database";
 
 const createDb = (callback) => {
     const query = `CREATE TABLE IF NOT EXISTS tasks(

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import UserPreferences from "./settings/UserPreferences";
+import UserPreferences from "./storage/UserPreferences";
 import themes from "./themes/themes";
 
 const isElectron = window.isElectron;

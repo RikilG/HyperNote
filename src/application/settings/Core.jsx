@@ -3,8 +3,8 @@ import { useState } from "react";
 
 import Button from "../ui/Button";
 import Textbox from "../ui/Textbox";
-import UserPreferences from "../settings/UserPreferences";
-import FileSystem from "../FileSystem";
+import UserPreferences from "../storage/UserPreferences";
+import FileSystem from "../storage/FileSystem";
 
 const style = {
     container: {

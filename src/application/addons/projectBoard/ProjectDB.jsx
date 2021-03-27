@@ -1,6 +1,10 @@
 // database helper functions
 import { toast } from "react-toastify";
-import { PROJECT_DB, sendBackendAsync, OPERATIONS } from "../../Database";
+import {
+    PROJECT_DB,
+    sendBackendAsync,
+    OPERATIONS,
+} from "../../storage/Database";
 
 const handleError = (err) => {
     if (err) {
