@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import UserPreferences from "./storage/UserPreferences";
+import React, { useState, useEffect, useContext } from "react";
+import StorageContext from "./storage/StorageContext";
 import themes from "./themes/themes";
 
 const isElectron = window.isElectron;
@@ -32,7 +32,8 @@ export const ThemeContext = React.createContext({
 });
 
 export const ThemeContextWrapper = ({ children, titlebar }) => {
-    const [themeName, setThemeName] = useState(UserPreferences.get("theme"));
+    const { userPreferences } = useContext(StorageContext);
+    const [themeName, setThemeName] = useState(userPreferences.get("theme"));
     const [theme, setTheme] = useState(themes[themeName]);
 
     const changeTheme = (newTheme) => {
@@ -44,7 +45,7 @@ export const ThemeContextWrapper = ({ children, titlebar }) => {
                     Color.fromHex(themes[newTheme].backgroundAccent)
                 );
             }
-            UserPreferences.set("theme", newTheme);
+            userPreferences.set("theme", newTheme);
         }
     };
 

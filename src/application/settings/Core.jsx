@@ -3,7 +3,6 @@ import { useContext, useState } from "react";
 
 import Button from "../ui/Button";
 import Textbox from "../ui/Textbox";
-import UserPreferences from "../storage/UserPreferences";
 import StorageContext from "../storage/StorageContext";
 
 const style = {
@@ -31,9 +30,9 @@ const style = {
 };
 
 const Core = (props) => {
-    const { fileSystem } = useContext(StorageContext);
+    const { fileSystem, userPreferences } = useContext(StorageContext);
     let [noteStorage, setNoteStorage] = useState(
-        UserPreferences.get("noteStorage")
+        userPreferences.get("noteStorage")
     );
 
     const handleStorageChange = () => {
@@ -50,7 +49,7 @@ const Core = (props) => {
                 } else if (path !== noteStorage) {
                     // new path selected
                     setNoteStorage(path);
-                    UserPreferences.set("noteStorage", path);
+                    userPreferences.set("noteStorage", path);
                     toast("Storage path updated");
                     toast.warning(
                         "Application restart required ('Reload App' from settings)",

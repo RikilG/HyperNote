@@ -1,7 +1,3 @@
-import FileSystem from "../storage/FileSystem";
-// import { toast } from 'react-toastify';
-
-const fileSystem = FileSystem.getInstance();
 const isElectron = window.isElectron;
 const path = isElectron && window.require("path");
 const basePath =
@@ -9,51 +5,69 @@ const basePath =
 const dataPath = isElectron && path.join(basePath, "userStorage");
 const configPath = isElectron && path.join(dataPath, "config.json");
 export default class UserPreferences {
-    static preferences = {};
+    static instance;
+    preferences = {};
+    fileSystem = undefined;
     static defaults = {
         theme: "material",
         noteStorage: isElectron && path.join(dataPath, "noteStorage"),
         preferredTimeFormat: "12H",
+        dropboxIntegration: false,
+        dropboxConfig: {},
     };
 
-    static __loadPreferences() {
+    static getInstance() {
+        if (UserPreferences.instance) {
+            return UserPreferences.instance;
+        }
+        UserPreferences.instance = new UserPreferences();
+        return UserPreferences.instance;
+    }
+
+    setFileSystem(fileSystem) {
+        this.fileSystem = fileSystem;
+    }
+
+    __loadPreferences() {
         const defaultData = { error: true };
         try {
-            if (fileSystem.exists(configPath))
-                this.preferences = JSON.parse(fileSystem.readFile(configPath));
+            if (!this.fileSystem.exists(dataPath)) {
+                this.fileSystem.newDirectory(dataPath);
+            }
+
+            if (this.fileSystem.exists(configPath))
+                this.preferences = JSON.parse(
+                    this.fileSystem.readFile(configPath)
+                );
             else {
-                this.preferences = this.defaults;
+                this.preferences = UserPreferences.defaults;
                 this.setPreferences();
             }
 
-            if (!fileSystem.exists(this.preferences.userStorage)) {
-                fileSystem.newDirectory(this.preferences.userStorage);
+            if (!this.fileSystem.exists(this.preferences.noteStorage)) {
+                this.fileSystem.newDirectory(this.preferences.noteStorage);
             }
-            if (!fileSystem.exists(this.preferences.noteStorage)) {
-                fileSystem.newDirectory(this.preferences.noteStorage);
-            }
-
             return this.preferences;
         } catch (error) {
             return defaultData;
         }
     }
 
-    static getPreferences() {
+    getPreferences() {
         if (this.preferences === {}) {
             this.__loadPreferences();
         }
         return this.preferences;
     }
 
-    static get(key) {
+    get(key) {
         if (Object.keys(this.preferences).length === 0) {
             this.__loadPreferences();
         }
         return this.preferences[key];
     }
 
-    static set(key, value) {
+    set(key, value) {
         let contents = this.getPreferences();
         if (contents.error === true) return;
         contents[key] = value || true;
@@ -61,11 +75,11 @@ export default class UserPreferences {
         this.setPreferences();
     }
 
-    static setPreferences() {
-        fileSystem.writeFile(configPath, JSON.stringify(this.preferences));
+    setPreferences() {
+        this.fileSystem.writeFile(configPath, JSON.stringify(this.preferences));
     }
 
-    static resetDefaults() {
+    resetDefaults() {
         this.preferences = this.defaults;
         this.setPreferences();
     }

@@ -9,8 +9,10 @@ import {
     faChevronLeft,
     faWindowRestore,
     faChevronRight,
+    faLink,
 } from "@fortawesome/free-solid-svg-icons";
 
+import CloudSettings from "../settings/CloudSettings";
 import Settings from "../settings/Settings";
 import Tooltip from "../ui/Tooltip";
 
@@ -32,7 +34,7 @@ const style = {
     tools: {
         display: "flex",
         flexFlow: "column",
-        paddingBottom: "1rem",
+        paddingBottom: "0.8rem",
     },
     icon: {
         color: "var(--primaryTextColor)",
@@ -44,9 +46,16 @@ const style = {
 
 const Navbar = (props) => {
     let [showSettings, setShowSettings] = useState(false);
+    let [showCloudSettings, setShowCloudSettings] = useState(false);
 
     const toggleSettings = () => {
+        setShowCloudSettings(false);
         setShowSettings(!showSettings);
+    };
+
+    const toggleCloudSettings = () => {
+        setShowSettings(false);
+        setShowCloudSettings(!showCloudSettings);
     };
 
     return (
@@ -101,6 +110,13 @@ const Navbar = (props) => {
                 </Tooltip>
             </div>
             <div style={style.tools}>
+                <Tooltip value="Cloud Connections" position="right">
+                    <FontAwesomeIcon
+                        style={style.icon}
+                        icon={faLink}
+                        onClick={toggleCloudSettings}
+                    />
+                </Tooltip>
                 <Tooltip value="Settings" position="right">
                     <FontAwesomeIcon
                         style={style.icon}
@@ -110,6 +126,9 @@ const Navbar = (props) => {
                 </Tooltip>
             </div>
             {showSettings && <Settings onExit={toggleSettings} />}
+            {showCloudSettings && (
+                <CloudSettings onExit={toggleCloudSettings} />
+            )}
         </div>
     );
 };

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
-import UserPreferences from "../storage/UserPreferences";
+import StorageContext from "../storage/StorageContext";
 
 const style = {
     container: {
@@ -32,6 +32,7 @@ const convertTo12H = (hrs) => {
 };
 
 const TimePicker = ({ initialValue, setTime }) => {
+    const { userPreferences } = useContext(StorageContext);
     const now = initialValue || new Date();
     let [minVal, setMinVal] = useState(now.getMinutes());
     let [hrsVal, setHrsVal] = useState(now.getHours());
@@ -47,7 +48,7 @@ const TimePicker = ({ initialValue, setTime }) => {
     // };
 
     useEffect(() => {
-        if (UserPreferences.get("preferredTimeFormat") === "12H") {
+        if (userPreferences.get("preferredTimeFormat") === "12H") {
             setHrsVal((prev) => {
                 const converted = convertTo12H(prev);
                 typeRef.current.value = converted.type;

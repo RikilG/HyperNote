@@ -33,18 +33,18 @@ const style = {
     },
 };
 
-export const showDialog = (onAccept, onReject, onCancel, setDialog) => {
-    setDialog({
-        visible: true,
-        onAccept: onAccept,
-        onReject: onReject,
-        onCancel: onCancel,
-    });
-};
+/*
+props.config:
+- onAccept: func
+- onReject: func
+- onCancel: func
+- visible: boolean
+- message: text
+- accept: text to show on accept button
+- reject: text to show on reject button
 
-export const hideDialog = (setDialog) => {
-    setDialog({ visible: false });
-};
+props.setDialog: for visible and invisible setting
+*/
 
 const Dialog = (props) => {
     let accept = props.accept || props.config.accept || "Yes";
@@ -55,19 +55,32 @@ const Dialog = (props) => {
         e.stopPropagation();
     };
 
+    const acceptHandler = () => {
+        if (props.config.onAccept) props.config.onAccept();
+        props.setDialog({ ...props.config, visible: false });
+    };
+
+    const rejectHandler = () => {
+        if (props.config.onReject) props.config.onReject();
+        props.setDialog({ ...props.config, visible: false });
+    };
+
+    const cancelHandler = () => {
+        if (props.config.onCancel) props.config.onCancel();
+        props.setDialog({ ...props.config, visible: false });
+    };
+
     return (
         <div>
             {props.config.visible && (
-                <div style={style.backDrop} onClick={props.config.onCancel}>
+                <div style={style.backDrop} onClick={cancelHandler}>
                     <div style={style.dialogBox} onClick={noAction}>
-                        <div style={style.header}>{props.children}</div>
+                        <div style={style.header}>
+                            {props.config.message || props.children}
+                        </div>
                         <div style={style.buttons}>
-                            <Button onClick={props.config.onAccept}>
-                                {accept}
-                            </Button>
-                            <Button onClick={props.config.onReject}>
-                                {reject}
-                            </Button>
+                            <Button onClick={acceptHandler}>{accept}</Button>
+                            <Button onClick={rejectHandler}>{reject}</Button>
                         </div>
                     </div>
                 </div>

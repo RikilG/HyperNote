@@ -2,8 +2,43 @@ const path = require("path");
 const { app, BrowserWindow, protocol } = require("electron");
 
 let mainWindow;
+let authWindow;
 
-function createWindow() {
+function createAuthWindow(authUrl) {
+    authWindow = new BrowserWindow({
+        width: 600,
+        height: 800,
+        show: false,
+        parent: mainWindow,
+        modal: true,
+        "node-integration": false,
+        "web-security": false,
+    });
+
+    authWindow.loadURL(authUrl);
+    authWindow.on("ready-to-show", function () {
+        authWindow.show();
+        authWindow.focus();
+    });
+    // 'will-navigate' is an event emitted when the window.location changes
+    // newUrl should contain the tokens you need
+    // 'will-redirect' used here as will-navigate was not working for dropbox
+    authWindow.webContents.on("will-redirect", function (event, newUrl) {
+        // More complex code to handle tokens goes here
+        if (newUrl.startsWith("http://localhost")) {
+            mainWindow.loadURL(newUrl);
+            authWindow.hide();
+            authWindow.close();
+            mainWindow.webContents.send("parse-args-invoke", newUrl);
+        }
+    });
+
+    authWindow.on("closed", function () {
+        authWindow = null;
+    });
+}
+
+function createMainWindow() {
     mainWindow = new BrowserWindow({
         title: "Hypernote",
         backgroundColor: "#202020",
@@ -29,6 +64,12 @@ function createWindow() {
         mainWindow.show();
         mainWindow.focus();
     });
+
+    mainWindow.webContents.on("will-navigate", function (event, newUrl) {
+        // More complex code to handle tokens goes here
+        event.preventDefault();
+        createAuthWindow(newUrl);
+    });
 }
 
 app.on("ready", () => {
@@ -38,7 +79,7 @@ app.on("ready", () => {
         const url = request.url.substr(12); // all urls start with 'file://'
         callback({ path: path.normalize(`${path.dirname(__dirname)}/${url}`) });
     });
-    createWindow();
+    createMainWindow();
 });
 
 const requestHandler = require("./requestHandler");
@@ -52,7 +93,7 @@ app.on("window-all-closed", function () {
 
 app.on("activate", function () {
     if (mainWindow === null) {
-        createWindow();
+        createMainWindow();
     }
 });
 

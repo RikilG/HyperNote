@@ -1,11 +1,11 @@
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
-import Dialog, { showDialog, hideDialog } from "../ui/Dialog";
+import Dialog from "../ui/Dialog";
 import Appearance from "./Appearance";
 import Core from "./Core";
 import Modal from "../ui/Modal";
-import UserPreferences from "../storage/UserPreferences";
+import StorageContext from "../storage/StorageContext";
 import "../css/Settings.css";
 
 const style = {
@@ -29,6 +29,7 @@ const style = {
 };
 
 const Settings = (props) => {
+    const { userPreferences } = useContext(StorageContext);
     let categories = ["Appearance", "Core", "Editor", "About"];
     let [currentCategory, setCurrentCategory] = useState(categories[0]);
     const [dialog, setDialog] = useState({
@@ -39,19 +40,14 @@ const Settings = (props) => {
     });
 
     const handleDialog = () => {
-        showDialog(
-            () => {
+        setDialog({
+            visible: true,
+            onAccept: () => {
                 handleResetDefaults();
-                hideDialog(setDialog);
-            }, // onAccept
-            () => {
-                hideDialog(setDialog);
-            }, // onReject
-            () => {
-                hideDialog(setDialog);
-            }, // onCancel
-            setDialog // pass the function which changes the dialog properties
-        );
+            },
+            onReject: () => {},
+            onCancel: () => {},
+        });
     };
 
     const setCategory = (e) => {
@@ -70,7 +66,7 @@ const Settings = (props) => {
     };
 
     const handleResetDefaults = () => {
-        UserPreferences.resetDefaults();
+        userPreferences.resetDefaults();
         props.onExit();
         toast.warning(
             'Application restart required ("Reload App" from settings)',
@@ -121,7 +117,9 @@ const Settings = (props) => {
                 </div>
                 <div style={style.categoryOptions}>{loadCurrentCategory()}</div>
             </div>
-            <Dialog config={dialog}>Reset defaults?</Dialog>
+            <Dialog config={dialog} setDialog={setDialog}>
+                Reset defaults?
+            </Dialog>
         </Modal>
     );
 };
