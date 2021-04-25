@@ -92,12 +92,12 @@ const Textbox = (props) => {
             handleCancelWrapper("click");
         };
 
-        document.addEventListener("mousedown", handleClick);
+        if (props.visible) document.addEventListener("mousedown", handleClick);
         return () => {
             // return function to be called when unmounted
             document.removeEventListener("mousedown", handleClick);
         };
-    }, [handleCancelWrapper, setVisible]);
+    }, [handleCancelWrapper, setVisible, props.visible]);
 
     useEffect(() => {
         // run on componentDidMount!

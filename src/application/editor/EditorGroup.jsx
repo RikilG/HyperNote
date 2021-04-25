@@ -27,9 +27,11 @@ const EditorGroup = (props) => {
 
     useEffect(() => {
         if (props.fileObj) {
-            setValue(fileSystem.readFile(props.fileObj.path));
+            fileSystem
+                .readFile(props.fileObj.path)
+                .then((data) => setValue(data));
         }
-    }, [props.fileObj]); // runs ony once, componentDidMount or when props change
+    }, [props.fileObj, fileSystem]); // runs ony once, componentDidMount or when props change
 
     const handleTextChange = (text) => {
         setValue(text);
@@ -45,8 +47,11 @@ const EditorGroup = (props) => {
         if (!modified) {
             return;
         } else {
-            fileSystem.writeFile(props.fileObj.path, value);
-            toast("File saved successfully!");
+            fileSystem.writeFile(props.fileObj.path, value).then((data) => {
+                if (data && data.status !== 200) {
+                    toast.error("ERROR WHILE SAVING FILE TO DROPBOX");
+                } else toast("File saved successfully!");
+            });
         }
     };
 

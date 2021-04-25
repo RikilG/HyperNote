@@ -6,6 +6,7 @@ export default class LocalStorageHelper {
     // set in preload.js
     fs = isElectron && window.require("fs");
     path = isElectron && window.require("path");
+    localStorageBasePath = "";
     static instance;
 
     static getInstance() {
@@ -17,6 +18,15 @@ export default class LocalStorageHelper {
     }
 
     generateTree(base, root) {
+        /**
+         * tree = {
+         *   id,
+         *   path,
+         *   name,
+         *   type,
+         *   subtree,
+         * }
+         */
         if (!isElectron) return;
         const fullPath = this.join(base, root);
         let stats;
@@ -43,7 +53,9 @@ export default class LocalStorageHelper {
             try {
                 tree.subtree = this.fs
                     .readdirSync(fullPath)
-                    .map((child) => this.getTree(base, root + "/" + child));
+                    .map((child) =>
+                        this.getTreeWrapper(base, root + "/" + child)
+                    );
             } catch (err) {
                 console.log(err);
                 toast.error("FAILED TO RETRIVE SUB-TREE", {
@@ -63,7 +75,7 @@ export default class LocalStorageHelper {
         return tree;
     }
 
-    getTree(base, root) {
+    getTreeWrapper(base, root) {
         if (!isElectron) return;
         let tree = this.generateTree(base, root);
         let obj = [tree];
@@ -86,8 +98,13 @@ export default class LocalStorageHelper {
         return obj[0];
     }
 
+    getTree(root) {
+        return this.getTreeWrapper(this.localStorageBasePath, root);
+    }
+
     readFile(filepath) {
         if (!isElectron) return;
+        filepath = this.localStorageBasePath + filepath;
         try {
             return this.fs.readFileSync(filepath, { encoding: "utf-8" });
         } catch (err) {
@@ -99,6 +116,7 @@ export default class LocalStorageHelper {
 
     writeFile(filepath, content) {
         if (!isElectron) return;
+        filepath = this.localStorageBasePath + filepath;
         try {
             return this.fs.writeFileSync(filepath, content);
         } catch (err) {
@@ -109,6 +127,7 @@ export default class LocalStorageHelper {
 
     exists(filepath) {
         if (!isElectron) return;
+        filepath = this.localStorageBasePath + filepath;
         try {
             return this.fs.existsSync(filepath);
         } catch (err) {
@@ -119,6 +138,7 @@ export default class LocalStorageHelper {
 
     newDirectory(folderpath) {
         if (!isElectron) return;
+        folderpath = this.localStorageBasePath + folderpath;
         if (!this.exists(folderpath)) {
             try {
                 this.fs.mkdirSync(folderpath);
@@ -131,6 +151,7 @@ export default class LocalStorageHelper {
 
     newFile(filepath) {
         if (!isElectron) return;
+        filepath = this.localStorageBasePath + filepath;
         if (!this.exists(filepath)) {
             try {
                 this.writeFile(filepath, "");
@@ -163,6 +184,8 @@ export default class LocalStorageHelper {
     }
 
     rename(oldpath, newpath) {
+        oldpath = this.localStorageBasePath + oldpath;
+        newpath = this.localStorageBasePath + newpath;
         if (!isElectron) return;
         try {
             this.fs.renameSync(oldpath, newpath);
@@ -179,6 +202,7 @@ export default class LocalStorageHelper {
 
     delete(filepath) {
         if (!isElectron) return;
+        filepath = this.localStorageBasePath + filepath;
         try {
             const stats = this.fs.lstatSync(filepath);
             if (stats.isDirectory()) {

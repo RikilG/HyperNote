@@ -26,6 +26,7 @@ import TreeTextbox from "./TreeTextbox";
 import ContextMenu from "../ui/ContextMenu";
 import StorageContext from "../storage/StorageContext";
 import { ExplorerContext } from "./Explorer";
+import { toast } from "react-toastify";
 
 const styles = {
     treeItem: {
@@ -99,8 +100,14 @@ const TreeItem = (props) => {
             name: "delete",
             icon: faTrash,
             action: () => {
-                fileSystem.delete(props.path);
-                refreshTree();
+                fileSystem.delete(props.path).then((data) => {
+                    if (data && data.status !== 200) {
+                        toast.error("Unable to delete");
+                    } else {
+                        toast("Deleted successfully");
+                        refreshTree();
+                    }
+                });
             },
         },
     ];

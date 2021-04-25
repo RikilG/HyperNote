@@ -57,7 +57,7 @@ const TimePicker = ({ initialValue, setTime }) => {
         } else {
             typeRef.current.value = "hrs";
         }
-    }, []);
+    }, [userPreferences]);
 
     return (
         <div style={style.container}>

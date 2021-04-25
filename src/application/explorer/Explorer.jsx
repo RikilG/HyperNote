@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
 import Tree from "./Tree";
 import TreeToolbar from "./TreeToolbar";
@@ -17,6 +17,10 @@ const style = {
         padding: "0.2rem 0.6rem",
         color: "var(--primaryColor)",
     },
+    storage: {
+        padding: "0.1rem 0.6rem",
+        margin: "0.2rem 0.6rem",
+    },
     tree: {
         // height: "calc(var(--windowHeight) - 150px)",
         overflowY: "auto",
@@ -30,25 +34,45 @@ const ExplorerContext = React.createContext({
 });
 
 const Explorer = (props) => {
-    const { fileSystem, userPreferences } = useContext(StorageContext);
+    const { fileSystem, storage, setStorage } = useContext(StorageContext);
     const { openWindow } = useContext(WindowContext);
     let [tree, setTree] = useState({});
 
-    const refreshTree = () => {
-        // TODO: make getTree() async to remove file system parsing from main thread
+    const refreshTree = useCallback(() => {
+        setTree({ subtree: [{ name: "....LOADING....", type: "file" }] });
+        // TODO: as getTree() is async, have a loading symbol
         // TODO: modify prevTree from setTree (using func syntax of setState) to reduce disk load
         // TODO: sort the resulting tree to show folders first and next files
-        setTree(fileSystem.getTree());
-    };
+        fileSystem.getTree().then((tree) => {
+            setTree(tree);
+        });
+    }, [fileSystem]);
 
     useEffect(() => {
         refreshTree();
-    }, []);
+    }, [storage, refreshTree]);
 
     return (
         <div style={style.explorer}>
             <ExplorerContext.Provider value={{ refreshTree }}>
                 <div style={style.header}>Explorer</div>
+                <select
+                    style={style.storage}
+                    onChange={(event) => setStorage(event.target.value)}
+                    defaultValue={storage}
+                >
+                    {Object.entries(fileSystem.storageInfo).map(
+                        ([device, value]) => {
+                            return (
+                                value.connected && (
+                                    <option key={device} value={device}>
+                                        {value.name}
+                                    </option>
+                                )
+                            );
+                        }
+                    )}
+                </select>
                 <TreeToolbar path={tree.path} />
                 <div style={style.tree}>
                     <Tree

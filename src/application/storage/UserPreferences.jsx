@@ -12,7 +12,7 @@ export default class UserPreferences {
         theme: "material",
         noteStorage: isElectron && path.join(dataPath, "noteStorage"),
         preferredTimeFormat: "12H",
-        dropboxIntegration: false,
+        dropboxIntegration: !window.isElectron,
         dropboxConfig: {},
     };
 

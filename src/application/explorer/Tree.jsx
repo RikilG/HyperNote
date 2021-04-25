@@ -44,9 +44,9 @@ const Tree = (props) => {
             <div className={props.root ? "" : "explorerTree"}>
                 {subtree &&
                     (props.root || expanded) &&
-                    subtree.map((element) => (
+                    Object.values(subtree).map((element) => (
                         <Tree
-                            key={element.id}
+                            key={"tree" + element.id}
                             treeObj={element}
                             openWindow={props.openWindow}
                         />

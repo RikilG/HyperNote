@@ -3,6 +3,7 @@ import { useContext } from "react";
 import Textbox from "../ui/Textbox";
 import StorageContext from "../storage/StorageContext";
 import { ExplorerContext } from "../explorer/Explorer";
+import { toast } from "react-toastify";
 
 const style = {
     container: {
@@ -27,10 +28,29 @@ const TreeTextbox = (props) => {
 
     const handleConfirm = (newName) => {
         if (newName && newName !== "") {
-            if (props.clickEvent === "file")
-                fileSystem.newFile(fileSystem.join(path, newName));
-            else fileSystem.newDirectory(fileSystem.join(path, newName));
-            refreshTree();
+            if (props.clickEvent === "file") {
+                fileSystem
+                    .newFile(fileSystem.join(path, newName))
+                    .then((data) => {
+                        if (data && data.status !== 200) {
+                            toast.error("Unable to create file");
+                        } else {
+                            toast("File created");
+                            refreshTree(); // TODO: edit file tree, don't refresh
+                        }
+                    });
+            } else {
+                fileSystem
+                    .newDirectory(fileSystem.join(path, newName))
+                    .then((data) => {
+                        if (data && data.status !== 200) {
+                            toast.error("Unable to create directory");
+                        } else {
+                            toast("Directory created");
+                            refreshTree(); // TODO: edit file tree, don't refresh
+                        }
+                    });
+            }
         }
     };
 
@@ -53,7 +73,6 @@ const TreeTextbox = (props) => {
                 case "csv":
                 case "svg":
                 case "rst":
-                case "rss":
                 case "xml":
                 case "ini":
                 case "json":
