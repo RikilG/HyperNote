@@ -37,7 +37,7 @@ export default class UserPreferences {
 
             if (this.fileSystem.exists(configPath))
                 this.preferences = JSON.parse(
-                    this.fileSystem.readFile(configPath)
+                    this.fileSystem.readFile(configPath, true)
                 );
             else {
                 this.preferences = UserPreferences.defaults;
@@ -76,7 +76,11 @@ export default class UserPreferences {
     }
 
     setPreferences() {
-        this.fileSystem.writeFile(configPath, JSON.stringify(this.preferences));
+        this.fileSystem.writeFile(
+            configPath,
+            JSON.stringify(this.preferences),
+            true
+        );
     }
 
     resetDefaults() {

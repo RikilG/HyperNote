@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 
 import Dialog from "../ui/Dialog";
+import Switch from "../ui/Switch";
 import Modal from "../ui/Modal";
 import StorageContext from "../storage/StorageContext";
 
@@ -32,14 +33,23 @@ const Settings = (props) => {
     const { fileSystem, userPreferences } = useContext(StorageContext);
     const [dialog, setDialog] = useState({});
 
-    const toggleDropboxConn = () => {
+    const toggleDropboxConn = (active, setActive) => {
+        if (!active) {
+            userPreferences.set("dropboxIntegration", false);
+            return;
+        }
         setDialog({
             onAccept: () => {
                 userPreferences.set("dropboxIntegration", true);
                 fileSystem.dropboxInit();
             },
-            onCancel: () => {},
-            onReject: () => {},
+            onReject: () => {
+                userPreferences.set("dropboxIntegration", false);
+                setActive(false);
+            },
+            onCancel: () => {
+                setActive((prev) => !prev); // go back to state before changing
+            },
             visible: true,
             message:
                 "Connect to dropbox? You may be redirected to sign-in page to authorize Hypernote to connect to your cloud storage.",
@@ -54,18 +64,32 @@ const Settings = (props) => {
                     <div style={style.subheader}>Dropbox</div>
                     <div style={style.table}>
                         <div>Status</div>
-                        <div onClick={toggleDropboxConn}>Not Connected</div>
+                        <div>
+                            <Switch
+                                initialActive={userPreferences.get(
+                                    "dropboxIntegration"
+                                )}
+                                label="Not Connected"
+                                onToggle={toggleDropboxConn}
+                            />
+                        </div>
                         <div>Sync</div>
-                        <div>Inactive</div>
+                        <div>
+                            <Switch label="Inactive" />
+                        </div>
                     </div>
                 </div>
                 <div style={style.subContainer}>
                     <div style={style.subheader}>Google Drive</div>
                     <div style={style.table}>
                         <div>Status</div>
-                        <div>Not Connected</div>
+                        <div>
+                            <Switch label="Not Connected" />
+                        </div>
                         <div>Sync</div>
-                        <div>Inactive</div>
+                        <div>
+                            <Switch label="Inactive" />
+                        </div>
                     </div>
                 </div>
             </div>

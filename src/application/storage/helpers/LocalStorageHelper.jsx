@@ -102,9 +102,9 @@ export default class LocalStorageHelper {
         return this.getTreeWrapper(this.localStorageBasePath, root);
     }
 
-    readFile(filepath) {
+    readFile(filepath, useAbsolutePath) {
         if (!isElectron) return;
-        filepath = this.localStorageBasePath + filepath;
+        if (!useAbsolutePath) filepath = this.localStorageBasePath + filepath;
         try {
             return this.fs.readFileSync(filepath, { encoding: "utf-8" });
         } catch (err) {
@@ -114,9 +114,9 @@ export default class LocalStorageHelper {
         }
     }
 
-    writeFile(filepath, content) {
+    writeFile(filepath, content, useAbsolutePath) {
         if (!isElectron) return;
-        filepath = this.localStorageBasePath + filepath;
+        if (!useAbsolutePath) filepath = this.localStorageBasePath + filepath;
         try {
             return this.fs.writeFileSync(filepath, content);
         } catch (err) {
