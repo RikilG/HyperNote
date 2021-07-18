@@ -2,6 +2,7 @@ package hypernote
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -9,9 +10,12 @@ import (
 )
 
 
+var ErrNotExist = errors.New("specified path does not exist")
+
 type StorageApi interface {
 	GetTree(w http.ResponseWriter, r *http.Request)
 	GetProfiles(w http.ResponseWriter, r *http.Request)
+	CreateProfile(w http.ResponseWriter, r *http.Request)
 }
 
 type Storage struct {
@@ -22,25 +26,53 @@ func (s *Storage) GetTree(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "StorageTree")
 }
 
-func (s *Storage) GetProfiles(w http.ResponseWriter, r *http.Request) {
-	var testProfiles []Profile
-	var err error
-	profilesName := "profiles.json"
-	defaultProfilesBytes, _ := json.Marshal(make([]Profile, 0))
-
-	w.Header().Set("Content-Type", "application/json")
-	createFileIfNotExist(s.Fs, profilesName, defaultProfilesBytes)
-	dataBytes, err := afero.ReadFile(s.Fs, profilesName)
+func (s *Storage) GetProfiles(w http.ResponseWriter, r *http.Request) {	
+	profiles, err := getProfilesFromProfileConfig(s.Fs)
 	if err != nil {
-		w.Write(getJsonError(err))
+		writeError(w, err)
 		return
 	}
-	err = json.Unmarshal(dataBytes, &testProfiles)
+	dataBytes, err := json.Marshal(profiles)
 	if err != nil {
-		w.Write(getJsonError(err))
+		writeError(w, err)
 	} else {
-		w.Write(dataBytes)
+		writeData(w, dataBytes, http.StatusOK)
 	}
+}
+
+func (s *Storage) CreateProfile(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var profile Profile
+	err := decoder.Decode(&profile)
+	if err != nil {
+		writeError(w, err)
+	} else {
+		if profile.Path != "" {
+			exists, err := afero.DirExists(afero.NewOsFs(), profile.Path)
+			if err != nil {
+				writeError(w, err)
+				return
+			}
+			if !exists {
+				writeError(w, ErrNotExist)
+				return
+			}
+		} else { // if path is == "", then create in AppData/HyperNote/storage
+			createDirIfNotExist(s.Fs, profile.Name)
+		}
+		createNewProfile(s.Fs, profile)
+	}
+}
+
+func writeData(w http.ResponseWriter, data []byte, statusCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(data)
+}
+
+func writeError(w http.ResponseWriter, err error) {
+	errData, _ := json.Marshal(BackendError{ err.Error() })
+	writeData(w, errData, http.StatusBadRequest)
 }
 
 func createDirIfNotExist(fs afero.Fs, path string) error {
