@@ -54,5 +54,6 @@ func setupRouter(s *HyperNoteServer) *mux.Router {
 	router.HandleFunc("/api/storage/GetTree", s.storage.GetTree)
 	router.HandleFunc("/api/storage/GetProfiles", s.storage.GetProfiles)
 	router.HandleFunc("/api/storage/CreateProfile", s.storage.CreateProfile)
+	router.HandleFunc("/api/storage/DeleteProfile", s.storage.DeleteProfile)
 	return router
 }

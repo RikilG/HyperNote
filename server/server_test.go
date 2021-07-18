@@ -1,10 +1,19 @@
 package hypernote_test
 
 import (
+	"hypernote"
 	"net/http"
 	"testing"
+
+	"github.com/spf13/afero"
 )
 
+
+func TestNewHyperNoteServer(t *testing.T) {
+	appDataFs := afero.NewMemMapFs()
+	_, err := hypernote.NewHyperNoteServer(appDataFs)
+	checkErr(t, err)
+}
 
 func TestEndpoints(t *testing.T) {
 	server := getServer(t)

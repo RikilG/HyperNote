@@ -10,12 +10,19 @@ import (
 )
 
 
-var ErrNotExist = errors.New("specified path does not exist")
+var (
+	ErrNotExist = errors.New("specified path does not exist")
+	ErrInvalidProfilePath = errors.New("the profile path is invalid")
+	ErrDuplicateProfile = errors.New("a profile already exists with the given name")
+	ErrInvalidProfileName = errors.New("invalid profile name given")
+	ErrDirNotEmpty = errors.New("given directory is not empty")
+)
 
 type StorageApi interface {
 	GetTree(w http.ResponseWriter, r *http.Request)
 	GetProfiles(w http.ResponseWriter, r *http.Request)
 	CreateProfile(w http.ResponseWriter, r *http.Request)
+	DeleteProfile(w http.ResponseWriter, r *http.Request)
 }
 
 type Storage struct {
@@ -41,27 +48,32 @@ func (s *Storage) GetProfiles(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Storage) CreateProfile(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
 	var profile Profile
-	err := decoder.Decode(&profile)
+	err := getJsonBody(r, &profile)
 	if err != nil {
 		writeError(w, err)
-	} else {
-		if profile.Path != "" {
-			exists, err := afero.DirExists(afero.NewOsFs(), profile.Path)
-			if err != nil {
-				writeError(w, err)
-				return
-			}
-			if !exists {
-				writeError(w, ErrNotExist)
-				return
-			}
-		} else { // if path is == "", then create in AppData/HyperNote/storage
-			createDirIfNotExist(s.Fs, profile.Name)
-		}
-		createNewProfile(s.Fs, profile)
+		return
 	}
+	
+	err = createNewProfile(s.Fs, profile)
+	if err != nil { writeError(w, err) }
+}
+
+func (s *Storage) DeleteProfile(w http.ResponseWriter, r *http.Request) {
+	var profile Profile
+	err := getJsonBody(r, &profile)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	
+	err = deleteProfile(s.Fs, profile)
+	if err != nil { writeError(w, err) }
+}
+
+func getJsonBody(r *http.Request, output interface{}) error {
+	decoder := json.NewDecoder(r.Body)
+	return decoder.Decode(&output)
 }
 
 func writeData(w http.ResponseWriter, data []byte, statusCode int) {
