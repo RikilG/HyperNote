@@ -2,6 +2,7 @@ package hypernote
 
 import (
 	"encoding/json"
+	"net/http"
 	"path/filepath"
 
 	"github.com/spf13/afero"
@@ -9,9 +10,53 @@ import (
 
 
 const profilesName = "profiles.json"
+
 type Profile struct {
 	Name string
 	Path string
+}
+
+type Profiles struct {
+	Fs afero.Fs
+}
+
+type ProfilesApi interface {
+	GetProfiles(w http.ResponseWriter, r *http.Request)
+	CreateProfile(w http.ResponseWriter, r *http.Request)
+	DeleteProfile(w http.ResponseWriter, r *http.Request)
+}
+
+func (p *Profiles) GetProfiles(w http.ResponseWriter, r *http.Request) {	
+	profiles, err := getProfilesFromProfileConfig(p.Fs)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeData(w, profiles, http.StatusOK)
+}
+
+func (p *Profiles) CreateProfile(w http.ResponseWriter, r *http.Request) {
+	var profile Profile
+	err := getJsonBody(r, &profile)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	
+	err = createNewProfile(p.Fs, profile)
+	if err != nil { writeError(w, err) }
+}
+
+func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
+	var profile Profile
+	err := getJsonBody(r, &profile)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	
+	err = deleteProfile(p.Fs, profile)
+	if err != nil { writeError(w, err) }
 }
 
 func getProfilesFromProfileConfig(fs afero.Fs) (profiles []Profile, err error) {

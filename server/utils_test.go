@@ -1,9 +1,9 @@
 package hypernote_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"hypernote"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -25,8 +25,9 @@ func newGetRequest(url string) *http.Request {
 	return request
 }
 
-func newPostRequest(url string, body io.Reader) *http.Request {
-	request, _ := http.NewRequest(http.MethodPost, url, body)
+func newPostRequest(url string, body []byte) *http.Request {
+	bodyReader := bytes.NewReader(body)
+	request, _ := http.NewRequest(http.MethodPost, url, bodyReader)
 	return request
 }
 
