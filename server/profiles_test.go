@@ -85,10 +85,9 @@ func TestCreateProfile(t *testing.T) {
 
 		request := newPostRequest("/api/profiles/CreateProfile", newProfileData)
 		response := getResponse(server, request)
-		backendError := getErrorFromResponse(t, response)
 
 		assertJsonBody(t, response)
-		assertError(t, hypernote.ErrNotExist, backendError)
+		assertError(t, hypernote.ErrNotExist, response)
 		assertStatusCode(t, http.StatusBadRequest, response.Code)
 	})
 
@@ -98,10 +97,9 @@ func TestCreateProfile(t *testing.T) {
 		profileData := createTestProfile(server, profileName)
 		request := newPostRequest("/api/profiles/CreateProfile", profileData)
 		response := getResponse(server, request)
-		err := getErrorFromResponse(t, response)
 
 		assertStatusCode(t, http.StatusBadRequest, response.Code)
-		assertError(t, hypernote.ErrDuplicateProfile, err)
+		assertError(t, hypernote.ErrDuplicateProfile, response)
 	})
 }
 

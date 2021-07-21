@@ -16,6 +16,7 @@ var (
 	ErrDuplicateProfile = errors.New("a profile already exists with the given name")
 	ErrInvalidProfileName = errors.New("invalid profile name given")
 	ErrDirNotEmpty = errors.New("given directory is not empty")
+	ErrProfileNotLoaded = errors.New("profile is not loaded")
 )
 
 type BackendError struct {
@@ -46,12 +47,16 @@ func (s *HyperNoteServer) handleApi(w http.ResponseWriter, r *http.Request) {
 func NewHyperNoteServer(appDataFs afero.Fs) (*HyperNoteServer, error) {
 	config, err := GetConfigFromAppData(appDataFs)
 	if err != nil { return nil, err }
+	storageFs := afero.NewBasePathFs(appDataFs, config.StoragePath)
 
 	s := new(HyperNoteServer)
 	s.profiles = &Profiles{
-		Fs: afero.NewBasePathFs(appDataFs, config.StoragePath),
+		Fs: storageFs,
 	}
-	s.storage = &Storage{}
+	s.storage = &Storage{
+		storageFs: storageFs,
+		profileFs: nil,
+	}
 	s.Handler = setupRouter(s)
 	return s, nil
 }
@@ -65,6 +70,7 @@ func setupRouter(s *HyperNoteServer) *mux.Router {
 	router.HandleFunc("/api/profiles/GetProfiles", s.profiles.GetProfiles)
 	router.HandleFunc("/api/profiles/CreateProfile", s.profiles.CreateProfile)
 	router.HandleFunc("/api/profiles/DeleteProfile", s.profiles.DeleteProfile)
+	router.HandleFunc("/api/storage/LoadProfile", s.storage.LoadProfile)
 	router.HandleFunc("/api/storage/GetTree", s.storage.GetTree)
 	return router
 }

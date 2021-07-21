@@ -69,17 +69,17 @@ func getProfilesFromProfileConfig(fs afero.Fs) (profiles []Profile, err error) {
 	return
 }
 
-func createNewProfile(fs afero.Fs, profile Profile) error {
-	contains := func(profiles []Profile, profile Profile) bool {
-		for _, p := range profiles {
-			if p.Name == profile.Name { return true }
-		}
-		return false
+func contains(profiles []Profile, profile Profile) (bool, int) {
+	for i, p := range profiles {
+		if p.Name == profile.Name { return true, i }
 	}
+	return false, -1
+}
 
+func createNewProfile(fs afero.Fs, profile Profile) error {
 	profiles, err := getProfilesFromProfileConfig(fs)
 	if err != nil { return err }
-	if contains(profiles, profile) {
+	if output, _ := contains(profiles, profile); output {
 		return ErrDuplicateProfile
 	}
 

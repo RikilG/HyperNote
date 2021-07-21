@@ -20,6 +20,30 @@ func getServer(t testing.TB) (*hypernote.HyperNoteServer) {
 	return server
 }
 
+func getServerWithTestProfiles(t testing.TB, profileList []string) (*hypernote.HyperNoteServer, afero.Fs) {
+	t.Helper()
+	var profiles = make([]hypernote.Profile, 0)
+	storagePath := "HyperNote/storage"
+	configPath := "HyperNote/config.json"
+	profilesPath := storagePath + "/profiles.json"
+	appDataFs := afero.NewMemMapFs()
+
+	appDataFs.MkdirAll(storagePath, 0755)
+	defaultConfigBytes, err := json.Marshal(hypernote.Config{StoragePath: storagePath})
+	checkErr(t, err)
+	afero.WriteFile(appDataFs, configPath, defaultConfigBytes, 0755)
+	for _, profile := range profileList {
+		appDataFs.MkdirAll(storagePath + "/" + profile + "/assets", 0755)
+		profiles = append(profiles, hypernote.Profile{profile, ""})
+	}
+	profileConfigBytes, err := json.Marshal(profiles)
+	checkErr(t, err)
+	afero.WriteFile(appDataFs, profilesPath, profileConfigBytes, 0755)
+	server, err := hypernote.NewHyperNoteServer(appDataFs)
+	if err != nil { t.Fatal("Error while creating server", err.Error()) }
+	return server, afero.NewBasePathFs(appDataFs, storagePath)
+}
+
 func newGetRequest(url string) *http.Request {
 	request, _ := http.NewRequest(http.MethodGet, url, nil)
 	return request
@@ -71,10 +95,11 @@ func assertJsonBody(t testing.TB, response *httptest.ResponseRecorder) {
 	assertString(t, "application/json", response.Header().Get("Content-Type"))
 }
 
-func assertError(t testing.TB, expected error, got hypernote.BackendError) {
+func assertError(t testing.TB, expected error, response *httptest.ResponseRecorder) {
 	t.Helper()
-	if expected.Error() != got.Error {
-		t.Errorf("Expected %q, got %q", expected.Error(), got.Error)
+	err := getErrorFromResponse(t, response)
+	if expected.Error() != err.Error {
+		t.Errorf("Expected %q, got %q", expected.Error(), err.Error)
 	}
 }
 
